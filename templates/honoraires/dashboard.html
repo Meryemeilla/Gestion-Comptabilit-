@@ -1,0 +1,252 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Tableau de bord Honoraires - Cabinet Comptable{% endblock %}
+
+{% block breadcrumb %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    .sf-breadcrumb-container {
+        background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1rem;
+    }
+
+    .sf-breadcrumb {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+</style>
+<nav aria-label="breadcrumb" class="sf-breadcrumb-container">
+    <ol class="breadcrumb sf-breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dashboard' %}">
+                <i class="bi bi-speedometer2 mr-1"></i>
+                Tableau de bord
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="bi bi-cash-stack mr-1"></i>
+            Honoraires
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<style>
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .sf-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.15);
+    }
+    
+    .sf-card-header {
+        background-color: white;
+        color: var(--sf-blue);
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .sf-card-title {
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .sf-card-icon {
+        font-size: 1.75rem;
+        color: var(--sf-blue);
+        opacity: 0.7;
+    }
+    
+    .sf-card-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--sf-dark-blue);
+    }
+    
+    .sf-card-label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+    }
+    
+    .sf-btn-secondary {
+        background-color: white;
+        color: var(--sf-blue);
+        border: 1px solid var(--sf-blue);
+    }
+    
+    .sf-btn-secondary:hover {
+        background-color: var(--sf-light-bg);
+        color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-dark-blue {
+        background-color: var(--sf-dark-blue);
+        color: white;
+        border: 1px solid var(--sf-dark-blue);
+    }
+    
+    .sf-btn-dark-blue:hover {
+        background-color: #244872;
+        color: white;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- En-tête de page -->
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-cash-stack mr-2"></i>
+            Tableau de bord Honoraires
+        </h1>
+    </div>
+
+    <div class="row">
+        <!-- Honoraires Card -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card sf-card h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="sf-card-label">Honoraires</div>
+                            <div class="sf-card-value">Gestion des honoraires</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-euro-sign sf-card-icon"></i>
+                        </div>
+                    </div>
+                    <div class="row no-gutters align-items-center mt-3">
+                        <div class="col-auto">
+                            <a href="{% url 'honoraires:honoraire_list' %}" class="btn sf-btn-dark-blue">
+                                <i class="bi bi-box-arrow-in-right mr-2"></i>Accéder
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Honoraires PV Card -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card sf-card h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="sf-card-label">Honoraires PV</div>
+                            <div class="sf-card-value">Gestion des honoraires PV</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-invoice sf-card-icon"></i>
+                        </div>
+                    </div>
+                    <div class="row no-gutters align-items-center mt-3">
+                        <div class="col-auto">
+                            <a href="{% url 'honoraires:honoraire_pv_list' %}" class="btn sf-btn-dark-blue">
+                                <i class="bi bi-box-arrow-in-right mr-2"></i>Accéder
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Règlements Card -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card sf-card h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="sf-card-label">Règlements</div>
+                            <div class="sf-card-value">Gestion des règlements</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-receipt sf-card-icon"></i>
+                        </div>
+                    </div>
+                    <div class="row no-gutters align-items-center mt-3">
+                        <div class="col-auto">
+                            <a href="{% url 'honoraires:reglement_list' %}" class="btn sf-btn-dark-blue">
+                                <i class="bi bi-box-arrow-in-right mr-2"></i>Accéder
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12 text-right">
+            <a href="{% url 'cabinet:dashboard' %}" class="btn sf-btn-secondary">
+                <i class="bi bi-arrow-left-circle mr-2"></i> Retour au Tableau de bord principal
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

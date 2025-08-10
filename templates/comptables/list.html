@@ -1,0 +1,580 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Comptables - Cabinet Comptable{% endblock %}
+
+{% block breadcrumb %}
+<style>
+   .sf-breadcrumb {
+        background: linear-gradient(to right, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-size: 0.93rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.1rem;
+        padding: 0 0.6rem;
+        font-weight: bold;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        background-color: rgba(54, 96, 146, 0.08);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item a i {
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active i {
+        color: var(--sf-gold);
+    }
+     /* Classes utilitaires */
+    .text-sf-blue { color: var(--sf-blue); }
+    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
+    .text-sf-gold { color: var(--sf-gold); }
+</style>
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb sf-breadcrumb" style="background-color: transparent; padding: 0.75rem 0; margin: 0;">
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dashboard' %}" 
+               style="text-decoration: none; color: #366092; transition: color 0.2s; display: inline-flex; align-items: center;"
+               onmouseover="this.style.color='#2c5282'" 
+               onmouseout="this.style.color='#366092'">
+                <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page" 
+            style="color: #d4af37; font-weight: 500; display: inline-flex; align-items: center;">
+            <i class="bi bi-person-vcard me-2"></i>Comptables
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .sf-form-label {
+        font-weight: 600;
+        color: var(--sf-dark-blue);
+        margin-bottom: 0.5rem;
+    }
+    
+    .sf-form-control {
+        border-radius: 0.35rem;
+        border: 1px solid #d1d3e2;
+        padding: 0.75rem 1rem;
+        transition: border-color 0.3s;
+    }
+    
+    .sf-form-control:focus {
+        border-color: var(--sf-blue);
+        box-shadow: 0 0 0 0.2rem rgba(54, 96, 146, 0.25);
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-primary:hover {
+        background-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+    
+    .search-box {
+        position: relative;
+    }
+    
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+    
+    .search-box input {
+        padding-left: 2.5rem;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(54, 96, 146, 0.05);
+    }
+    
+    .btn-square {
+        width: 2.5rem;
+        height: 2.5rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+    
+    .actions-group .btn {
+        margin: 0 2px;
+    }
+    /* Bouton de suppression personnalisé */
+   .modal-content {
+    border-radius: 12px;
+    overflow: hidden;
+    }
+
+    .modal-header {
+        padding: 1.2rem 1.5rem;
+        background-color: #f8f9fa;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        font-size: 1.05rem;
+        text-align: center;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem 1.5rem;
+        gap: 1rem;
+        border-top: none;
+        justify-content: center;
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+        transition: all 0.3s;
+        min-width: 100px;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+    }
+
+    .btn-danger {
+        transition: all 0.3s;
+        background-color: #dc3545;
+        border-color: #dc3545;
+        min-width: 120px;
+    }
+
+    .btn-danger:hover {
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+    }
+
+    .fa-exclamation-triangle {
+        color: #ffc107;
+    }
+     .sf-actions-group {
+        display: flex;
+        justify-content: center;
+        gap: 0.3rem;
+    }
+
+    .sf-btn-info {
+        background-color: #17a2b8;
+        border-color: #117a8b;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.35rem;
+        transition: all 0.3s;
+    }
+
+    .sf-btn-info:hover {
+        background-color: #138496;
+        border-color: #117a8b;
+        color: white;
+    }
+
+    .sf-btn-warning {
+        background-color: #ffc107;
+        border-color: #d39e00;
+        color: #212529;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.35rem;
+        transition: all 0.3s;
+    }
+
+    .sf-btn-warning:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+        color: #212529;
+    }
+
+    .sf-btn-danger {
+        background-color: #dc3545;
+        border-color: #bd2130;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.35rem;
+        transition: all 0.3s;
+    }
+
+    .sf-btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+        color: white;
+    }
+
+    .sf-actions-group .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- En-tête de page -->
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-person-badge mr-2"></i>
+            Gestion des comptables
+        </h1>
+        <div class="d-flex align-items-center">
+        <a href="{% url 'cabinet:comptable_create' %}" class="btn sf-btn-primary" style="color: white;">
+            <i class="bi bi-person-plus mr-2"></i> Nouveau comptable
+        </a>
+        <a href="{% url 'cabinet:dashboard' %}" class="btn sf-btn-secondary ml-2">
+            <i class="bi bi-x-circle mr-2"></i> Annuler
+        </a>
+        </div>
+    </div>
+</div>
+   <!-- Dans la partie Filtres et recherche -->
+    <div class="card sf-card shadow mb-4">
+        <div class="sf-card-header">
+            <h5 class="m-0 font-weight-bold">
+                <i class="bi bi-funnel me-2"></i>Filtres et recherche
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" class="form-control sf-form-control" name="search" 
+                            placeholder="Rechercher par nom, prénom, matricule ou email..."
+                            value="{{ request.GET.search }}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn sf-btn-outline w-100">
+                        <i class="bi bi-search mr-2"></i> Rechercher
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'cabinet:export_excel' 'comptables' %}" class="btn" style="border-color: #28a745; color: #28a745;">
+                            <i class="bi bi-file-earmark-excel mr-2" style="color: #28a745;"></i> Export Excel
+                        </a>
+                        {% if request.GET.search %}
+                        <a href="{% url 'cabinet:comptable_list' %}" class="btn sf-btn-outline">
+                            <i class="bi bi-x mr-2"></i> Effacer
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Liste des comptables -->
+    <div class="card sf-card shadow">
+        <div class="sf-card-header d-flex justify-content-between align-items-center">
+            <h5 class="m-0 font-weight-bold">
+                <i class="bi bi-people me-2"></i>Liste des comptables ({{ comptables|length }})
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            {% if comptables %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Matricule</th>
+                            <th>Nom complet</th>
+                            <th>Téléphone principal</th>
+                            <th>Email</th>
+                            <th class="text-center">Dossiers PM</th>
+                            <th class="text-center">Dossiers PP</th>
+                            <th class="text-center">Total</th>
+                            <th class="text-center">Statut</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for comptable in comptables %}
+                        <tr>
+                            <td><strong>{{ comptable.matricule }}</strong></td>
+                            <td>
+                                <strong>{{ comptable.nom_complet }}</strong>
+                                {% if comptable.cnss %}<br><small class="text-muted">CNSS: {{ comptable.cnss }}</small>{% endif %}
+                            </td>
+                            <td>
+                                {% if comptable.tel %}
+                                <i class="bi bi-telephone me-1"></i>{{ comptable.tel }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if comptable.email %}
+                                <i class="bi bi-envelope me-1"></i>{{ comptable.email }}
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-primary">{{ comptable.nbre_pm_count }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-info">{{ comptable.nbre_et_count }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary">{{ comptable.nbre_pm_count|add:comptable.nbre_et_count  }}</span>
+                            </td>
+                            <td class="text-center">
+                                {% if comptable.actif %}
+                                <span class="badge bg-success">Actif</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inactif</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="sf-actions-group">
+                                    <a href="{% url 'cabinet:comptable_detail' comptable.pk %}" 
+                                    class="btn sf-btn-info btn-sm text-white"
+                                    title="Voir détails">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{% url 'cabinet:comptable_edit' comptable.pk %}" 
+                                    class="btn sf-btn-warning btn-sm"
+                                    title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" 
+                                            class="btn sf-btn-danger btn-sm text-white"
+                                            title="Supprimer"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deleteModal{{ comptable.pk }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-people" style="font-size: 4rem; color: #dee2e6;"></i>
+                <h5 class="mt-3 text-muted">Aucun comptable trouvé</h5>
+                <p class="text-muted">
+                    {% if request.GET.search %}
+                    Aucun résultat pour votre recherche "{{ request.GET.search }}".
+                    {% else %}
+                    Commencez par ajouter un nouveau comptable.
+                    {% endif %}
+                </p>
+                <a href="{% url 'cabinet:comptable_create' %}" class="btn sf-btn-primary" style="color: white;">
+                    <i class="bi bi-person-plus mr-2"></i> Ajouter un comptable
+                </a>
+
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                    <i class="bi bi-chevron-double-left"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+            </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- Tâches effectuées par l'utilisateur -->
+<!-- <div class="card sf-card shadow mt-4">
+    <div class="sf-card-header">
+        <h5 class="m-0 font-weight-bold">
+            <i class="bi bi-check2-circle me-2"></i> Tâches effectuées
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if taches_effectuees and taches_effectuees|length > 0 %}
+            <ul class="mb-0">
+                {% for tache in taches_effectuees %}
+                    <li>{{ tache }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <span class="text-muted">Aucune tâche effectuée récemment.</span>
+        {% endif %}
+    </div>
+</div> -->
+<!-- Modals de suppression -->
+{% for comptable in comptables %}
+<div class="modal fade" id="deleteModal{{ comptable.pk }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title text-dark fs-5 fw-bold">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="mb-0 text-center text-muted">
+                    Êtes-vous sûr de vouloir supprimer le comptable <strong>{{ comptable.nom_complet }}</strong> ({{ comptable.matricule }}) ?
+                </p>
+                 <p class="small text-center text-muted mt-2">
+                    <i class="fas fa-info-circle me-1"></i>Cette action est irréversible
+                </p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                    Annuler
+                </button>
+                <form action="{% url 'cabinet:comptable_delete' comptable.pk %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="fas fa-trash-alt me-2"></i>Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-focus sur le champ de recherche
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput && !searchInput.value) {
+            searchInput.focus();
+        }
+    });
+</script>
+{% endblock %}

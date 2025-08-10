@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">{% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} Suivi Forfaitaire</h2>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            {{ form.dossier.label_tag(attrs={"class": "form-label"}) }}
+            {{ form.dossier|add_class:"form-control" }}
+        </div>
+        <div class="mb-3">
+            {{ form.annee.label_tag(attrs={"class": "form-label"}) }}
+            {{ form.annee|add_class:"form-control" }}
+        </div>
+        <div class="mb-3">
+            {{ form.code_pp.label_tag(attrs={"class": "form-label"}) }}
+            {{ form.code_pp|add_class:"form-control" }}
+        </div>
+        
+        <div class="form-check mb-3">
+            {{ form.declaration_annuelle_effectuee|add_class:"form-check-input" }}
+            {{ form.declaration_annuelle_effectuee.label_tag(attrs={"class": "form-check-label"}) }}
+        </div>
+        <div class="form-check mb-3">
+            {{ form.paiement_annuel_effectue|add_class:"form-check-input" }}
+            {{ form.paiement_annuel_effectue.label_tag(attrs={"class": "form-check-label"}) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.acompte_1.label_tag(attrs={"class": "form-label"}) }}
+            {{ form.acompte_1|add_class:"form-control" }}
+        </div>
+        <div class="mb-3">
+            {{ form.acompte_2.label_tag(attrs={"class": "form-label"}) }}
+            {{ form.acompte_2|add_class:"form-control" }}
+        </div>
+        <div class="mb-3">
+            {{ form.acompte_3.label_tag(attrs={"class": "form-label"}) }}
+            {{ form.acompte_3|add_class:"form-control" }}
+        </div>
+        <div class="mb-3">
+            {{ form.acompte_4.label_tag(attrs={"class": "form-label"}) }}
+            {{ form.acompte_4|add_class:"form-control" }}
+        </div>
+
+        <div class="form-check mb-3">
+            {{ form.declaration_ir|add_class:"form-check-input" }}
+            {{ form.declaration_ir.label_tag(attrs={"class": "form-check-label"}) }}
+        </div>
+        <div class="form-check mb-3">
+            {{ form.declaration_9421|add_class:"form-check-input" }}
+            {{ form.declaration_9421.label_tag(attrs={"class": "form-check-label"}) }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a href="{% url 'fiscal:suiviforfaitaire_list' %}" class="btn btn-secondary ms-2">Annuler</a>
+    </form>
+</div>
+{% endblock %}

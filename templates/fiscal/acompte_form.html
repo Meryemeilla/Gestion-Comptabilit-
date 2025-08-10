@@ -1,0 +1,269 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} Acompte - Cabinet Comptable{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .sf-form-label {
+        font-weight: 600;
+        color: var(--sf-dark-blue);
+        margin-bottom: 0.5rem;
+    }
+    
+    .sf-form-control {
+        border-radius: 0.35rem;
+        border: 1px solid #d1d3e2;
+        padding: 0.75rem 1rem;
+        transition: border-color 0.3s;
+    }
+    
+    .sf-form-control:focus {
+        border-color: var(--sf-blue);
+        box-shadow: 0 0 0 0.2rem rgba(54, 96, 146, 0.25);
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-primary:hover {
+        background-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+    
+    /* Style pour les paragraphes du formulaire */
+    .card-body p {
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-body label {
+        font-weight: 600;
+        color: var(--sf-dark-blue);
+    }
+
+    /* Styles du fil d'ariane */
+    .sf-breadcrumb-container {
+        background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1rem;
+    }
+
+    .sf-breadcrumb {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Utility classes */
+    .text-sf-blue { color: var(--sf-blue); }
+    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
+    .text-sf-gold { color: var(--sf-gold); }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Fil d'ariane -->
+    <nav aria-label="breadcrumb" class="sf-breadcrumb-container">
+        <ol class="breadcrumb sf-breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'cabinet:dashboard' %}">
+                    <i class="bi bi-speedometer2"></i> Tableau de bord
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'fiscal:acompte_list' %}">
+                    <i class="bi bi-cash-stack"></i> Acomptes
+                </a>
+            </li>
+            <li class="breadcrumb-item active">
+                <i class="bi {% if form.instance.pk %}bi-pencil-square{% else %}bi-plus-circle{% endif %}"></i>
+                {% if form.instance.pk %}Modifier Acompte{% else %}Ajouter Acompte{% endif %}
+            </li>
+        </ol>
+    </nav>
+
+    <!-- En-tête de page -->
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-cash-stack mr-2"></i>
+            {% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} Acompte
+        </h1>
+        <p class="mb-0 text-muted">Formulaire pour {% if form.instance.pk %}modifier{% else %}ajouter{% endif %} un acompte.</p>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="card sf-card shadow mb-4">
+        <div class="sf-card-header">
+            <h5 class="m-0 font-weight-bold">
+                <i class="bi bi-info-circle mr-2"></i>
+                Informations de l'Acompte
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+               
+                
+                <!-- Affichage manuel des champs pour contrôler l'ordre et les labels -->
+                 <div class="sf-form-group">
+                    {{ form.code.label_tag }}
+                    {{ form.code }}
+                </div>
+                
+                <div class="sf-form-group">
+                    {{ form.dossier.label_tag }}
+                    {{ form.dossier }}
+                </div>
+                
+                
+                
+                <div class="sf-form-group">
+                    {{ form.annee.label_tag }}
+                    {{ form.annee }}
+                </div>
+                
+                <div class="sf-form-group">
+                    <label for="{{ form.is_montant.id_for_label }}">Montant IS:</label>
+                    {{ form.is_montant }}
+                </div>
+                
+                <div class="sf-form-group">
+                    {{ form.regularisation.label_tag }}
+                    {{ form.regularisation }}
+                </div>
+                
+                <div class="sf-form-group">
+                    {{ form.a1.label_tag }}
+                    {{ form.a1 }}
+                </div>
+                
+                <div class="sf-form-group">
+                    {{ form.a2.label_tag }}
+                    {{ form.a2 }}
+                </div>
+                
+                <div class="sf-form-group">
+                    {{ form.a3.label_tag }}
+                    {{ form.a3 }}
+                </div>
+                
+                <div class="sf-form-group">
+                    {{ form.a4.label_tag }}
+                    {{ form.a4 }}
+                </div>
+                
+                <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                    <a href="{% url 'fiscal:acompte_list' %}" class="btn sf-btn-outline mr-3">
+                        <i class="bi bi-x-circle mr-2"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn sf-btn-primary" style="color: white;">
+                        <i class="bi bi-save mr-2"></i> {% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Style des champs de formulaire
+        document.querySelectorAll('select, input, textarea').forEach(element => {
+            if (element.type !== 'checkbox' && element.type !== 'radio') {
+                element.classList.add('sf-form-control', 'form-control');
+            }
+        });
+        
+        // Style des labels
+        document.querySelectorAll('label').forEach(label => {
+            label.classList.add('sf-form-label');
+        });
+    });
+</script>
+{% endblock %}
