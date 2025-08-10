@@ -1,0 +1,191 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ document.reference }} - Cabinet Comptable{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:dashboard' %}">Tableau de bord</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:juridique_list' %}">Documents Juridiques</a></li>
+        <li class="breadcrumb-item active">{{ document.reference }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Détails du document juridique</h1>
+    <div>
+        <a href="{% url 'cabinet:juridique_update' document.id %}" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Modifier
+        </a>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            <i class="bi bi-trash"></i> Supprimer
+        </button>
+    </div>
+</div>
+
+<!-- Informations du document -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-file-earmark-text me-2"></i>Informations générales
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label text-muted">Référence</label>
+                        <p class="mb-0"><strong>{{ document.reference }}</strong></p>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted">Type</label>
+                        <p class="mb-0">{{ document.get_type_display }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted">Statut</label>
+                        <p class="mb-0">
+                            <span class="badge bg-{{ document.get_statut_color }}">
+                                {{ document.get_statut_display }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label class="form-label text-muted">Titre</label>
+                        <p class="mb-0">{{ document.titre }}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Date du document</label>
+                        <p class="mb-0">{{ document.date_document|date:"d/m/Y" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Date d'expiration</label>
+                        <p class="mb-0">
+                            {% if document.date_expiration %}
+                            {{ document.date_expiration|date:"d/m/Y" }}
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label class="form-label text-muted">Description</label>
+                        <p class="mb-0">
+                            {% if document.description %}
+                            {{ document.description|linebreaks }}
+                            {% else %}
+                            <span class="text-muted">Aucune description</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historique des modifications -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-clock-history me-2"></i>Historique des modifications
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="timeline p-4">
+                    {% for historique in document.historique.all %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">{{ historique.get_type_modification_display }}</h6>
+                            <p class="text-muted mb-0">{{ historique.description }}</p>
+                            <small class="text-muted">
+                                Par {{ historique.utilisateur }} le {{ historique.date_modification|date:"d/m/Y H:i" }}
+                            </small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-center text-muted py-3">Aucun historique disponible</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Informations du dossier -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-folder me-2"></i>Dossier associé
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6 class="mb-2">
+                    <a href="{% url 'cabinet:dossier_detail' document.dossier.id %}">
+                        {{ document.dossier.numero }} - {{ document.dossier.nom }}
+                    </a>
+                </h6>
+                <p class="text-muted mb-0">
+                    <small>Type: {{ document.dossier.get_type_display }}</small><br>
+                    <small>IF: {{ document.dossier.if }}</small><br>
+                    <small>Comptable: {{ document.dossier.comptable }}</small>
+                </p>
+            </div>
+        </div>
+
+        <!-- Document attaché -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-paperclip me-2"></i>Document attaché
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if document.fichier %}
+                <div class="text-center">
+                    <i class="bi bi-file-earmark-text display-4"></i>
+                    <p class="mt-2">{{ document.fichier.name|slice:"14:" }}</p>
+                    <a href="{{ document.fichier.url }}" class="btn btn-primary" target="_blank">
+                        <i class="bi bi-download"></i> Télécharger
+                    </a>
+                </div>
+                {% else %}
+                <div class="text-center text-muted">
+                    <i class="bi bi-file-earmark-x display-4"></i>
+                    <p class="mt-2">Aucun document attaché</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer le document <strong>{{ document.reference }}</strong> ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{% url 'cabinet:juridique_delete' document.id %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

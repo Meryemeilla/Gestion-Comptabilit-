@@ -1,0 +1,157 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+    {% if honoraire %}Modifier{% else %}Nouvel{% endif %} honoraire - Cabinet Comptable
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:dashboard' %}">Tableau de bord</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:honoraire_list' %}">Honoraires</a></li>
+        <li class="breadcrumb-item active">
+            {% if honoraire %}Modifier {{ honoraire.reference }}{% else %}Nouvel honoraire{% endif %}
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">
+        {% if honoraire %}
+        Modifier l'honoraire
+        {% else %}
+        Nouvel honoraire
+        {% endif %}
+    </h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="bi bi-cash me-2"></i>
+            {% if honoraire %}
+            Modification de l'honoraire {{ honoraire.reference }}
+            {% else %}
+            Création d'un nouvel honoraire
+            {% endif %}
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">Informations de l'honoraire</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="{{ form.dossier.id_for_label }}" class="form-label">Dossier concerné *</label>
+                                {{ form.dossier }}
+                                {% if form.dossier.errors %}
+                                <div class="invalid-feedback d-block">{{ form.dossier.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.date_pv.id_for_label }}" class="form-label">Date du PV *</label>
+                                {{ form.date_pv }}
+                                {% if form.date_pv.errors %}
+                                <div class="invalid-feedback d-block">{{ form.date_pv.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.type_pv.id_for_label }}" class="form-label">Type de PV *</label>
+                                {{ form.type_pv }}
+                                {% if form.type_pv.errors %}
+                                <div class="invalid-feedback d-block">{{ form.type_pv.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.montant.id_for_label }}" class="form-label">Montant du PV (DH) *</label>
+                                {{ form.montant }}
+                                {% if form.montant.errors %}
+                                <div class="invalid-feedback d-block">{{ form.montant.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                <div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.statut.id_for_label }}" class="form-label">Statut *</label>
+                                {{ form.statut }}
+                                {% if form.statut.errors %}
+                                <div class="invalid-feedback d-block">{{ form.statut.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 text-end">
+                <a href="{% url 'cabinet:honoraire_list' %}" class="btn btn-secondary me-2">
+                    <i class="bi bi-x-circle"></i> Annuler
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> 
+                    {% if honoraire %}Mettre à jour{% else %}Créer{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Ajouter la classe form-control à tous les champs du formulaire
+    document.querySelectorAll('input, select, textarea').forEach(function(element) {
+        element.classList.add('form-control');
+    });
+
+    // Ajouter la classe form-select aux éléments select
+    document.querySelectorAll('select').forEach(function(element) {
+        element.classList.remove('form-control');
+        element.classList.add('form-select');
+    });
+
+    // Configurer les champs de date
+    document.querySelectorAll('input[type="date"]').forEach(function(element) {
+        element.classList.add('form-control');
+    });
+
+    // Configurer le champ montant
+    const montantField = document.querySelector('#{{ form.montant.id_for_label }}');
+    if (montantField) {
+        montantField.setAttribute('step', '0.01');
+        montantField.setAttribute('min', '0');
+    }
+
+    // Ajuster la hauteur du textarea de description
+    const descriptionField = document.querySelector('#{{ form.description.id_for_label }}');
+    if (descriptionField) {
+        descriptionField.style.height = '100px';
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,447 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Événements Juridiques{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    .sf-breadcrumb-container {
+        background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1rem;
+    }
+
+    .sf-breadcrumb {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+    }
+    
+    .sf-table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .sf-table thead th {
+        background-color: var(--sf-light-bg);
+        color: var(--sf-dark-blue);
+        border-bottom: 2px solid var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-table tbody tr:hover {
+        background-color: rgba(54, 96, 146, 0.05);
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-primary:hover {
+        background-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-info {
+        background-color: #17a2b8;
+        border-color: #117a8b;
+    }
+    
+    .sf-btn-warning {
+        background-color: #ffc107;
+        border-color: #d39e00;
+        color: #212529;
+    }
+    
+    .sf-btn-danger {
+        background-color: #dc3545;
+        border-color: #bd2130;
+    }
+    
+    .badge-status {
+        padding: 0.35em 0.65em;
+        font-weight: 500;
+    }
+
+    /* Styles spécifiques pour la modal de suppression */
+    .modal-content {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        padding: 1.2rem 1.5rem;
+        background-color: #f8f9fa;
+        border-bottom: none;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        font-size: 1.05rem;
+        text-align: center;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem 1.5rem;
+        gap: 1rem;
+        border-top: none;
+        justify-content: center;
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+        transition: all 0.3s;
+        min-width: 100px;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+    }
+
+    .btn-danger {
+        transition: all 0.3s;
+        background-color: #dc3545;
+        border-color: #dc3545;
+        min-width: 120px;
+    }
+
+    .btn-danger:hover {
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+    }
+
+    .fa-exclamation-triangle {
+        color: #ffc107;
+    }
+
+    .sf-actions-group .btn {
+        margin-right: 0.3rem;
+        border-radius: 0.35rem;
+    }
+     .sf-actions-group {
+        display: flex;
+        justify-content: center;
+        gap: 0.3rem;
+    }
+
+    .sf-btn-info {
+        background-color: #17a2b8;
+        border-color: #117a8b;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.35rem;
+        transition: all 0.3s;
+    }
+
+    .sf-btn-info:hover {
+        background-color: #138496;
+        border-color: #117a8b;
+        color: white;
+    }
+
+    .sf-btn-warning {
+        background-color: #ffc107;
+        border-color: #d39e00;
+        color: #212529;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.35rem;
+        transition: all 0.3s;
+    }
+
+    .sf-btn-warning:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+        color: #212529;
+    }
+
+    .sf-btn-danger {
+        background-color: #dc3545;
+        border-color: #bd2130;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.35rem;
+        transition: all 0.3s;
+    }
+
+    .sf-btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+        color: white;
+    }
+
+    .sf-actions-group .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="sf-breadcrumb-container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb sf-breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'cabinet:dashboard' %}">
+                        <i class="bi bi-speedometer2"></i> Tableau de bord
+                    </a>
+                </li>
+                <li class="breadcrumb-item active">
+                    <i class="bi bi-calendar-event"></i> Événements Juridiques
+                </li>
+            </ol>
+        </nav>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-calendar-event mr-2"></i>
+            Événements Juridiques
+        </h1>
+        <div class="d-flex align-items-center">
+        <a href="{% url 'juridique:evenementjuridique_create' %}" class="btn sf-btn-primary" style="color: white;">
+            <i class="bi bi-plus-circle mr-2"></i> Ajouter un événement
+        </a>
+        <a href="{% url 'cabinet:dashboard' %}" class="btn sf-btn-secondary ms-2">
+            <i class="bi bi-x-circle mr-2"></i> Annuler
+        </a>
+        </div>
+    </div>
+</div>
+
+<div class="card sf-card shadow mb-4">
+        <div class="sf-card-header">
+            <h5 class="m-0 font-weight-bold">
+                <i class="bi bi-funnel me-2"></i>Filtres et recherches
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-center">
+                <!-- Champ de recherche -->
+                <div class="col-md-6 position-relative">
+                    <i class="bi bi-search position-absolute"
+                       style="left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+                    <input type="text" class="form-control sf-form-control ps-4" name="search"
+                           placeholder="Rechercher par code, description ou dossier..."
+                           value="{{ request.GET.search }}" autocomplete="off">
+                </div>
+
+                <!-- Boutons -->
+                 <div class="col-md-2">
+                        <button type="submit" class="btn sf-btn-outline" title="Rechercher">
+                            <i class="bi bi-search me-2"></i>Rechercher
+                        </button>
+                    </div>
+                    <div class="col-md-3 text-end">
+                    <a href="{% url 'cabinet:export_excel' 'evenement_juridique' %}" class="btn" style="border-color: #28a745; color: #28a745;">
+                            <i class="bi bi-file-earmark-excel mr-2" style="color: #28a745;"></i>Export Excel
+                    </a>
+                    {% if request.GET.search %}
+                        <a href="{% url 'juridique:evenementjuridique_list' %}" class="btn sf-btn-outline">
+                            <i class="bi bi-x mr-2"></i> Effacer
+                        </a>
+                    {% endif %}
+            </div>
+                    
+            </form>
+        </div>
+    </div>
+
+    <!-- Carte contenant le tableau -->
+    <div class="card sf-card shadow mb-4">
+        <div class="sf-card-header">
+            <h6 class="m-0 font-weight-bold">
+                <i class="bi bi-list-check mr-2"></i>
+                Liste des événements
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table sf-table" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Dossier</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in evenement_juridiques %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'juridique:evenementjuridique_detail' event.pk %}" class="text-dark">
+                                    {{ event.description|truncatechars:40 }}
+                                </a>
+                            </td>
+                            <td>{{ event.type_evenement }}</td>
+                            <td>{{ event.date_evenement|date:"d/m/Y" }}</td>
+                            <td>{{ event.dossier.denomination|truncatechars:20 }}</td>
+                            <td>
+                                <span class="badge badge-status 
+                                    {% if event.statut == 'Planifié' %}bg-warning text-dark
+                                    {% elif event.statut == 'Terminé' %}bg-success
+                                    {% elif event.statut == 'Annulé' %}bg-danger
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ event.statut }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="sf-actions-group">
+                                    <a href="{% url 'juridique:evenementjuridique_detail' event.pk %}" 
+                                       class="btn sf-btn-info btn-sm text-white"
+                                       title="Voir détails">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{% url 'juridique:evenementjuridique_update' event.pk %}" 
+                                       class="btn sf-btn-warning btn-sm"
+                                       title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="#" 
+                                       class="btn sf-btn-danger btn-sm text-white"
+                                       title="Supprimer"
+                                       data-bs-toggle="modal" 
+                                       data-bs-target="#deleteModal{{ event.pk }}">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <i class="bi bi-calendar-x text-muted" style="font-size: 2rem;"></i>
+                                <p class="mt-2">Aucun événement juridique trouvé</p>
+                                <a href="{% url 'juridique:evenementjuridique_create' %}" class="btn sf-btn-primary" style="color: white;">
+                                    <i class="bi bi-plus-circle mr-2"></i> Créer un événement
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals de suppression -->
+{% for event in evenement_juridiques %}
+<div class="modal fade" id="deleteModal{{ event.pk }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title text-dark fs-5 fw-bold">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="mb-0 text-center text-muted">
+                    Êtes-vous sûr de vouloir supprimer l'événement <strong>"{{ event.description|truncatechars:30 }}"</strong> du {{ event.date_evenement|date:"d/m/Y" }} ?
+                </p>
+                <p class="small text-center text-muted mt-2">
+                    <i class="fas fa-info-circle me-1"></i>Cette action est irréversible
+                </p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                    Annuler
+                </button>
+                <form action="{% url 'juridique:evenementjuridique_delete' event.pk %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="fas fa-trash-alt me-2"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

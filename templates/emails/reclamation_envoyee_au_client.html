@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Réclamation concernant votre dossier</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #eeeeee;
+            background-color: #fafafa;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #888888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p>Bonjour,</p>
+
+        <p>
+            Une nouvelle réclamation a été ajoutée concernant votre dossier
+            <strong>{{ dossier.denomination }}</strong>.
+        </p>
+
+        {% if reclamation.type_reclamation %}
+        <p><strong>Type de réclamation :</strong> {{ reclamation.type_reclamation }}</p>
+        {% endif %}
+
+        {% if reclamation.remarque %}
+        <p><strong>Remarques :</strong><br>{{ reclamation.remarque|linebreaksbr }}</p>
+        {% endif %}
+
+        <p>
+            Merci de consulter votre espace client ou de nous contacter si vous avez besoin de plus d’informations.
+        </p>
+
+        <p>Cordialement,<br>L’équipe du Cabinet Comptable</p>
+
+        <div class="footer">
+            Ce message vous est adressé automatiquement. Merci de ne pas y répondre.
+        </div>
+    </div>
+</body>
+</html>

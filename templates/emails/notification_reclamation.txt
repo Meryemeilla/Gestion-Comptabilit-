@@ -1,0 +1,8 @@
+Nouvelle Réclamation #{{ reclamation.id }}
+
+Client: {{ reclamation.dossier.client.nom }}
+Dossier: {{ reclamation.dossier.code }}
+Date: {{ reclamation.date_creation|date:"d/m/Y" }}
+
+Description:
+{{ reclamation.description }}

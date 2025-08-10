@@ -1,0 +1,430 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Honoraires{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    
+    .sf-breadcrumb-container {
+        background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1rem;
+    }
+
+    .sf-breadcrumb {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Utility classes */
+    .text-sf-blue { color: var(--sf-blue); }
+    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
+    .text-sf-gold { color: var(--sf-gold); }
+    
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-primary:hover {
+        background-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-info {
+        background-color: #17a2b8;
+        border-color: #148a9c;
+    }
+    
+    .sf-btn-warning {
+        background-color: #ffc107;
+        border-color: #e0a800;
+    }
+    
+    .sf-btn-danger {
+        background-color: #dc3545;
+        border-color: #c82333;
+    }
+    
+    .sf-btn-secondary {
+        background-color: whitesmoke;
+        border-color: whitesmoke;
+    }
+    
+    .sf-table th {
+        color: var(--sf-dark-blue);
+        font-weight: 600;
+        background-color: var(--sf-light-bg);
+    }
+    
+    .sf-table tr:hover {
+        background-color: rgba(54, 96, 146, 0.05);
+    }
+    
+    .sf-filter-select {
+        border-radius: 0.35rem;
+        border: 1px solid #d1d3e2;
+    }
+
+    /* Styles spécifiques pour la modal de suppression */
+    .modal-content {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        padding: 1.2rem 1.5rem;
+        background-color: #f8f9fa;
+        border-bottom: none;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        font-size: 1.05rem;
+        text-align: center;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem 1.5rem;
+        gap: 1rem;
+        border-top: none;
+        justify-content: center;
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+        transition: all 0.3s;
+        min-width: 100px;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+    }
+
+    .btn-danger {
+        transition: all 0.3s;
+        background-color: #dc3545;
+        border-color: #dc3545;
+        min-width: 120px;
+    }
+
+    .btn-danger:hover {
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+    }
+
+    .fa-exclamation-triangle {
+        color: #ffc107;
+    }
+
+    .sf-actions-group .btn {
+        margin-right: 0.3rem;
+        border-radius: 0.35rem;
+    }
+     .sf-actions-group {
+        display: flex;
+        justify-content: center;
+        gap: 0.3rem;
+    }
+
+    .sf-btn-info {
+        background-color: #17a2b8;
+        border-color: #117a8b;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.35rem;
+        transition: all 0.3s;
+    }
+
+    .sf-btn-info:hover {
+        background-color: #138496;
+        border-color: #117a8b;
+        color: white;
+    }
+
+    .sf-btn-warning {
+        background-color: #ffc107;
+        border-color: #d39e00;
+        color: #212529;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.35rem;
+        transition: all 0.3s;
+    }
+
+    .sf-btn-warning:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+        color: #212529;
+    }
+
+    .sf-btn-danger {
+        background-color: #dc3545;
+        border-color: #bd2130;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.35rem;
+        transition: all 0.3s;
+    }
+
+    .sf-btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+        color: white;
+    }
+
+    .sf-actions-group .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Fil d'Ariane -->
+    <nav aria-label="breadcrumb" class="sf-breadcrumb-container">
+        <ol class="breadcrumb sf-breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'cabinet:dashboard' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                    <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-sf-gold">
+                <i class="bi bi-cash-coin me-2"></i>Honoraires
+            </li>
+        </ol>
+    </nav>
+
+    <!-- En-tête de page -->
+    <div class="row sf-page-header">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h1 class="sf-page-title">
+                <i class="bi bi-cash-coin mr-2"></i>
+                Liste des Honoraires
+            </h1>
+            
+            <div class="d-flex align-items-center">
+                <div class="btn-group" role="group">
+                    <a href="{% url 'honoraires:honoraire_create' %}" class="btn sf-btn-primary" style="color: white;">
+                        <i class="bi bi-plus-circle mr-2"></i> Ajouter un Honoraire
+                    </a>
+                    <a href="{% url 'cabinet:export_excel' 'honoraires'%}" class="btn" style="border-color: #28a745; color: #28a745;">
+                            <i class="bi bi-file-earmark-excel mr-2" style="color: #28a745;"></i> Export Excel
+                    </a>
+                    <a href="{% url 'cabinet:dashboard' %}" class="btn sf-btn-secondary ml-2">
+                        <i class="bi bi-x-circle mr-2"></i> Annuler
+                    </a>
+                    
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtre -->
+    <form method="get" class="mb-4">
+        <div class="input-group" style="max-width: 300px;">
+            <select name="filtre" class="form-select sf-filter-select">
+                <option value="" {% if not request.GET.filtre %}selected{% endif %}>-- Tous les honoraires --</option>
+                <option value="mensuel" {% if request.GET.filtre == "mensuel" %}selected{% endif %}>Mensuel</option>
+                <option value="trimestriel" {% if request.GET.filtre == "trimestriel" %}selected{% endif %}>Trimestriel</option>
+                <option value="annuel" {% if request.GET.filtre == "annuel" %}selected{% endif %}>Annuel</option>
+            </select>
+            <button class="btn sf-btn-primary" style="color: white;" type="submit">
+                <i class="bi bi-funnel mr-2"></i> Filtrer
+            </button>
+        </div>
+    </form>
+
+    <!-- Tableau -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card sf-card shadow">
+                <div class="sf-card-header">
+                    <h5 class="m-0 font-weight-bold">
+                        <i class="bi bi-list-check mr-2"></i>
+                        Liste des honoraires
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0 sf-table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Dossier</th>
+                                    <th>Montant Mensuel</th>
+                                    <th>Reste Mensuel</th>
+                                    <th>Montant Trimestriel</th>
+                                    <th>Reste Trimestriel</th>
+                                    <th>Montant Annuel</th>
+                                    <th>Reste Annuel</th>
+                                    <th>Date d'échéance</th>
+                                    <th>Statut de Règlement</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for honoraire in honoraires %}
+                                <tr>
+                                    <td>{{ honoraire.code }}</td>
+                                    <td>{{ honoraire.dossier }}</td>
+                                    <td>{{ honoraire.montant_mensuel }}</td>
+                                    <td>{{ honoraire.reste_mensuel }}</td>
+                                    <td>{{ honoraire.montant_trimestriel }}</td>
+                                    <td>{{ honoraire.reste_trimestriel }}</td>
+                                    <td>{{ honoraire.montant_annuel }}</td>
+                                    <td>{{ honoraire.reste_annuel }}</td>
+                                    <td>{{ honoraire.date_echeance|date:"d/m/Y" }}</td>
+                                    <td>{{ honoraire.get_statut_reglement_display }}</td>
+                                    <td class="text-center">
+                                        <div class="sf-actions-group">
+                                            <a href="{% url 'honoraires:honoraire_detail' honoraire.pk %}" 
+                                            class="btn sf-btn-info btn-sm text-white" title="Voir détails">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'honoraires:honoraire_update' honoraire.pk %}" 
+                                            class="btn sf-btn-warning btn-sm" title="Modifier">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <button type="button" class="btn sf-btn-danger btn-sm text-white" title="Supprimer"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteModal{{ honoraire.pk }}">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="10" class="text-center py-4">Aucun honoraire trouvé.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals de suppression -->
+{% for honoraire in honoraires %}
+<div class="modal fade" id="deleteModal{{ honoraire.pk }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title text-dark fs-5 fw-bold">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="mb-0 text-center text-muted">
+                    Êtes-vous sûr de vouloir supprimer l'honoraire pour <strong>{{ honoraire.dossier }}</strong> ?
+                </p>
+                <p class="small text-center text-muted mt-2">
+                    <i class="fas fa-info-circle me-1"></i>Cette action est irréversible
+                </p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                    Annuler
+                </button>
+                <form action="{% url 'honoraires:honoraire_delete' honoraire.pk %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="fas fa-trash-alt me-2"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

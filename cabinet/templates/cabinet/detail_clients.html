@@ -1,0 +1,559 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ client.user.get_full_name|default:client.contact_personne }} - Détails Client{% endblock %}
+
+{% block breadcrumb %}
+<style>
+    .sf-breadcrumb-container {
+        background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1rem;
+    }
+
+    .sf-breadcrumb {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+</style>
+<nav aria-label="breadcrumb" class="sf-breadcrumb-container">
+    <ol class="breadcrumb sf-breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dashboard' %}">
+                <i class="bi bi-speedometer2"></i> Tableau de bord
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:liste_clients' %}">
+                <i class="bi bi-people"></i> Clients
+            </a>
+        </li>
+        <li class="breadcrumb-item active">
+            <i class="bi bi-person-lines-fill"></i> {{ client.user.get_full_name|default:client.contact_personne|truncatechars:20 }}
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+        margin-bottom: 2rem;
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-card-header h5 {
+        margin-bottom: 0;
+        font-weight: 600;
+    }
+    
+    .sf-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 0.35rem;
+        font-weight: 600;
+    }
+    
+    .sf-badge-info {
+        background-color: #e7f1ff;
+        color: var(--sf-blue);
+    }
+    
+    .sf-badge-warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .sf-badge-success {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+    
+    .sf-badge-danger {
+        background-color: #fee2e2;
+        color: #b91c1c;
+    }
+    
+    .sf-table {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+    
+    .sf-table th {
+        width: 30%;
+        font-weight: 600;
+        color: var(--sf-dark-blue);
+        background-color: #f8f9fc;
+    }
+    
+    .sf-table td {
+        padding: 0.75rem;
+    }
+    
+    .sf-table tr:not(:last-child) {
+        border-bottom: 1px solid #e3e6f0;
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-primary:hover {
+        background-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-warning {
+        background-color: #ffc107;
+        border-color: #e0a800;
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-danger {
+        background-color: #e74a3b;
+        border-color: #d52a1a;
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+    
+    .client-avatar-container {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background-color: var(--sf-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 3rem;
+        font-weight: bold;
+        margin: 0 auto 1rem;
+    }
+    
+    .client-header-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+    
+    @media (max-width: 768px) {
+        .client-header-actions {
+            justify-content: center;
+            margin-top: 1rem;
+        }
+    }
+    
+    /* Styles spécifiques pour la modal */
+    .modal-content {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        padding: 1.2rem 1.5rem;
+        background-color: #f8f9fa;
+        border-bottom: none;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        font-size: 1.05rem;
+        text-align: center;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem 1.5rem;
+        gap: 1rem;
+        border-top: none;
+        justify-content: center;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- En-tête de page -->
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-person-lines-fill me-2"></i>
+            Détails du client
+        </h1>
+        <div class="client-header-actions">
+            <a href="{% url 'cabinet:modifier_client_par_admin' client.id %}" class="btn sf-btn-warning">
+                <i class="bi bi-pencil me-2"></i> Modifier
+            </a>
+            <button type="button" class="btn sf-btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="bi bi-trash me-2"></i> Supprimer
+            </button>
+            
+            <a href="{% url 'cabinet:liste_clients' %}" class="btn sf-btn-outline">
+                <i class="bi bi-arrow-left me-2"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <!-- En-tête client -->
+    
+    <div class="card sf-card shadow mb-4">
+        <div class="card-body text-center text-md-start">
+            <div class="row align-items-center">
+                <div class="col-md-auto text-center">
+                    <div class="client-avatar-container">
+                        {{ client.user.get_full_name|default:client.contact_personne|first|upper }}
+                    </div>
+                </div>
+                <div class="col-md">
+                    <h2 class="mb-2 d-flex align-items-center gap-2 flex-wrap">
+                        {{ client.user.get_full_name|default:client.contact_personne }}
+                        <span class="badge {% if client.user.is_active %}bg-success{% else %}bg-danger{% endif %} py-1 px-2 fs-6 fw-normal">
+                            {% if client.user.is_active %}Actif{% else %}Inactif{% endif %}
+                        </span>
+                    </h2>
+                    <div class="text-muted mb-2">
+                        <i class="bi bi-envelope me-1"></i> {{ client.user.email|default:"Non renseigné" }}
+                        <span class="mx-2">|</span>
+                        <i class="bi bi-telephone me-1"></i> {{ client.user.telephone|default:"Non renseigné" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations générales -->
+    <!-- <div class="row"> -->
+        <div class="col-lg-8">
+            <div class="card sf-card shadow">
+                <div class="sf-card-header">
+                    <h5 class="m-0">
+                        <i class="bi bi-info-circle me-2"></i>Informations générales
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="sf-table">
+                                <tr>
+                                    <th>Nom complet</th>
+                                    <td>{{ client.user.get_full_name|default:client.contact_personne }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nom d'utilisateur</th>
+                                    <td>{{ client.user.username|default:"-" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Email</th>
+                                    <td>{{ client.user.email|default:"-" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="sf-table">
+                                <tr>
+                                    <th>Téléphone</th>
+                                    <td>{{ client.user.telephone|default:"-" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Date création</th>
+                                    <td>{{ client.user.date_joined|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Dernière connexion</th>
+                                    <td>
+                                        {% if client.user.last_login %}
+                                            {{ client.user.last_login|date:"d/m/Y H:i" }}
+                                        {% else %}
+                                            Jamais connecté
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informations complémentaires -->
+            <!-- <div class="card sf-card shadow">
+                <div class="sf-card-header">
+                    <h5 class="m-0">
+                        <i class="bi bi-building me-2"></i>Informations professionnelles
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="sf-table">
+                                <tr>
+                                    <th>Entreprise</th>
+                                    <td>{{ dossier.denomination|default:"-" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>IF</th>
+                                    <td>{{ dossier.if_identifiant|default:"-" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="sf-table">
+                                <tr>
+                                    <th>Adresse</th>
+                                    <td>{{ dossier.adresse|default:"Non renseignée" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Comptable assigné</th>
+                                    <td>
+                                        {% if dossier.comptable_traitant %}
+                                            {{ dossier.comptable_traitant.nom_complet }}
+                                        {% else %}
+                                            Non assigné
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div> -->
+            <!-- </div> -->
+        <!-- </div> -->
+
+        <!-- Colonne droite -->
+        <!-- <div class="col-lg-4"> -->
+            <!-- Dossiers associés -->
+            <div class="card sf-card shadow">
+                <div class="sf-card-header">
+                    <h5 class="m-0">
+                        <i class="bi bi-folder me-2"></i>Dossiers associés
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if client.dossiers_client.all %}
+                        <div class="list-group">
+                            {% for dossier in client.dossiers_client.all %}
+                            <a href="{% url 'cabinet:dossier_detail' dossier.id %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ dossier.denomination|default:"-" }}</h6>
+                                    <small class="text-muted">{{ dossier.get_code_display }}</small>
+                                </div>
+                                <td>
+                                        {% if dossier.comptable_traitant %}
+                                            {{ dossier.comptable_traitant.nom_complet }}
+                                        {% else %}
+                                            Non assigné
+                                        {% endif %}
+                                </td>
+                                <p class="mb-1 small text-muted">
+                                    <i class="bi bi-calendar me-1"></i> Créé le {{ dossier.date_creation|date:"d/m/Y" }}
+                                </p>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">Aucun dossier associé</p>
+                    {% endif %}
+                </div>
+            </div> 
+
+            <!-- Actions rapides
+            <div class="card sf-card shadow mt-4">
+                <div class="sf-card-header">
+                    <h5 class="m-0">
+                        <i class="bi bi-lightning me-2"></i>Actions rapides
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if client.user.is_active %}
+                            <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#disableModal">
+                                <i class="bi bi-person-x me-2"></i> Désactiver le compte
+                            </button>
+                        {% else %}
+                            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#enableModal">
+                                <i class="bi bi-person-check me-2"></i> Activer le compte
+                            </button>
+                        {% endif %}
+                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
+                            <i class="bi bi-key me-2"></i> Réinitialiser mot de passe
+                        </button>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<!-- Modal Réinitialisation mot de passe -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-key me-2"></i>
+                    Réinitialiser le mot de passe
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir réinitialiser le mot de passe de <strong>{{ client.user.get_full_name|default:client.contact_personne }}</strong> ?</p>
+                <p class="small text-muted">Un email contenant les instructions sera envoyé à l'utilisateur.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Désactivation -->
+<div class="modal fade" id="disableModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-person-x me-2"></i>
+                    Désactiver le compte
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir désactiver le compte de <strong>{{ client.user.get_full_name|default:client.contact_personne }}</strong> ?</p>
+                <p class="small text-muted">L'utilisateur ne pourra plus se connecter jusqu'à réactivation.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Activation -->
+<div class="modal fade" id="enableModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-person-check me-2"></i>
+                    Activer le compte
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir activer le compte de <strong>{{ client.user.get_full_name|default:client.contact_personne }}</strong> ?</p>
+                <p class="small text-muted">L'utilisateur pourra à nouveau se connecter.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-trash me-2"></i>
+                    Supprimer le client
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer définitivement <strong>{{ client.user.get_full_name|default:client.contact_personne }}</strong> ?</p>
+                <p class="small text-center text-muted mt-2">
+                    <i class="fas fa-info-circle me-1"></i>Cette action est irréversible et supprimera toutes les données associées.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{% url 'cabinet:supprimer_client' client.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

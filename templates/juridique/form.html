@@ -1,0 +1,216 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+    {% if document %}Modifier{% else %}Nouveau{% endif %} document juridique - Cabinet Comptable
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:dashboard' %}">Tableau de bord</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:juridique_list' %}">Documents Juridiques</a></li>
+        <li class="breadcrumb-item active">
+            {% if document %}Modifier {{ document.reference }}{% else %}Nouveau document{% endif %}
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">
+        {% if document %}
+        Modifier le document juridique
+        {% else %}
+        Nouveau document juridique
+        {% endif %}
+    </h1>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-file-earmark-text me-2"></i>Informations du document
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Dossier -->
+                    <div class="mb-3">
+                        <label for="id_dossier" class="form-label">Dossier <span class="text-danger">*</span></label>
+                        {{ form.dossier }}
+                        {% if form.dossier.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.dossier.errors|join:" " }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Type de document -->
+                    <div class="mb-3">
+                        <label for="id_type" class="form-label">Type de document <span class="text-danger">*</span></label>
+                        {{ form.type }}
+                        {% if form.type.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.type.errors|join:" " }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Titre -->
+                    <div class="mb-3">
+                        <label for="id_titre" class="form-label">Titre <span class="text-danger">*</span></label>
+                        {{ form.titre }}
+                        {% if form.titre.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.titre.errors|join:" " }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="id_description" class="form-label">Description</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.description.errors|join:" " }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <!-- Date du document -->
+                        <div class="col-md-6 mb-3">
+                            <label for="id_date_document" class="form-label">Date du document <span class="text-danger">*</span></label>
+                            {{ form.date_document }}
+                            {% if form.date_document.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.date_document.errors|join:" " }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Date d'expiration -->
+                        <div class="col-md-6 mb-3">
+                            <label for="id_date_expiration" class="form-label">Date d'expiration</label>
+                            {{ form.date_expiration }}
+                            {% if form.date_expiration.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.date_expiration.errors|join:" " }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Statut -->
+                    <div class="mb-3">
+                        <label for="id_statut" class="form-label">Statut <span class="text-danger">*</span></label>
+                        {{ form.statut }}
+                        {% if form.statut.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.statut.errors|join:" " }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Fichier -->
+                    <div class="mb-3">
+                        <label for="id_fichier" class="form-label">Document</label>
+                        {% if document and document.fichier %}
+                        <div class="mb-2">
+                            <small class="text-muted">Document actuel : {{ document.fichier.name|slice:"14:" }}</small>
+                        </div>
+                        {% endif %}
+                        {{ form.fichier }}
+                        {% if form.fichier.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.fichier.errors|join:" " }}
+                        </div>
+                        {% endif %}
+                        <div class="form-text">Formats acceptés : PDF, DOC, DOCX, XLS, XLSX (max. 10 MB)</div>
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="{% url 'cabinet:juridique_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>Aide
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6>Types de documents</h6>
+                <ul class="mb-4">
+                    <li><strong>Statuts :</strong> Documents constitutifs de la société</li>
+                    <li><strong>PV :</strong> Procès-verbaux d'assemblées</li>
+                    <li><strong>Contrat :</strong> Contrats commerciaux ou juridiques</li>
+                    <li><strong>Autre :</strong> Autres documents juridiques</li>
+                </ul>
+
+                <h6>Statuts des documents</h6>
+                <ul>
+                    <li><strong>En cours :</strong> Document en cours de traitement</li>
+                    <li><strong>Validé :</strong> Document validé et actif</li>
+                    <li><strong>Expiré :</strong> Document dont la date d'expiration est dépassée</li>
+                    <li><strong>Archivé :</strong> Document conservé pour référence</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ajouter la classe form-select aux select
+        document.querySelectorAll('select').forEach(function(select) {
+            select.classList.add('form-select');
+        });
+
+        // Ajouter la classe form-control aux inputs
+        document.querySelectorAll('input[type="text"], input[type="date"], textarea').forEach(function(input) {
+            input.classList.add('form-control');
+        });
+
+        // Ajouter la classe form-control-file aux inputs de type file
+        document.querySelectorAll('input[type="file"]').forEach(function(input) {
+            input.classList.add('form-control');
+        });
+
+        // Ajuster la hauteur du textarea description
+        const textarea = document.querySelector('#id_description');
+        if (textarea) {
+            textarea.style.height = '100px';
+        }
+
+        // Initialiser les champs de date
+        const dateInputs = document.querySelectorAll('input[type="date"]');
+        dateInputs.forEach(function(input) {
+            if (!input.value) {
+                const today = new Date().toISOString().split('T')[0];
+                if (input.id === 'id_date_document') {
+                    input.value = today;
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

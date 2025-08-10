@@ -1,0 +1,394 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Liste Suivi Fiscal - Cabinet Comptable{% endblock %}
+
+{% block breadcrumb %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    .sf-breadcrumb-container {
+        background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1rem;
+    }
+
+    .sf-breadcrumb {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Classes utilitaires */
+    .text-sf-blue { color: var(--sf-blue); }
+    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
+    .text-sf-gold { color: var(--sf-gold); }
+</style>
+<nav aria-label="breadcrumb" class="sf-breadcrumb-container">
+    <ol class="breadcrumb sf-breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dashboard' %}">
+                <i class="bi bi-speedometer2 mr-1"></i>
+                Tableau de bord
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="bi bi-file-earmark-bar-graph mr-1"></i>
+            Suivi Fiscal
+        </li>
+    </ol>
+</nav>
+
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    
+    
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+        margin-bottom: 1.5rem;
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-card-title {
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .sf-list-item {
+        padding: 0.75rem 1.25rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .sf-list-item:last-child {
+        border-bottom: none;
+    }
+    
+    .sf-list-item:hover {
+        background-color: rgba(54, 96, 146, 0.05);
+    }
+    
+    .sf-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 0.35rem;
+        font-weight: 600;
+    }
+    
+    .sf-badge-primary {
+        background-color: var(--sf-blue);
+        color: white;
+    }
+    
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.35rem 0.75rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+    
+    .sf-empty-message {
+        color: #6c757d;
+        padding: 1.5rem;
+        text-align: center;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- En-tête de page -->
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-file-earmark-bar-graph mr-2"></i>
+            Suivi Fiscal
+        </h1>
+        <a href="{% url 'cabinet:dashboard' %}" class="btn sf-btn-secondary ml-2">
+            <i class="bi bi-x-circle mr-2"></i> Annuler
+        </a>
+    </div>
+
+    <!-- Suivi TVA -->
+    <div class="card sf-card">
+        <div class="sf-card-header d-flex justify-content-between align-items-center">
+            <h5 class="sf-card-title">
+                <i class="bi bi-list-check mr-2"></i>
+                Suivi TVA
+            </h5>
+            <a href="{% url 'fiscal:suivitva_create' %}" class="btn btn-sm btn-light">
+                <i class="bi bi-plus-circle"></i> Ajouter
+            </a>
+        </div>
+        <div class="card-body p-0">
+            {% if suivis_tva %}
+                <ul class="list-group list-group-flush">
+                    {% for item in suivis_tva %}
+                    <li class="sf-list-item">
+                        <div>
+                            <strong>{{ item.dossier.denomination }}</strong>
+                            <span class="sf-badge sf-badge-primary ml-2">{{ item.annee }}</span>
+                        </div>
+                        <div>
+                            <a href="{% url 'fiscal:suivitva_detail' item.pk %}" class="btn btn-sm sf-btn-outline">
+                                <i class="bi bi-eye"></i> Détails
+                            </a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="sf-empty-message">
+                    <i class="bi bi-info-circle mr-2"></i>
+                    Aucun suivi TVA disponible
+                </div>
+            {% endif %}
+        </div>
+        <div class="card-footer text-center">
+            <a href="{% url 'fiscal:suivitva_list' %}" class="btn btn-sm sf-btn-outline">
+                <i class="bi bi-list"></i> Voir tous les suivis TVA
+            </a>
+        </div>
+    </div>
+
+    <!-- Suivi CMetIR -->
+    <div class="card sf-card">
+        <div class="sf-card-header d-flex justify-content-between align-items-center">
+            <h5 class="sf-card-title">
+                <i class="bi bi-percent mr-2"></i>
+                Suivi CM et IR
+            </h5>
+            <a href="{% url 'fiscal:cmir_create' %}" class="btn btn-sm btn-light">
+                <i class="bi bi-plus-circle"></i> Ajouter
+            </a>
+        </div>
+        <div class="card-body p-0">
+            {% if suivis_cmetir %}
+                <ul class="list-group list-group-flush">
+                    {% for item in suivis_cmetir %}
+                    <li class="sf-list-item">
+                        <div>
+                            <strong>{{ item.dossier.denomination }}</strong>
+                            <span class="sf-badge sf-badge-primary ml-2">{{ item.annee }}</span>
+                        </div>
+                        <div>
+                            <a href="{% url 'fiscal:cmir_detail' item.pk %}" class="btn btn-sm sf-btn-outline">
+                                <i class="bi bi-eye"></i> Détails
+                            </a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="sf-empty-message">
+                    <i class="bi bi-info-circle mr-2"></i>
+                    Aucun suivi CM et IR disponible
+                </div>
+            {% endif %}
+        </div>
+        <div class="card-footer text-center">
+            <a href="{% url 'fiscal:cmir_list' %}" class="btn btn-sm sf-btn-outline">
+                <i class="bi bi-list"></i> Voir tous les suivis CM et IR
+            </a>
+        </div>
+    </div>
+
+    <!-- Acomptes -->
+    <div class="card sf-card">
+        <div class="sf-card-header d-flex justify-content-between align-items-center">
+            <h5 class="sf-card-title">
+                <i class="bi bi-cash-stack mr-2"></i>
+                Acomptes
+            </h5>
+            <a href="{% url 'fiscal:acompte_create' %}" class="btn btn-sm btn-light">
+                <i class="bi bi-plus-circle"></i> Ajouter
+            </a>
+        </div>
+        <div class="card-body p-0">
+            {% if suivis_acomptes %}
+                <ul class="list-group list-group-flush">
+                    {% for item in suivis_acomptes %}
+                    <li class="sf-list-item">
+                        <div>
+                            <strong>{{ item.dossier.denomination }}</strong>
+                            <span class="sf-badge sf-badge-primary ml-2">{{ item.annee }}</span>
+                        </div>
+                        <div>
+                            <a href="{% url 'fiscal:acompte_detail' item.pk %}" class="btn btn-sm sf-btn-outline">
+                                <i class="bi bi-eye"></i> Détails
+                            </a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="sf-empty-message">
+                    <i class="bi bi-info-circle mr-2"></i>
+                    Aucun acompte enregistré
+                </div>
+            {% endif %}
+        </div>
+        <div class="card-footer text-center">
+            <a href="{% url 'fiscal:acompte_list' %}" class="btn btn-sm sf-btn-outline">
+                <i class="bi bi-list"></i> Voir tous les acomptes
+            </a>
+        </div>
+    </div>
+
+    <!-- Dépôt Bilan -->
+    <div class="card sf-card">
+        <div class="sf-card-header d-flex justify-content-between align-items-center">
+            <h5 class="sf-card-title">
+                <i class="bi bi-file-text mr-2"></i>
+                Dépôt Bilan
+            </h5>
+            <a href="{% url 'fiscal:depotbilan_create' %}" class="btn btn-sm btn-light">
+                <i class="bi bi-plus-circle"></i> Ajouter
+            </a>
+        </div>
+        <div class="card-body p-0">
+            {% if depots_bilan %}
+                <ul class="list-group list-group-flush">
+                    {% for item in depots_bilan %}
+                    <li class="sf-list-item">
+                        <div>
+                            <strong>{{ item.dossier.denomination }}</strong>
+                            <span class="sf-badge sf-badge-primary ml-2">{{ item.annee_exercice }}</span>
+                        </div>
+                        <div>
+                            <a href="{% url 'fiscal:depotbilan_detail' item.pk %}" class="btn btn-sm sf-btn-outline">
+                                <i class="bi bi-eye"></i> Détails
+                            </a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="sf-empty-message">
+                    <i class="bi bi-info-circle mr-2"></i>
+                    Aucun dépôt de bilan
+                </div>
+            {% endif %}
+        </div>
+        <div class="card-footer text-center">
+            <a href="{% url 'fiscal:depotbilan_list' %}" class="btn btn-sm sf-btn-outline">
+                <i class="bi bi-list"></i> Voir tous les dépôts de bilan
+            </a>
+        </div>
+    </div>
+
+    <!-- Suivi Forfaitaire -->
+    <div class="card sf-card">
+        <div class="sf-card-header d-flex justify-content-between align-items-center">
+            <h5 class="sf-card-title">
+                <i class="bi bi-calculator mr-2"></i>
+                Suivi Forfaitaire
+            </h5>
+            <a href="{% url 'fiscal:suiviforfaitaire_create' %}" class="btn btn-sm btn-light">
+                <i class="bi bi-plus-circle"></i> Ajouter
+            </a>
+        </div>
+        <div class="card-body p-0">
+            {% if suivis_forfaitaire %}
+                <ul class="list-group list-group-flush">
+                    {% for item in suivis_forfaitaire %}
+                    <li class="sf-list-item">
+                        <div>
+                            <strong>{{ item.dossier.denomination }}</strong>
+                            <span class="sf-badge sf-badge-primary ml-2">{{ item.annee }}</span>
+                        </div>
+                        <div>
+                            <a href="{% url 'fiscal:suiviforfaitaire_detail' item.pk %}" class="btn btn-sm sf-btn-outline">
+                                <i class="bi bi-eye"></i> Détails
+                            </a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="sf-empty-message">
+                    <i class="bi bi-info-circle mr-2"></i>
+                    Aucun suivi forfaitaire
+                </div>
+            {% endif %}
+        </div>
+        <div class="card-footer text-center">
+            <a href="{% url 'fiscal:suiviforfaitaire_list' %}" class="btn btn-sm sf-btn-outline">
+                <i class="bi bi-list"></i> Voir tous les suivis forfaitaires
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

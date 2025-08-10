@@ -1,0 +1,206 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Honoraires - Cabinet Comptable{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:dashboard' %}">Tableau de bord</a></li>
+        <li class="breadcrumb-item active">Honoraires</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Gestion des honoraires</h1>
+    <a href="{% url 'cabinet:honoraire_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Nouvel honoraire
+    </a>
+    <a href="{% url 'cabinet:dashboard' %}" class="btn btn-secondary ml-2">
+        <i class="bi bi-x-circle mr-2"></i> Annuler
+    </a>
+</div>
+
+<!-- Filtres et recherche -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control" name="search" 
+                           placeholder="Rechercher..."
+                           value="{{ request.GET.search }}">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="col">
+                    <label for="type">Type</label>
+                    <select class="form-control" id="type" name="type">
+                        <option value="">Tous</option>
+                        <option value="MENSUEL" {% if request.GET.type == 'MENSUEL' %}selected{% endif %}>Mensuel</option>
+                        <option value="TRIMESTRIEL" {% if request.GET.type == 'TRIMESTRIEL' %}selected{% endif %}>Trimestriel</option>
+                        <option value="ANNUEL" {% if request.GET.type == 'ANNUEL' %}selected{% endif %}>Annuel</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <select name="annee" class="form-select">
+                    <option value="">Année</option>
+                    {% for annee in annees %}
+                    <option value="{{ annee }}" {% if request.GET.annee == annee|stringformat:"i" %}selected{% endif %}>{{ annee }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="statut" class="form-select">
+                    <option value="">Statut</option>
+                    <option value="EN_ATTENTE" {% if request.GET.statut == 'EN_ATTENTE' %}selected{% endif %}>En attente</option>
+                    <option value="PAYE" {% if request.GET.statut == 'PAYE' %}selected{% endif %}>Payé</option>
+                    <option value="ANNULE" {% if request.GET.statut == 'ANNULE' %}selected{% endif %}>Annulé</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary">
+                    <i class="bi bi-search"></i> Rechercher
+                </button>
+            </div>
+            <div class="col-md-3 text-end">
+                <a href="{% url 'cabinet:export_excel' 'honoraires' %}" class="btn btn-outline-success">
+                    <i class="bi bi-file-earmark-excel"></i> Export Excel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Statistiques -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Total honoraires</h6>
+                <h3 class="card-title mb-0">{{ total_honoraires|floatformat:2 }} DH</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Honoraires payés</h6>
+                <h3 class="card-title mb-0 text-success">{{ total_payes|floatformat:2 }} DH</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Honoraires en attente</h6>
+                <h3 class="card-title mb-0 text-warning">{{ total_en_attente|floatformat:2 }} DH</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Taux de recouvrement</h6>
+                <h3 class="card-title mb-0">{{ taux_recouvrement|floatformat:1 }}%</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Liste des honoraires -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="bi bi-cash me-2"></i>Liste des honoraires ({{ honoraires|length }})
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        {% if honoraires %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Dossier</th>
+                        <th class="text-end">Honoraires (DH)</th>
+                        <th class="text-end">Règlements (DH)</th>
+                        <th class="text-end">Reste (DH)</th>
+                        <th>Date échéance</th>
+                        <th class="text-center">Statut</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for honoraire in honoraires %}
+                    <tr>
+                        <td><strong>{{ honoraire.dossier.code }}</strong></td>
+                        <td>{{ honoraire.dossier.denomination }}</td>
+                        <td class="text-end">
+                            {{ honoraire.montant_mensuel|floatformat:2 }} / {{ honoraire.montant_trimestriel|floatformat:2 }} / {{ honoraire.montant_annuel|floatformat:2 }}
+                        </td>
+                        <td class="text-end">
+                            {{ honoraire.total_reglements_mensuel|floatformat:2 }} / {{ honoraire.total_reglements_trimestriel|floatformat:2 }} / {{ honoraire.total_reglements_annuel|floatformat:2 }}
+                        </td>
+                        <td class="text-end">
+                            {{ honoraire.reste_mensuel|floatformat:2 }} / {{ honoraire.reste_trimestriel|floatformat:2 }} / {{ honoraire.reste_annuel|floatformat:2 }}
+                        </td>
+                        <td>{{ honoraire.date_echeance|date:"d/m/Y" }}</td>
+                        <td class="text-center">
+                            <span class="badge bg-{{ honoraire.get_statut_color }}">
+                                {{ honoraire.get_statut_display }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'cabinet:honoraire_detail' honoraire.id %}" class="btn btn-sm btn-info">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{% url 'cabinet:honoraire_update' honoraire.id %}" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" 
+                                    data-bs-target="#deleteModal{{ honoraire.id }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-cash-stack display-4 text-muted"></i>
+            <p class="mt-2">Aucun honoraire trouvé</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modals de suppression -->
+{% for honoraire in honoraires %}
+<div class="modal fade" id="deleteModal{{ honoraire.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer l'honoraire <strong>{{ honoraire.reference }}</strong> ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{% url 'cabinet:honoraire_delete' honoraire.id %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

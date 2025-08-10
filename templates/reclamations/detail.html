@@ -1,0 +1,403 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ reclamation.numero }} - Détails de la réclamation - Cabinet Comptable{% endblock %}
+
+{% block breadcrumb %}
+<style>
+    .sf-breadcrumb-container {
+        background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1rem;
+    }
+
+    .sf-breadcrumb {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Classes utilitaires */
+    .text-sf-blue { color: var(--sf-blue); }
+    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
+    .text-sf-gold { color: var(--sf-gold); }
+</style>
+<nav aria-label="breadcrumb" class="sf-breadcrumb-container">
+    <ol class="breadcrumb sf-breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dashboard' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:reclamation_list' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                <i class="bi bi-exclamation-triangle me-2"></i>Réclamations
+            </a>
+        </li>
+        <li class="breadcrumb-item active text-sf-gold">
+            <i class="bi bi-file-earmark-text me-2"></i>{{ reclamation.numero }}
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+        margin-bottom: 1.5rem;
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-info-table {
+        width: 100%;
+    }
+    
+    .sf-info-table th {
+        width: 30%;
+        font-weight: 600;
+        color: var(--sf-dark-blue);
+    }
+    
+    .sf-info-table td {
+        padding: 0.75rem 0;
+        vertical-align: top;
+    }
+    
+    .sf-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 0.35rem;
+        font-weight: 600;
+    }
+    
+    .sf-btn-warning {
+        background-color: #f6c23e;
+        border-color: #dda20a;
+        color: #fff;
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-danger {
+        background-color: #e74a3b;
+        border-color: #be2617;
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+    
+    .sf-timeline-item {
+        position: relative;
+        padding-left: 40px;
+        margin-bottom: 20px;
+    }
+    
+    .sf-timeline-marker {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 3px var(--sf-blue);
+    }
+    
+    .sf-timeline-content {
+        background: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .sf-form-select, .sf-form-control {
+        border-radius: 0.35rem;
+        border: 1px solid #d1d3e2;
+        padding: 0.75rem 1rem;
+    }
+    
+    .sf-form-select:focus, .sf-form-control:focus {
+        border-color: var(--sf-blue);
+        box-shadow: 0 0 0 0.2rem rgba(54, 96, 146, 0.25);
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-outline-primary {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+    }
+    
+    .sf-btn-outline-primary:hover {
+        background-color: var(--sf-light-bg);
+    }
+    
+    .sf-modal-header {
+        background-color: var(--sf-blue);
+        color: white;
+    }
+    
+    .sf-document-btn {
+        background-color: #1cc88a;
+        border-color: #17a673;
+    }
+
+    /* Styles pour la modal de suppression */
+    .modal-content {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        padding: 1.2rem 1.5rem;
+        background-color: #f8f9fa;
+        border-bottom: none;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        font-size: 1.05rem;
+        text-align: center;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem 1.5rem;
+        gap: 1rem;
+        border-top: none;
+        justify-content: center;
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+        transition: all 0.3s;
+        min-width: 100px;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+    }
+
+    .btn-danger {
+        transition: all 0.3s;
+        background-color: #dc3545;
+        border-color: #dc3545;
+        min-width: 120px;
+    }
+
+    .btn-danger:hover {
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+    }
+
+    .fa-exclamation-triangle {
+        color: #ffc107;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- En-tête de page -->
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-exclamation-circle mr-2"></i>
+            Détails de la réclamation
+        </h1>
+        <div>
+        {% if reclamation.created_by == user %}
+            <a href="{% url 'cabinet:reclamation_update' reclamation.id %}" class="btn sf-btn-warning">
+                <i class="bi bi-pencil mr-1"></i> Modifier
+            </a>
+            <button type="button" class="btn sf-btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                <i class="bi bi-trash mr-1"></i> Supprimer
+            </button>
+        {% endif %}
+        </div>
+    </div>
+
+    <!-- Informations générales -->
+    <div class="card sf-card shadow">
+        <div class="sf-card-header">
+            <h5 class="m-0 font-weight-bold">
+                <i class="bi bi-info-circle mr-2"></i>
+                Informations générales
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="sf-info-table">
+                        <tr>
+                            <th>Code</th>
+                            <td><strong>{{ reclamation.code }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Dossier</th>
+                            <td>
+                                <a href="{% url 'cabinet:dossier_detail' reclamation.dossier.id %}">
+                                    {{ reclamation.dossier.code }} - {{ reclamation.dossier.denomination }}
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Type de réclamation</th>
+                            <td>{{ reclamation.type_reclamation }}</td>
+                        </tr>
+                        <tr>
+                            <th>Remarque</th>
+                            <td>{{ reclamation.remarque|linebreaks }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="sf-info-table">
+                        <tr>
+                            <th>Classement</th>
+                            <td>
+                                <span class="sf-badge bg-{{ reclamation.get_classement_color }}">
+                                    {{ reclamation.get_classement_display}}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Priorité</th>
+                            <td>
+                                <span class="sf-badge bg-{{ reclamation.get_priorite_color }}">
+                                    {{ reclamation.get_priorite_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+
+                        <tr>
+                            <th>Date création</th>
+                            <td>{{ reclamation.date_creation|date:"d/m/Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Dernière mise à jour</th>
+                            <td>{{ reclamation.date_modification|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Document</th>
+                            <td>
+                                {% if reclamation.document %}
+                                    <a href="{{ reclamation.document.url }}" class="btn sf-document-btn btn-sm" target="_blank">
+                                        <i class="bi bi-download mr-1"></i> Télécharger
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">Aucun document joint</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title text-dark fs-5 fw-bold">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="mb-0 text-center text-muted">
+                    Êtes-vous sûr de vouloir supprimer la réclamation <strong>{{ reclamation.code }}</strong> ?
+                </p>
+                <p class="small text-center text-muted mt-2">
+                    <i class="fas fa-info-circle me-1"></i>Cette action est irréversible
+                </p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                    Annuler
+                </button>
+                <form action="{% url 'cabinet:reclamation_delete' reclamation.id %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="fas fa-trash-alt me-2"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,269 @@
+<!-- <!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Cabinet Comptable{% endblock %}</title>
+    
+    - CDN Links -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* Variables CSS */
+        :root {
+            --primary-color: #366092;
+            --secondary-color: #f8f9fa;
+            --accent-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        /* Base Styles */
+        body {
+            background-color: #f5f6fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-y: auto;
+        }
+        
+        /* Navigation */
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--primary-color) !important;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.12);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2c5282 100%);
+            color: white;
+            border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+            padding: 1rem 1.25rem;
+        }
+        
+        /* Buttons */
+        .btn-square {
+            width: 48px;
+            height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            margin: 0 2px;
+            border: 2px solid transparent;
+            background: #fff;
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+        .btn-primary.btn-square {
+            border-color: #366092;
+            color: #366092;
+        }
+        .btn-warning.btn-square {
+            border-color: #ffc107;
+            color: #ffc107;
+        }
+        .btn-danger.btn-square {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+        .btn-square:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            background: #f8f9fa;
+        }
+        .actions-group {
+            display: inline-flex;
+            gap: 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(54,96,146,0.08);
+            overflow: hidden;
+            background: #fff;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2c5282 100%);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.5rem 1.25rem;
+            transition: var(--transition);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(54, 96, 146, 0.3);
+        }
+        
+        /* Tables */
+        .table {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        .table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+        
+        /* Alerts */
+        .alert {
+            border: none;
+            border-radius: var(--border-radius);
+            border-left: 4px solid;
+        }
+        
+        /* Utility Classes */
+        .stat-card {
+            background: linear-gradient(135deg, #fff 0%, var(--secondary-color) 100%);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .badge {
+            border-radius: 20px;
+            padding: 0.375rem 0.75rem;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .btn-square {
+            width: 48px;
+            height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            padding: 0;
+            background: #fff;
+            border-width: 2px;
+            border-style: solid;
+        }
+        .btn-primary.btn-square {
+            color: #1976d2;
+            border-color: #1976d2;
+            background: #fff;
+        }
+        .btn-primary.btn-square:hover {
+            background: #1976d2;
+            color: #fff;
+        }
+        .btn-warning.btn-square {
+            color: #fbc02d;
+            border-color: #fbc02d;
+            background: #fff;
+        }
+        .btn-warning.btn-square:hover {
+            background: #fbc02d;
+            color: #fff;
+        }
+        .btn-danger.btn-square {
+            color: #d32f2f;
+            border-color: #d32f2f;
+            background: #fff;
+        }
+        .btn-danger.btn-square:hover {
+            background: #d32f2f;
+            color: #fff;
+        }
+        .btn-square:not(:last-child) {
+            border-right: none;
+        }
+        .actions-group {
+            display: inline-flex;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Exemples de conditions d'affichage selon le rôle/groupe -->
+
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="row">
+            <main class="col-12 main-content">
+                <!-- System Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" title="Fermer l'alerte"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <!-- Breadcrumbs -->
+                {% block breadcrumb %}{% endblock %}
+                
+                <!-- Page Content -->
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-hide alerts
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    new bootstrap.Alert(alert).close();
+                });
+            }, 5000);
+            
+            // Add fade-in animation
+            document.querySelector('.main-content').classList.add('fade-in');
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

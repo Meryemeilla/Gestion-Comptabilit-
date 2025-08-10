@@ -1,0 +1,15 @@
+{% extends "emails/base.html" %}
+{% block content %}
+<h1>Nouvelle Réclamation #{{ reclamation.code }}</h1>
+<p>
+   <strong>Client :</strong>
+    {% if reclamation.dossier.client.user %}
+        {{ reclamation.dossier.client.user.first_name }} {{ reclamation.dossier.client.user.last_name }}
+    {% else %}
+        {{ reclamation.dossier.client.contact_personne }}
+    {% endif %}<br>
+    <strong>Dossier :</strong> {{ reclamation.dossier.code }}<br>
+    <strong>Date :</strong> {{ reclamation.date_creation|date:"d/m/Y" }}
+</p>
+<p>{{ reclamation.description }}</p>
+{% endblock %}

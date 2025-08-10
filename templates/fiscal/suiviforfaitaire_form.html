@@ -1,0 +1,279 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} Suivi Forfaitaire - Cabinet Comptable{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+        --sf-forfait-purple: #366092
+    }
+    
+    .sf-breadcrumb {
+        background: linear-gradient(to right, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-size: 0.93rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.1rem;
+        padding: 0 0.6rem;
+        font-weight: bold;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        background-color: rgba(54, 96, 146, 0.08);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item a i {
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active i {
+        color: var(--sf-gold);
+    }
+     /* Classes utilitaires */
+    .text-sf-blue { color: var(--sf-blue); }
+    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
+    .text-sf-gold { color: var(--sf-gold); }
+
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-forfait-purple);
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-forfait-purple);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .sf-form-label {
+        font-weight: 600;
+        color: var(--sf-dark-blue);
+        margin-bottom: 0.5rem;
+    }
+    
+    .sf-form-control {
+        border-radius: 0.35rem;
+        border: 1px solid #d1d3e2;
+        padding: 0.75rem 1rem;
+        transition: border-color 0.3s;
+    }
+    
+    .sf-form-control:focus {
+        border-color: var(--sf-forfait-purple);
+        box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-forfait-purple);
+        border-color: #366092;
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-primary:hover {
+        background-color: #366092;
+    }
+    
+    .sf-btn-outline {
+        color: var(--sf-forfait-purple);
+        border-color: var(--sf-forfait-purple);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: rgba(111, 66, 193, 0.1);
+    }
+    
+    /* Style spécifique forfaitaire */
+    .forfait-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        background-color: #e9ecef;
+        color: var(--sf-forfait-purple);
+        font-weight: 600;
+    }
+    
+    .montant-forfait {
+        font-weight: bold;
+        color: var(--sf-forfait-purple);
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb sf-breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'cabinet:dashboard' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                    <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'fiscal:suiviforfaitaire_list' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                    <i class="bi bi-calculator me-2"></i>Suivis Forfaitaires
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-sf-gold">
+                <i class="bi bi-pencil-square me-2"></i>{% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} Suivi
+            </li>
+        </ol>
+    </nav>
+
+    <!-- En-tête de page -->
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-calculator mr-2"></i>
+            {% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} Suivi Forfaitaire
+        </h1>
+        <p class="mb-0 text-muted">Formulaire pour {% if form.instance.pk %}modifier{% else %}ajouter{% endif %} un suivi forfaitaire.</p>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="card sf-card shadow mb-4">
+        <div class="sf-card-header">
+            <h5 class="m-0 font-weight-bold">
+                <i class="bi bi-card-checklist mr-2"></i>
+                Informations du Suivi Forfaitaire
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                
+                <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                    <a href="{% url 'fiscal:suiviforfaitaire_list' %}" class="btn sf-btn-outline mr-3">
+                        <i class="bi bi-x-circle mr-2"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn sf-btn-primary" style="color: white;">
+                        <i class="bi bi-save mr-2"></i> {% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Style des champs de formulaire
+        document.querySelectorAll('select, input, textarea').forEach(element => {
+            if (element.type !== 'checkbox' && element.type !== 'radio') {
+                element.classList.add('sf-form-control', 'form-control');
+            }
+        });
+        
+        // Style des labels
+        document.querySelectorAll('label').forEach(label => {
+            label.classList.add('sf-form-label');
+        });
+        
+        // Style des paragraphes du formulaire
+        document.querySelectorAll('.card-body p').forEach(p => {
+            p.classList.add('sf-form-group');
+        });
+
+        // Formatage des montants forfaitaires
+        const forfaitFields = ['id_montant_forfait', 'id_montant_paye'];
+        forfaitFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener('blur', function() {
+                    if (this.value) {
+                        this.value = parseFloat(this.value).toFixed(2);
+                    }
+                });
+            }
+        });
+
+        // Gestion des dates
+        const dateFields = ['id_date_debut', 'id_date_fin', 'id_date_paiement'];
+        dateFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener('focus', function() {
+                    this.type = 'date';
+                });
+                field.addEventListener('blur', function() {
+                    if (!this.value) this.type = 'text';
+                });
+            }
+        });
+
+        // Mise en évidence du type de forfait
+        const typeForfaitField = document.getElementById('id_type_forfait');
+        if (typeForfaitField) {
+            typeForfaitField.addEventListener('change', function() {
+                const badge = document.querySelector('.forfait-display');
+                if (badge) {
+                    badge.textContent = this.options[this.selectedIndex].text;
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

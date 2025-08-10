@@ -1,0 +1,429 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ dossier.numero }} - Détails du dossier{% endblock %}
+
+{% block breadcrumb %}
+<style>
+    .sf-breadcrumb-container {
+        background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1rem;
+    }
+
+    .sf-breadcrumb {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+</style>
+<nav aria-label="breadcrumb" class="sf-breadcrumb-container">
+    <ol class="breadcrumb sf-breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dashboard' %}">
+                <i class="bi bi-speedometer2"></i> Tableau de bord
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dossier_list' %}">
+                <i class="bi bi-folder"></i> Dossiers
+            </a>
+        </li>
+        <li class="breadcrumb-item active">
+            <i class="bi bi-file-earmark-text"></i> {{ dossier.code }}
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+        margin-bottom: 2rem;
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-card-header h5 {
+        margin-bottom: 0;
+        font-weight: 600;
+    }
+    
+    .sf-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 0.35rem;
+        font-weight: 600;
+    }
+    
+    .sf-badge-info {
+        background-color: #e7f1ff;
+        color: var(--sf-blue);
+    }
+    
+    .sf-badge-warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .sf-table {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+    
+    .sf-table th {
+        width: 30%;
+        font-weight: 600;
+        color: var(--sf-dark-blue);
+        background-color: #f8f9fc;
+    }
+    
+    .sf-table td {
+        padding: 0.75rem;
+    }
+    
+    .sf-table tr:not(:last-child) {
+        border-bottom: 1px solid #e3e6f0;
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-primary:hover {
+        background-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-warning {
+        background-color: #ffc107;
+        border-color: #e0a800;
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-danger {
+        background-color: #e74a3b;
+        border-color: #d52a1a;
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+    
+    /* Styles spécifiques pour la modal de suppression */
+    .modal-content {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        padding: 1.2rem 1.5rem;
+        background-color: #f8f9fa;
+        border-bottom: none;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        font-size: 1.05rem;
+        text-align: center;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem 1.5rem;
+        gap: 1rem;
+        border-top: none;
+        justify-content: center;
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+        transition: all 0.3s;
+        min-width: 100px;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+    }
+
+    .btn-danger {
+        transition: all 0.3s;
+        background-color: #dc3545;
+        border-color: #dc3545;
+        min-width: 120px;
+    }
+
+    .btn-danger:hover {
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+    }
+
+    .fa-exclamation-triangle {
+        color: #ffc107;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- En-tête de page -->
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-folder me-2"></i>
+            Détails du dossier {{ dossier.numero }}
+        </h1>
+        {% if not request.user.is_client %}
+        <div>
+            <a href="{% url 'cabinet:dossier_edit' dossier.id %}" class="btn sf-btn-warning">
+                <i class="bi bi-pencil me-2"></i> Modifier
+            </a>
+            <button type="button" class="btn sf-btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                <i class="bi bi-trash me-2"></i> Supprimer
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Informations générales -->
+    <div class="card sf-card shadow">
+        <div class="sf-card-header">
+            <h5 class="m-0">
+                <i class="bi bi-info-circle me-2"></i>Informations générales
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="sf-table">
+                        <tr>
+                            <th>Code</th>
+                            <td><strong>{{ dossier.code }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Nom</th>
+                            <td>{{ dossier.denomination }}</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <span class="sf-badge sf-badge-info">
+                                    {{ dossier.get_code_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>IF</th>
+                            <td>{{ dossier.if_identifiant|default:'-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Client</th>
+                            <td>{{ dossier.client|default:'-' }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="sf-table">
+                        <tr>
+                            <th>Comptable</th>
+                            <td>
+                                {% if dossier.comptable_traitant %}
+                                <a href="{% url 'cabinet:comptable_detail' dossier.comptable_traitant.id %}" class="text-primary">
+                                    {{ dossier.comptable_traitant.nom_complet }}
+                                </a>
+                                {% else %}
+                                <span class="text-muted">Non assigné</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                       
+                        <tr>
+                            <th>Date création</th>
+                            <td>{{ dossier.date_creation|date:"d/m/Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Dernière mise à jour</th>
+                            <td>{{ dossier.date_modification|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card sf-card mt-4">
+    <div class="sf-card-header">
+        <h5 class="m-0">
+            <i class="bi bi-paperclip me-2"></i>Documents joints
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if dossier.documents.exists %}
+            <ul class="list-group list-group-flush">
+                {% for document in dossier.documents.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{{ document.fichier.url }}" target="_blank">{{ document.nom|default:document.fichier.name }}</a>
+                        <span class="badge bg-secondary">{{ document.fichier.size|filesizeformat }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">Aucun document joint à ce dossier.</p>
+        {% endif %}
+    </div>
+</div>
+
+
+    <!-- Documents fiscaux -->
+    <!-- <div class="card sf-card shadow">
+        <div class="sf-card-header">
+            <h5 class="m-0">
+                <i class="bi bi-file-earmark-text me-2"></i>Documents fiscaux
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if dossier.documents_fiscaux.all %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Période</th>
+                            <th>Date dépôt</th>
+                            <th>Statut</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in dossier.documents_fiscaux.all %}
+                        <tr>
+                            <td>{{ doc.get_type_display }}</td>
+                            <td>{{ doc.periode }}</td>
+                            <td>{{ doc.date_depot|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="sf-badge" style="background-color: {{ doc.get_statut_bg_color }}; color: {{ doc.get_statut_text_color }};">
+                                    {{ doc.get_statut_display }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <a href="{{ doc.fichier.url }}" class="btn btn-sm sf-btn-outline" target="_blank">
+                                    <i class="bi bi-download me-1"></i> Télécharger
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">Aucun document fiscal disponible</p>
+            {% endif %}
+        </div>
+    </div> -->
+
+    <!-- Modal de suppression -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header border-0 bg-light">
+                    <h5 class="modal-title text-dark fs-5 fw-bold">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                        Confirmer la suppression
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p class="mb-0 text-center text-muted">
+                        Êtes-vous sûr de vouloir supprimer le dossier <strong>{{ dossier.denomination }}</strong> ({{ dossier.code }}) ?
+                    </p>
+                    <p class="small text-center text-muted mt-2">
+                        <i class="fas fa-info-circle me-1"></i>Cette action est irréversible
+                    </p>
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                        Annuler
+                    </button>
+                    <form action="{% url 'cabinet:dossier_delete' dossier.id %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger px-4">
+                            <i class="fas fa-trash-alt me-2"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

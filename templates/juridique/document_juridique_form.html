@@ -1,0 +1,230 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} Document Juridique{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+     .sf-breadcrumb-container {
+        background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1rem;
+    }
+
+    .sf-breadcrumb {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .sf-page-header { border-bottom: 2px solid var(--sf-gold); padding-bottom: 0.5rem; margin-bottom: 2rem; }
+    .sf-page-title { color: var(--sf-blue); font-weight: 600; }
+    .sf-card { border: none; box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1); border-left: 4px solid var(--sf-blue); }
+    .sf-card-header { background-color: var(--sf-blue); color: white; padding: 1rem 1.5rem; }
+    .sf-form-group { margin-bottom: 1.5rem; }
+    .sf-form-label { font-weight: 600; color: var(--sf-dark-blue); margin-bottom: 0.5rem; }
+    .sf-form-control { border-radius: 0.35rem; border: 1px solid #d1d3e2; padding: 0.75rem 1rem; transition: border-color 0.3s; }
+    .sf-form-control:focus { border-color: var(--sf-blue); box-shadow: 0 0 0 0.2rem rgba(54, 96, 146, 0.25); }
+    .sf-file-input { padding: 0.5rem; }
+    .sf-btn-primary { background-color: var(--sf-blue); border-color: var(--sf-dark-blue); }
+    .sf-btn-primary:hover { background-color: var(--sf-dark-blue); }
+    .sf-btn-outline { color: var(--sf-blue); border-color: var(--sf-blue); }
+    .sf-btn-outline:hover { background-color: var(--sf-light-bg); }
+    .time-note { font-size: 0.85rem; color: #6c757d; margin-top: 0.5rem; }
+    .status-section { margin: 1.5rem 0; padding: 1rem; background-color: #f8f9fa; border-radius: 0.35rem; }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="sf-breadcrumb-container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb sf-breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'cabinet:dashboard' %}">
+                        <i class="bi bi-speedometer2"></i> Tableau de bord
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{% url 'juridique:documentjuridique_list' %}">
+                        <i class="bi bi-files-alt"></i> Documents Juridiques
+                    </a>
+                </li>
+                <li class="breadcrumb-item active">
+                    <i class="bi {% if form.instance.pk %}bi-pencil-square{% else %}bi-plus-circle{% endif %}"></i>
+                    {% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} Document
+                </li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-file-earmark-text mr-2"></i>
+            {% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} un Document Juridique
+        </h1>
+    </div>
+
+    <div class="card sf-card shadow mb-4">
+        <div class="sf-card-header">
+            <h6 class="m-0 font-weight-bold">
+                <i class="bi bi-info-circle mr-2"></i>
+                Informations sur le document
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="sf-form-group">
+                            <label class="sf-form-label">Dossier associé</label>
+                            {{ form.dossier }}
+                        </div>
+
+                        <div class="sf-form-group">
+                            <label class="sf-form-label">Type de document</label>
+                            {{ form.type_document }}
+                        </div>
+
+                        <div class="sf-form-group">
+                            <label class="sf-form-label">Nom du document</label>
+                            {{ form.nom_document }}
+
+            
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label">Document joint:</label>
+                            <input type="file" name="fichier" class="sf-form-control">
+                       
+                            
+                        </div>
+
+                    <div class="col-md-6">
+                        <div class="sf-form-group">
+                            <label class="sf-form-label">Description</label>
+                            {{ form.description }}
+                        </div>
+
+                        <div class="sf-form-group">
+                            <label class="sf-form-label">Date du document</label>
+                            <div class="d-flex align-items-center">
+                                {{ form.date_document }}
+                                
+                            </div>
+                           
+                        </div>
+                         <div class="sf-form-group">
+                    <label class="sf-form-label">Statut</label>
+                    {{ form.statut }}
+                </div>
+
+                <div class="sf-form-group">
+                    <label class="sf-form-label">Remarques</label>
+                    <textarea name="remarques" rows="4" class="sf-form-control" placeholder="Ajouter des remarques">{{ form.instance.remarques|default_if_none:'' }}</textarea>
+                </div>
+                    </div>
+                </div>
+
+                
+                   
+                </div>
+
+               
+
+                <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                    <a href="{% if form.instance.pk %}{% url 'juridique:documentjuridique_detail' form.instance.pk %}{% else %}{% url 'juridique:documentjuridique_list' %}{% endif %}" 
+                       class="btn sf-btn-outline mr-3">
+                        <i class="bi bi-x-circle mr-2"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn sf-btn-primary" style="color: white;">
+                        <i class="bi bi-save mr-2"></i> Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('select, input[type="text"], input[type="date"], textarea').forEach(element => {
+            element.classList.add('sf-form-control', 'form-control');
+        });
+
+        const fileInput = document.getElementById('{{ form.fichier.id_for_label }}');
+        if (fileInput) {
+            fileInput.classList.add('custom-file-input', 'sf-file-input');
+            fileInput.addEventListener('change', function(e) {
+                const fileName = e.target.files[0]?.name || 'Choisir un fichier...';
+                document.querySelector('.custom-file-label').textContent = fileName;
+            });
+        }
+
+        const todayCheckbox = document.getElementById('today-checkbox');
+        const dateField = document.getElementById('{{ form.date_document.id_for_label }}');
+
+        if (todayCheckbox && dateField) {
+            todayCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    const today = new Date();
+                    const formattedDate = today.toISOString().split('T')[0];
+                    dateField.value = formattedDate;
+                }
+            });
+
+            const today = new Date().toISOString().split('T')[0];
+            if (dateField.value === today) {
+                todayCheckbox.checked = true;
+            }
+        }
+
+        document.querySelectorAll('.errorlist').forEach(list => {
+            list.classList.add('alert', 'alert-danger');
+        });
+    });
+</script>
+{% endblock %}

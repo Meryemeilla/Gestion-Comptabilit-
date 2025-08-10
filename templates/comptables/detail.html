@@ -1,0 +1,521 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ comptable.nom_complet }} - Comptables{% endblock %}
+
+{% block breadcrumb %}
+<style>
+    .sf-breadcrumb {
+        background: linear-gradient(to right, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-size: 0.93rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.1rem;
+        padding: 0 0.6rem;
+        font-weight: bold;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        background-color: rgba(54, 96, 146, 0.08);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item a i {
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active i {
+        color: var(--sf-gold);
+    }
+     /* Classes utilitaires */
+    .text-sf-blue { color: var(--sf-blue); }
+    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
+    .text-sf-gold { color: var(--sf-gold); }
+</style>
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb sf-breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dashboard' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:comptable_list' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                <i class="bi bi-person-vcard me-2"></i>Comptables
+            </a>
+        </li>
+        <li class="breadcrumb-item active text-sf-gold">
+            <i class="bi bi-person-circle me-2"></i>{{ comptable.nom_complet }}
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+        margin-bottom: 1.5rem;
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-card-title {
+        color: white;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-primary:hover {
+        background-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+    
+    .sf-btn-warning {
+        background-color: var(--sf-gold);
+        border-color: #c69500;
+        color: #212529;
+    }
+    
+    .sf-stat-card {
+        border-left: 4px solid var(--sf-blue);
+        border-radius: 0.35rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+    }
+    
+    .sf-stat-number {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--sf-blue);
+    }
+    
+    .sf-stat-label {
+        color: var(--sf-dark-blue);
+        font-weight: 500;
+    }
+    
+    .sf-table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .sf-table thead th {
+        background-color: var(--sf-light-bg);
+        color: var(--sf-dark-blue);
+        border-bottom: 2px solid var(--sf-gold);
+    }
+    
+    .sf-badge {
+        padding: 0.35em 0.65em;
+        font-weight: 600;
+        border-radius: 0.35rem;
+    }
+    
+    /* Style amélioré pour le bouton Assigner */
+    .sf-btn-assign {
+        background-color: #135a23;
+        border-color: #218838;
+    }
+    
+    .sf-btn-assign:hover {
+        background-color: #218838;
+    }
+    .statut-existant {
+    color: green;
+    font-weight: bold;
+    }
+    .statut-radie {
+        color: red;
+        font-weight: bold;
+    }
+    .statut-delaisse {
+        color: orange;
+        font-weight: bold;
+    }
+    .statut-livre {
+        color: blue;
+        font-weight: bold;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- En-tête de page amélioré avec bouton Assigner -->
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-person-badge mr-2"></i>
+            {{ comptable.nom_complet }}
+        </h1>
+        <div>
+            <a href="{% url 'cabinet:comptable_edit' comptable.pk %}" class="btn sf-btn-warning">
+                <i class="bi bi-pencil mr-2"></i> Modifier
+            </a>
+            <a href="{% url 'cabinet:dossier_list' %}?assign_to_comptable={{ comptable.pk }}" 
+               class="btn sf-btn-primary ml-2 sf-btn-assign"
+               title="Assigner un dossier existant à ce comptable">
+               <i class="bi bi-person-plus mr-2"></i> Assigner dossier
+            </a>
+            <a href="{% url 'cabinet:comptable_list' %}" class="btn sf-btn-outline ml-2">
+                <i class="bi bi-arrow-left mr-2"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Colonne gauche - Informations personnelles et contact -->
+        <div class="col-lg-4">
+            <!-- Carte Informations personnelles -->
+            <div class="card sf-card">
+                <div class="sf-card-header">
+                    <h5 class="sf-card-title">
+                        <i class="bi bi-person me-2"></i>Informations personnelles
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td class="fw-bold">Matricule:</td>
+                            <td>{{ comptable.matricule }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Nom:</td>
+                            <td>{{ comptable.nom }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Prénom:</td>
+                            <td>{{ comptable.prenom }}</td>
+                        </tr>
+                        {% if comptable.cnss %}
+                        <tr>
+                            <td class="fw-bold">CNSS:</td>
+                            <td>{{ comptable.cnss }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td class="fw-bold">Statut:</td>
+                            <td>
+                                {% if comptable.actif %}
+                                <span class="badge bg-success">Actif</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inactif</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Créé le:</td>
+                            <td>{{ comptable.date_creation|date:"d/m/Y à H:i" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Carte Contact -->
+            <div class="card sf-card mt-4">
+                <div class="sf-card-header">
+                    <h5 class="sf-card-title">
+                        <i class="bi bi-telephone me-2"></i>Contact
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if comptable.tel %}
+                    <div class="mb-3">
+                        <strong>Téléphone:</strong><br>
+                        <a href="tel:{{ comptable.tel }}" class="text-decoration-none">
+                            <i class="bi bi-telephone me-1"></i>{{ comptable.tel }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if comptable.tel_personnel %}
+                    <div class="mb-3">
+                        <strong>Téléphone personnel :</strong> {{ comptable.tel_personnel }}
+                    </div>
+                    {% endif %}
+                    {% if comptable.email %}
+                    <div class="mb-3">
+                        <strong>Email principal:</strong><br>
+                        <a href="mailto:{{ comptable.email }}" class="text-decoration-none">
+                            <i class="bi bi-envelope me-1"></i>{{ comptable.email }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if comptable.email_personnel %}
+                    <div class="mb-3">
+                        <strong>Email personnel:</strong><br>
+                        <a href="mailto:{{ comptable.email_personnel }}" class="text-decoration-none">
+                            <i class="bi bi-envelope me-1"></i>{{ comptable.email_personnel }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if comptable.adresse %}
+                    <div>
+                        <strong>Adresse:</strong><br>
+                        {{ comptable.adresse|linebreaks }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonne droite - Statistiques et dossiers -->
+        <div class="col-lg-8">
+            <!-- Statistiques -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card sf-stat-card h-100">
+                        <div class="card-body text-center">
+                            <div class="sf-stat-number">{{ stats.total_dossiers }}</div>
+                            <div class="sf-stat-label">Total dossiers</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card sf-stat-card h-100">
+                        <div class="card-body text-center">
+                            <div class="sf-stat-number">{{ stats.dossiers_pm }}</div>
+                            <div class="sf-stat-label">Dossiers PM</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card sf-stat-card h-100">
+                        <div class="card-body text-center">
+                            <div class="sf-stat-number">{{ stats.dossiers_pp }}</div>
+                            <div class="sf-stat-label">Dossiers PP</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card sf-stat-card h-100">
+                        <div class="card-body text-center">
+                            <div class="sf-stat-number">{{ stats.dossiers_avec_tva }}</div>
+                            <div class="sf-stat-label">Avec TVA</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liste des dossiers -->
+            <div class="card sf-card">
+                <div class="sf-card-header d-flex justify-content-between align-items-center">
+                    <h5 class="sf-card-title mb-0">
+                        <i class="bi bi-folder me-2"></i>Dossiers gérés ({{ dossiers|length }})
+                    </h5>
+                    <div>
+                        <a href="{% url 'cabinet:dossier_create' %}?comptable={{ comptable.pk }}" 
+                           class="btn btn-sm sf-btn-primary"
+                           title="Créer un nouveau dossier pour ce comptable">
+                           <i class="bi bi-folder-plus mr-1"></i> Nouveau
+                        </a>
+                        <a href="{% url 'cabinet:dossier_list' %}?assign_to_comptable={{ comptable.pk }}" 
+                           class="btn btn-sm sf-btn-primary ml-2 sf-btn-assign"
+                           title="Assigner un dossier existant à ce comptable">
+                           <i class="bi bi-person-plus mr-1"></i> Assigner
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if dossiers %}
+                    <div class="table-responsive">
+                        <table class="table sf-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Dénomination</th>
+                                    <th>Forme juridique</th>
+                                    <th>TVA</th>
+                                    <th>Statut</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dossier in dossiers %}
+                                <tr>
+                                    <td>
+                                        <span class="sf-badge bg-secondary">{{ dossier.code }}</span>
+                                    </td>
+                                    <td>
+                                        <strong>{{ dossier.denomination }}</strong>
+                                        {% if dossier.abreviation %}
+                                        <br><small class="text-muted">{{ dossier.abreviation }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ dossier.get_forme_juridique_display }}</td>
+                                    <td>
+                                        {% if dossier.declaration_tva == 'MENSUELLE' %}
+                                        <span class="sf-badge bg-info">Mensuelle</span>
+                                        {% elif dossier.declaration_tva == 'TRIMESTRIELLE' %}
+                                        <span class="sf-badge bg-warning">Trimestrielle</span>
+                                        {% else %}
+                                        <span class="sf-badge bg-secondary">Exonérée</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if dossier.statut == 'EXISTANT' %}
+                                        <span class="sf-badge bg-success" >{{ dossier.get_statut_display }}</span>
+                                        {% else %}
+                                        <span class="sf-badge bg-warning" >{{ dossier.get_statut_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{% url 'cabinet:dossier_detail' dossier.pk %}" 
+                                               class="btn btn-outline-primary" title="Voir les détails">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'cabinet:dossier_edit' dossier.pk %}" 
+                                               class="btn btn-outline-warning" title="Modifier">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-folder" style="font-size: 3rem; color: #dee2e6;"></i>
+                        <h6 class="mt-3 text-muted">Aucun dossier assigné</h6>
+                        <p class="text-muted">Ce comptable n'a pas encore de dossiers assignés.</p>
+                        <a href="{% url 'cabinet:dossier_list' %}?assign_to_comptable={{ comptable.pk }}" 
+                           class="btn sf-btn-primary sf-btn-assign"
+                           title="Assigner un dossier existant à ce comptable">
+                           <i class="bi bi-person-plus mr-1"></i> Assigner un dossier
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Tâches effectuées -->
+            <!-- <div class="card sf-card mt-4">
+                <div class="sf-card-header sf-card-header text-white">
+                    <h5 class="sf-card-title mb-0">
+                        <i class="bi bi-check2-circle me-2"></i> Tâches effectuées
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if taches_effectuees and taches_effectuees|length > 0 %}
+                        <ul class="mb-0">
+                            {% for tache in taches_effectuees %}
+                                <li>{{ tache }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span class="text-muted">Aucune tâche effectuée récemment.</span>
+                    {% endif %}
+                </div>
+            </div> -->
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Fonction pour recalculer les statistiques
+    function recalculerStatistiques() {
+        if (confirm('Voulez-vous recalculer les statistiques de ce comptable ?')) {
+            // Ici on pourrait faire un appel AJAX vers l'API
+            fetch(`/api/comptables/{{ comptable.pk }}/calculer_statistiques/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert('Statistiques recalculées avec succès');
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors du recalcul des statistiques');
+            });
+        }
+    }
+</script>
+{% endblock %}
+{% endblock %}

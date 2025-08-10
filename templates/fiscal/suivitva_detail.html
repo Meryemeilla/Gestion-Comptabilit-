@@ -1,0 +1,427 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Détail Suivi TVA - Cabinet Comptable{% endblock %}
+
+{% block breadcrumb %}
+<style>
+    .sf-breadcrumb {
+        background: linear-gradient(to right, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-size: 0.93rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.1rem;
+        padding: 0 0.6rem;
+        font-weight: bold;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        background-color: rgba(54, 96, 146, 0.08);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item a i {
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active i {
+        color: var(--sf-gold);
+    }
+     /* Classes utilitaires */
+    .text-sf-blue { color: var(--sf-blue); }
+    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
+    .text-sf-gold { color: var(--sf-gold); }
+</style>
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb sf-breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dashboard' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'fiscal:suivitva_list' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                <i class="bi bi-receipt me-2"></i>Suivi TVA
+            </a>
+        </li>
+        <li class="breadcrumb-item active text-sf-gold">
+            <i class="bi bi-eye me-2"></i>Détail: {{ suivitva.dossier.denomination }} ({{ suivitva.annee }})
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+        margin-bottom: 2rem;
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-card-secondary {
+        border-left: 4px solid var(--sf-gold);
+    }
+    
+    .sf-card-secondary .card-header {
+        background-color: var(--sf-light-bg);
+        color: var(--sf-dark-blue);
+        font-weight: 600;
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-primary:hover {
+        background-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+    
+    .sf-btn-warning {
+        background-color: #f6c23e;
+        border-color: #daa520;
+        color: #000;
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-danger {
+        background-color: #e74a3b;
+        border-color: #be2617;
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.35rem;
+        font-weight: 600;
+    }
+    
+    .status-declare {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-non-declare {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    /* Styles spécifiques pour la modal de suppression */
+    .modal-content {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        padding: 1.2rem 1.5rem;
+        background-color: #f8f9fa;
+        border-bottom: none;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        font-size: 1.05rem;
+        text-align: center;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem 1.5rem;
+        gap: 1rem;
+        border-top: none;
+        justify-content: center;
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+        transition: all 0.3s;
+        min-width: 100px;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+    }
+
+    .btn-danger {
+        transition: all 0.3s;
+        background-color: #dc3545;
+        border-color: #dc3545;
+        min-width: 120px;
+    }
+
+    .btn-danger:hover {
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+    }
+
+    .fa-exclamation-triangle {
+        color: #ffc107;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- En-tête de page -->
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-file-earmark-text mr-2"></i>
+            Détail Suivi TVA: {{ suivitva.dossier.denomination }} ({{ suivitva.annee }})
+        </h1>
+    </div>
+
+    <!-- Carte principale -->
+    <div class="card sf-card shadow">
+        <div class="sf-card-header">
+            <h5 class="m-0 font-weight-bold">
+                <i class="bi bi-graph-up mr-2"></i>
+                Informations du suivi TVA
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Colonne gauche - Informations générales -->
+                <div class="col-lg-6">
+                    <div class="card sf-card-secondary mb-4">
+                        <div class="card-header" style="color: white;">Informations Générales</div>
+                        <div class="card-body">
+                            <p><strong>Code:</strong> {{ suivitva.code }}</p>
+                            <p><strong>Dossier:</strong> {{ suivitva.dossier.denomination }}</p>
+                            <p><strong>Année:</strong> {{ suivitva.annee }}</p>
+                            <p><strong>% Mensuel Complété:</strong> 
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ suivitva.pourcentage_mensuel_complete }}%" 
+                                         aria-valuenow="{{ suivitva.pourcentage_mensuel_complete }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        {{ suivitva.pourcentage_mensuel_complete|floatformat:2 }}%
+                                    </div>
+                                </div>
+                            </p>
+                            <p><strong>% Trimestriel Complété:</strong> 
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" role="progressbar" 
+                                         style="width: {{ suivitva.pourcentage_trimestriel_complete }}%" 
+                                         aria-valuenow="{{ suivitva.pourcentage_trimestriel_complete }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        {{ suivitva.pourcentage_trimestriel_complete|floatformat:2 }}%
+                                    </div>
+                                </div>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Colonne droite - Suivi mensuel -->
+                <div class="col-lg-6">
+                    <div class="card sf-card-secondary mb-4">
+                        <div class="card-header" style="color: white;">Suivi Mensuel</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Janvier:</strong> <span class="status-badge {% if suivitva.jan %}status-declare{% else %}status-non-declare{% endif %}">
+                                        {% if suivitva.jan %}Déclaré{% else %}Non Déclaré{% endif %}
+                                    </span></p>
+                                    <p><strong>Février:</strong> <span class="status-badge {% if suivitva.fev %}status-declare{% else %}status-non-declare{% endif %}">
+                                        {% if suivitva.fev %}Déclaré{% else %}Non Déclaré{% endif %}
+                                    </span></p>
+                                    <p><strong>Mars:</strong> <span class="status-badge {% if suivitva.mars %}status-declare{% else %}status-non-declare{% endif %}">
+                                        {% if suivitva.mars %}Déclaré{% else %}Non Déclaré{% endif %}
+                                    </span></p>
+                                    <p><strong>Avril:</strong> <span class="status-badge {% if suivitva.avril %}status-declare{% else %}status-non-declare{% endif %}">
+                                        {% if suivitva.avril %}Déclaré{% else %}Non Déclaré{% endif %}
+                                    </span></p>
+                                    <p><strong>Mai:</strong> <span class="status-badge {% if suivitva.mai %}status-declare{% else %}status-non-declare{% endif %}">
+                                        {% if suivitva.mai %}Déclaré{% else %}Non Déclaré{% endif %}
+                                    </span></p>
+                                    <p><strong>Juin:</strong> <span class="status-badge {% if suivitva.juin %}status-declare{% else %}status-non-declare{% endif %}">
+                                        {% if suivitva.juin %}Déclaré{% else %}Non Déclaré{% endif %}
+                                    </span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Juillet:</strong> <span class="status-badge {% if suivitva.juillet %}status-declare{% else %}status-non-declare{% endif %}">
+                                        {% if suivitva.juillet %}Déclaré{% else %}Non Déclaré{% endif %}
+                                    </span></p>
+                                    <p><strong>Août:</strong> <span class="status-badge {% if suivitva.aout %}status-declare{% else %}status-non-declare{% endif %}">
+                                        {% if suivitva.aout %}Déclaré{% else %}Non Déclaré{% endif %}
+                                    </span></p>
+                                    <p><strong>Septembre:</strong> <span class="status-badge {% if suivitva.sep %}status-declare{% else %}status-non-declare{% endif %}">
+                                        {% if suivitva.sep %}Déclaré{% else %}Non Déclaré{% endif %}
+                                    </span></p>
+                                    <p><strong>Octobre:</strong> <span class="status-badge {% if suivitva.oct %}status-declare{% else %}status-non-declare{% endif %}">
+                                        {% if suivitva.oct %}Déclaré{% else %}Non Déclaré{% endif %}
+                                    </span></p>
+                                    <p><strong>Novembre:</strong> <span class="status-badge {% if suivitva.nov %}status-declare{% else %}status-non-declare{% endif %}">
+                                        {% if suivitva.nov %}Déclaré{% else %}Non Déclaré{% endif %}
+                                    </span></p>
+                                    <p><strong>Décembre:</strong> <span class="status-badge {% if suivitva.dec %}status-declare{% else %}status-non-declare{% endif %}">
+                                        {% if suivitva.dec %}Déclaré{% else %}Non Déclaré{% endif %}
+                                    </span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Suivi trimestriel -->
+            <div class="card sf-card-secondary">
+                <div class="card-header" style="color: white;">Suivi Trimestriel</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p><strong>Trimestre 1:</strong> <span class="status-badge {% if suivitva.t1 %}status-declare{% else %}status-non-declare{% endif %}">
+                                {% if suivitva.t1 %}Déclaré{% else %}Non Déclaré{% endif %}
+                            </span></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Trimestre 2:</strong> <span class="status-badge {% if suivitva.t2 %}status-declare{% else %}status-non-declare{% endif %}">
+                                {% if suivitva.t2 %}Déclaré{% else %}Non Déclaré{% endif %}
+                            </span></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Trimestre 3:</strong> <span class="status-badge {% if suivitva.t3 %}status-declare{% else %}status-non-declare{% endif %}">
+                                {% if suivitva.t3 %}Déclaré{% else %}Non Déclaré{% endif %}
+                            </span></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Trimestre 4:</strong> <span class="status-badge {% if suivitva.t4 %}status-declare{% else %}status-non-declare{% endif %}">
+                                {% if suivitva.t4 %}Déclaré{% else %}Non Déclaré{% endif %}
+                            </span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Boutons d'action -->
+            <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                <a href="{% url 'fiscal:suivitva_list' %}" class="btn sf-btn-outline mr-3">
+                    <i class="bi bi-arrow-left mr-2"></i> Retour à la liste
+                </a>
+                <a href="{% url 'fiscal:suivitva_update' suivitva.pk %}" class="btn sf-btn-warning mr-3" style="color: white;">
+                    <i class="bi bi-pencil mr-2"></i> Modifier
+                </a>
+                <button type="button" class="btn sf-btn-danger" style="color: white;" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="bi bi-trash mr-2"></i> Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title text-dark fs-5 fw-bold">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="mb-0 text-center text-muted">
+                    Êtes-vous sûr de vouloir supprimer le suivi TVA pour <strong>{{ suivitva.dossier.denomination }}</strong> ({{ suivitva.annee }}) ?
+                </p>
+                <p class="small text-center text-muted mt-2">
+                    <i class="fas fa-info-circle me-1"></i>Cette action est irréversible
+                </p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                    Annuler
+                </button>
+                <form action="{% url 'fiscal:suivitva_delete' suivitva.pk %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="fas fa-trash-alt me-2"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

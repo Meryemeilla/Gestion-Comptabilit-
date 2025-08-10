@@ -1,0 +1,59 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Rapports - Cabinet Comptable{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:dashboard' %}">Tableau de bord</a></li>
+        <li class="breadcrumb-item active">Rapports</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Rapports et Statistiques</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Dossiers Actifs</h5>
+                <p class="card-text display-4">{{ stats.total_dossiers }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Comptables Actifs</h5>
+                <p class="card-text display-4">{{ stats.total_comptables }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Réclamations en Cours</h5>
+                <p class="card-text display-4">{{ stats.reclamations_en_cours }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        Actions d'Exportation
+    </div>
+    <div class="card-body">
+        <p>Vous pouvez exporter différentes données au format Excel ou PDF :</p>
+        <a href="{% url 'cabinet:export_excel' type='comptables' %}" class="btn btn-success me-2"><i class="bi bi-file-earmark-excel"></i> Exporter Comptables (Excel)</a>
+        <a href="{% url 'cabinet:export_excel' type='dossiers' %}" class="btn btn-success me-2"><i class="bi bi-file-earmark-excel"></i> Exporter Dossiers (Excel)</a>
+        <a href="{% url 'cabinet:export_excel' type='honoraires' %}" class="btn btn-success"><i class="bi bi-file-earmark-excel"></i> Exporter Honoraires (Excel)</a>
+        <!-- Ajoutez d'autres liens d'exportation PDF si nécessaire -->
+    </div>
+</div>
+
+{% endblock %}

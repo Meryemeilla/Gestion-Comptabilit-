@@ -1,0 +1,218 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ document.reference }} - Détails du document fiscal{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:dashboard' %}">Tableau de bord</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:fiscal_list' %}">Documents Fiscaux</a></li>
+        <li class="breadcrumb-item active">{{ document.reference }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Détails du document fiscal</h1>
+    <div>
+        <a href="{% url 'cabinet:fiscal_update' document.id %}" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Modifier
+        </a>
+        {% if document.fichier %}
+        <a href="{{ document.fichier.url }}" class="btn btn-success" target="_blank">
+            <i class="bi bi-download"></i> Télécharger
+        </a>
+        {% endif %}
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            <i class="bi bi-trash"></i> Supprimer
+        </button>
+    </div>
+</div>
+
+<!-- Informations générales -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="bi bi-info-circle me-2"></i>Informations générales
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="30%">Référence</th>
+                        <td><strong>{{ document.reference }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Dossier</th>
+                        <td>
+                            <a href="{% url 'cabinet:dossier_detail' document.dossier.id %}">
+                                {{ document.dossier.numero }} - {{ document.dossier.nom }}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td>{{ document.get_type_display }}</td>
+                    </tr>
+                    <tr>
+                        <th>Période</th>
+                        <td>{{ document.periode }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="30%">Statut</th>
+                        <td>
+                            <span class="badge bg-{{ document.get_statut_color }}">
+                                {{ document.get_statut_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Date limite</th>
+                        <td>{{ document.date_limite|date:"d/m/Y" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date dépôt</th>
+                        <td>
+                            {% if document.date_depot %}
+                            {{ document.date_depot|date:"d/m/Y" }}
+                            {% else %}
+                            <span class="text-muted">Non déposé</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Retard</th>
+                        <td>
+                            {% if document.jours_retard > 0 %}
+                            <span class="text-danger">{{ document.jours_retard }} jours</span>
+                            {% else %}
+                            <span class="text-success">Aucun retard</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Détails du document -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="bi bi-file-earmark-text me-2"></i>Détails du document
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="20%">Montant déclaré</th>
+                        <td>{{ document.montant_declare|floatformat:2|default:'-' }} DH</td>
+                    </tr>
+                    <tr>
+                        <th>Montant à payer</th>
+                        <td>{{ document.montant_a_payer|floatformat:2|default:'-' }} DH</td>
+                    </tr>
+                    <tr>
+                        <th>Observations</th>
+                        <td>{{ document.observations|linebreaks|default:'Aucune observation' }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Historique des modifications -->
+{% if document.historique.all %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="bi bi-clock-history me-2"></i>Historique des modifications
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="timeline">
+            {% for modification in document.historique.all %}
+            <div class="timeline-item">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="mb-1">{{ modification.get_type_modification_display }}</h6>
+                        <small class="text-muted">{{ modification.date_modification|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    <p class="mb-0">{{ modification.description }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer le document <strong>{{ document.reference }}</strong> ?
+                Cette action est irréversible.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{% url 'cabinet:fiscal_delete' document.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 40px;
+        margin-bottom: 20px;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 3px var(--primary-color);
+    }
+
+    .timeline-content {
+        background: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+{% endblock %}

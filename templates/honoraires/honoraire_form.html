@@ -1,0 +1,379 @@
+{% extends 'base/base.html' %}
+{% block title %}
+    {% if honoraire %}Modifier{% else %}Ajouter{% endif %} Honoraire - Cabinet Comptable
+{% endblock %}
+{% if form.errors %}
+<div class="alert alert-danger">
+    <ul>
+    {% for field in form %}
+        {% for error in field.errors %}
+            <li>{{ field.label }} : {{ error }}</li>
+        {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+
+{% block breadcrumb %}
+<style>
+    .honoraire-breadcrumb {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-left: 4px solid #d4af37;
+    }
+
+    .honoraire-breadcrumb .breadcrumb {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-size: 0.92rem;
+    }
+
+    .honoraire-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .honoraire-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "▸";
+        color: #6c757d;
+        font-size: 1rem;
+        padding: 0 0.7rem;
+        vertical-align: middle;
+    }
+
+    .honoraire-breadcrumb .breadcrumb-item a {
+        color: #2c5282;
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        transition: all 0.2s;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+    }
+
+    .honoraire-breadcrumb .breadcrumb-item a:hover {
+        color: #1a365d;
+        background-color: rgba(42, 112, 194, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .honoraire-breadcrumb .breadcrumb-item a i {
+        font-size: 0.95rem;
+        color: #366092;
+    }
+
+    .honoraire-breadcrumb .breadcrumb-item.active {
+        color: #d4af37;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .honoraire-breadcrumb .breadcrumb-item.active i {
+        color: #d4af37;
+    }
+</style>
+
+<nav aria-label="breadcrumb" class="mb-4 honoraire-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dashboard' %}">
+                <i class="bi bi-house-door"></i> Tableau de bord
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'honoraires:honoraire_list' %}">
+                <i class="bi bi-cash-stack"></i> Honoraires
+            </a>
+        </li>
+        <li class="breadcrumb-item active">
+            <i class="bi {% if honoraire %}bi-pencil-square{% else %}bi-plus-circle{% endif %}"></i>
+            {% if honoraire %}Modifier {{ honoraire.reference }}{% else %}Ajouter Honoraire{% endif %}
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .sf-form-label {
+        font-weight: 600;
+        color: var(--sf-dark-blue);
+        margin-bottom: 0.5rem;
+    }
+    
+    .sf-form-control {
+        border-radius: 0.35rem;
+        border: 1px solid #d1d3e2;
+        padding: 0.75rem 1rem;
+        transition: border-color 0.3s;
+    }
+    
+    .sf-form-control:focus {
+        border-color: var(--sf-blue);
+        box-shadow: 0 0 0 0.2rem rgba(54, 96, 146, 0.25);
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-primary:hover {
+        background-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 0.35rem;
+        font-weight: 600;
+        background-color: #f8f9fa;
+    }
+    
+    .status-badge.en-attente {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-badge::after {
+        content: "✅";
+        margin-left: 0.5rem;
+    }
+    
+    .time-note {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+    
+    .today-option {
+        display: flex;
+        align-items: center;
+        margin-left: 1rem;
+    }
+    
+    .today-option input[type="checkbox"] {
+        margin-right: 0.5rem;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- En-tête de page -->
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-cash-coin mr-2"></i>
+            {% if honoraire %}Modifier{% else %}Ajouter{% endif %} Honoraire
+        </h1>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="card sf-card shadow mb-4">
+        <div class="sf-card-header">
+            <h5 class="m-0 font-weight-bold">
+                <i class="bi bi-file-earmark-text mr-2"></i>
+                {% if honoraire %}Modifier{% else %}Ajouter{% endif %} un honoraire
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+
+                
+                <div class="row">
+                    <!-- Colonne gauche -->
+                    <div class="col-md-6">
+                        <div class="sf-form-group">
+                            <label class="sf-form-label">Code</label>
+                            <div class="d-flex align-items-center">
+                                {{ form.code }}
+                               
+                            </div>
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label">Dossier</label>
+                            <div class="d-flex align-items-center">
+                                {{ form.dossier }}
+                               
+                            </div>
+                        </div>
+                        
+                        <div class="sf-form-group">
+                            <label class="sf-form-label">Montant mensuel</label>
+                            <div class="input-group">
+                                {{ form.montant_mensuel }}
+                                
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Colonne droite -->
+                    <div class="col-md-6">
+                        <div class="sf-form-group">
+                            <label class="sf-form-label">Montant trimestriel</label>
+                            <div class="input-group">
+                                {{ form.montant_trimestriel }}
+                               
+                            </div>
+                        </div>
+                        
+                        <div class="sf-form-group">
+                            <label class="sf-form-label">Montant annuel</label>
+                            <div class="input-group">
+                                {{ form.montant_annuel }}
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sf-form-group">
+                    <label class="sf-form-label">Statut du règlement</label>
+                    {{ form.statut_reglement }}
+                </div>
+                
+                <div class="sf-form-group">
+                    <label class="sf-form-label">Date d'échéance</label>
+                    <div class="d-flex align-items-center">
+                        {{ form.date_echeance }}
+                       
+                    </div>
+                   
+                </div>
+                
+                <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                    <a href="{% if honoraire %}{% url 'honoraires:honoraire_detail' honoraire.pk %}{% else %}{% url 'honoraires:honoraire_list' %}{% endif %}" 
+                       class="btn sf-btn-outline mr-3">
+                        <i class="bi bi-x-circle mr-2"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn sf-btn-primary" style="color: white;">
+                        <i class="bi bi-save mr-2"></i> Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Style des champs de formulaire
+        document.querySelectorAll('select, input[type="text"], input[type="date"], input[type="number"], textarea').forEach(element => {
+            element.classList.add('sf-form-control', 'form-control');
+        });
+        
+        // Gestion de la date "Today"
+        const todayCheckbox = document.getElementById('today-checkbox');
+        const dateField = document.getElementById('{{ form.date_echeance.id_for_label }}');
+        
+        if (todayCheckbox && dateField) {
+            todayCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    const today = new Date();
+                    const formattedDate = today.toISOString().split('T')[0];
+                    dateField.value = formattedDate;
+                }
+            });
+            
+            // Cocher automatiquement si la date est aujourd'hui
+            const today = new Date().toISOString().split('T')[0];
+            if (dateField.value === today) {
+                todayCheckbox.checked = true;
+            }
+        }
+        
+        // Formatage des montants
+        const formatMontant = (field) => {
+            if (field.value) {
+                field.value = parseFloat(field.value).toFixed(2);
+            }
+        };
+        
+        document.getElementById('{{ form.montant_mensuel.id_for_label }}').addEventListener('blur', function() {
+            formatMontant(this);
+        });
+        
+        document.getElementById('{{ form.montant_trimestriel.id_for_label }}').addEventListener('blur', function() {
+            formatMontant(this);
+        });
+        
+        document.getElementById('{{ form.montant_annuel.id_for_label }}').addEventListener('blur', function() {
+            formatMontant(this);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+<!-- templates/emails/bienvenue_client.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Bienvenue</title>
+</head>
+<body>
+    <h2>Bonjour {{ prenom }},</h2>
+
+    <p>Votre compte client a été créé avec succès ! </p>
+
+    <p>Voici vos identifiants de connexion :</p>
+    <ul>
+        <li><strong>Nom d'utilisateur :</strong> {{ username }}</li>
+        <li><strong>Mot de passe :</strong> {{ password }}</li>
+    </ul>
+
+    <p>Accédez à votre espace via ce lien :</p>
+    <p><a href="{{ login_url }}">{{ login_url }}</a></p>
+
+    <p><strong>Important :</strong> Nous vous conseillons de modifier votre mot de passe après votre première connexion.</p>
+
+    <p>Bien à vous,<br>L'équipe Cabinet Comptable</p>
+</body>
+</html>

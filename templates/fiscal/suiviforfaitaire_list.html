@@ -1,0 +1,428 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Liste Suivi Forfaitaire{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+
+    .sf-breadcrumb {
+        background: linear-gradient(to right, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-size: 0.93rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.1rem;
+        padding: 0 0.6rem;
+        font-weight: bold;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        background-color: rgba(54, 96, 146, 0.08);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item a i {
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active i {
+        color: var(--sf-gold);
+    }
+     /* Classes utilitaires */
+    .text-sf-blue { color: var(--sf-blue); }
+    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
+    .text-sf-gold { color: var(--sf-gold); }
+
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+    }
+
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+        padding: 0.5rem 1.5rem;
+    }
+
+    .sf-btn-primary:hover {
+        background-color: var(--sf-dark-blue);
+    }
+
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+
+    /* Styles spécifiques pour la modal de suppression */
+    .modal-content {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        padding: 1.2rem 1.5rem;
+        background-color: #f8f9fa;
+        border-bottom: none;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        font-size: 1.05rem;
+        text-align: center;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem 1.5rem;
+        gap: 1rem;
+        border-top: none;
+        justify-content: center;
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+        transition: all 0.3s;
+        min-width: 100px;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+    }
+
+    .btn-danger {
+        transition: all 0.3s;
+        background-color: #dc3545;
+        border-color: #dc3545;
+        min-width: 120px;
+    }
+
+    .btn-danger:hover {
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+    }
+
+    .fa-exclamation-triangle {
+        color: #ffc107;
+    }
+
+    .sf-actions-group .btn {
+        margin-right: 0.3rem;
+        border-radius: 0.35rem;
+    }
+     .sf-actions-group {
+        display: flex;
+        justify-content: center;
+        gap: 0.3rem;
+    }
+
+    .sf-btn-info {
+        background-color: #17a2b8;
+        border-color: #117a8b;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.35rem;
+        transition: all 0.3s;
+    }
+
+    .sf-btn-info:hover {
+        background-color: #138496;
+        border-color: #117a8b;
+        color: white;
+    }
+
+    .sf-btn-warning {
+        background-color: #ffc107;
+        border-color: #d39e00;
+        color: #212529;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.35rem;
+        transition: all 0.3s;
+    }
+
+    .sf-btn-warning:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+        color: #212529;
+    }
+
+    .sf-btn-danger {
+        background-color: #dc3545;
+        border-color: #bd2130;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.35rem;
+        transition: all 0.3s;
+    }
+
+    .sf-btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+        color: white;
+    }
+
+    .sf-actions-group .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb sf-breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'cabinet:dashboard' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                    <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-sf-gold">
+                <i class="bi bi-list-ul me-2"></i>Liste Suivi Forfaitaire
+            </li>
+        </ol>
+    </nav>
+
+    <!-- En-tête de page -->
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-list-ul mr-2"></i> Liste Suivi Forfaitaire
+        </h1>
+        <div class="d-flex align-items-center">
+            <a href="{% url 'fiscal:suiviforfaitaire_create' %}" class="btn sf-btn-primary" style="color: white;">Ajouter un Suivi Forfaitaire</a>
+            <a href="{% url 'cabinet:dashboard' %}" class="btn sf-btn-outline ml-2">
+                <i class="bi bi-x-circle mr-2"></i> Annuler
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtres et recherche -->
+    <div class="card sf-card shadow mb-4">
+        <div class="sf-card-header">
+            <h5 class="m-0 font-weight-bold">
+                <i class="bi bi-funnel me-2"></i>Filtres et recherches
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-center">
+                <!-- Champ de recherche -->
+                <div class="col-md-6 position-relative">
+                    <i class="bi bi-search position-absolute"
+                       style="left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+                    <input type="text" class="form-control sf-form-control ps-4" name="search"
+                           placeholder="Rechercher par code ou PP..."
+                           value="{{ request.GET.search }}" autocomplete="off">
+                </div>
+
+                <!-- Boutons -->
+                 <div class="col-md-2">
+                        <button type="submit" class="btn sf-btn-outline" title="Rechercher">
+                            <i class="bi bi-search me-2"></i>Rechercher
+                        </button>
+                    </div>
+                    <div class="col-md-3 text-end">
+                    <a href="{% url 'cabinet:export_excel' 'suivi_forfaitaire' %}" class="btn" style="border-color: #28a745; color: #28a745;">
+                            <i class="bi bi-file-earmark-excel mr-2" style="color: #28a745;"></i>Export Excel
+                    </a>
+                    {% if request.GET.search %}
+                        <a href="{% url 'fiscal:suiviforfaitaire_list' %}" class="btn sf-btn-outline">
+                            <i class="bi bi-x mr-2"></i> Effacer
+                        </a>
+                    {% endif %}
+                    </div>
+            </div>
+                    
+            </form>
+        </div>
+    </div>
+
+    <!-- Tableau des suivis -->
+    <div class="card sf-card shadow mb-4">
+        <div class="sf-card-header">
+            <h6 class="m-0 font-weight-bold">
+                <i class="bi bi-table mr-2"></i> Suivis Forfaitaires
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">CODE</th>
+                            <th rowspan="2">PP</th>
+                            <th colspan="2">DÉCLARATION ANNUELLE</th>
+                            <th rowspan="2">PAIEMENT ANNUEL</th>
+                            <th colspan="4">PAIEMENT TRIMESTRIEL</th>
+                            <th rowspan="2" class="text-center">Actions</th>
+                        </tr>
+                        <tr>
+                            <th>I.R</th>
+                            <th>9421</th>
+                            <th>1er Acompte</th>
+                            <th>2e Acompte</th>
+                            <th>3e Acompte</th>
+                            <th>4e Acompte</th>
+                        </tr>
+                    </thead>
+
+
+
+                    <tbody>
+                    {% for suivi in suiviforfaitaire_list %}
+                    <tr>
+                        <td>{{ suivi.code }}</td>
+                        <td>{{ suivi.pp }}</td>
+                        <td>{{ suivi.ir|floatformat:2 }}</td>
+                        <td>{{ suivi.code_9421|floatformat:2 }}</td>
+                        <td>{{ suivi.paiement_annuel|floatformat:2 }}</td> <!-- propriété calculée -->
+                        <td>{{ suivi.acompte_1|floatformat:2 }}</td>
+                        <td>{{ suivi.acompte_2|floatformat:2 }}</td>
+                        <td>{{ suivi.acompte_3|floatformat:2 }}</td>
+                        <td>{{ suivi.acompte_4|floatformat:2 }}</td>
+                        <td class="text-center">
+                            <div class="sf-actions-group">
+                                <a href="{% url 'fiscal:suiviforfaitaire_detail' suivi.pk %}" class="btn sf-btn-info btn-sm text-white">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'fiscal:suiviforfaitaire_update' suivi.pk %}" class="btn sf-btn-warning btn-sm">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button" class="btn sf-btn-danger btn-sm text-white" data-bs-toggle="modal" data-bs-target="#deleteModal{{ suivi.pk }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9">Aucun suivi forfaitaire disponible.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals de suppression -->
+{% for suivi in suiviforfaitaire_list %}
+<div class="modal fade" id="deleteModal{{ suivi.pk }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title text-dark fs-5 fw-bold">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="mb-0 text-center text-muted">
+                    Êtes-vous sûr de vouloir supprimer le suivi forfaitaire pour <strong>{{ suivi.dossier.denomination }}</strong> ({{ suivi.annee }}) ?
+                </p>
+                <p class="small text-center text-muted mt-2">
+                    <i class="fas fa-info-circle me-1"></i>Cette action est irréversible
+                </p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                    Annuler
+                </button>
+                <form action="{% url 'fiscal:suiviforfaitaire_delete' suivi.pk %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="fas fa-trash-alt me-2"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

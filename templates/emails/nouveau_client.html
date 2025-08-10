@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Nouveau client inscrit</title>
+</head>
+<body>
+  <h2>Un nouveau client vient de s'inscrire</h2>
+  <p><strong>Nom :</strong> {{ user.first_name }} {{ user.last_name }}</p>
+  <p><strong>Email :</strong> {{ user.email }}</p>
+  <p><strong>Nom d'utilisateur :</strong> {{ user.username }}</p>
+  <p>
+    Pour consulter tous les détails, vous pouvez <a href="{{ liste_clients_url }}">consulter la liste des clients</a>.
+  </p>
+</body>
+</html>

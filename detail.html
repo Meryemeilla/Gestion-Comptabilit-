@@ -1,0 +1,197 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ honoraire.reference }} - Détails de l'honoraire{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:dashboard' %}">Tableau de bord</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:honoraire_list' %}">Honoraires</a></li>
+        <li class="breadcrumb-item active">{{ honoraire.reference }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Détails de l'honoraire</h1>
+    <div>
+        <a href="{% url 'cabinet:honoraire_update' honoraire.id %}" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Modifier
+        </a>
+        {% if honoraire.statut == 'EN_ATTENTE' %}
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#paymentModal">
+            <i class="bi bi-check-circle"></i> Marquer comme payé
+        </button>
+        {% endif %}
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            <i class="bi bi-trash"></i> Supprimer
+        </button>
+    </div>
+</div>
+
+<!-- Informations générales -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="bi bi-info-circle me-2"></i>Informations générales
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="30%">Référence</th>
+                        <td><strong>{{ honoraire.reference }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Dossier</th>
+                        <td>
+                            <a href="{% url 'cabinet:dossier_detail' honoraire.dossier.id %}">
+                                {{ honoraire.dossier.numero }} - {{ honoraire.dossier.nom }}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td>{{ honoraire.description|linebreaks }}</td>
+                    </tr>
+                    <tr>
+                        <th>Montant</th>
+                        <td><strong class="text-primary">{{ honoraire.montant|floatformat:2 }} DH</strong></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="30%">Statut</th>
+                        <td>
+                            <span class="badge bg-{{ honoraire.get_statut_color }}">
+                                {{ honoraire.get_statut_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Date émission</th>
+                        <td>{{ honoraire.date_emission|date:"d/m/Y" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date échéance</th>
+                        <td>{{ honoraire.date_echeance|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% if honoraire.date_paiement %}
+                    <tr>
+                        <th>Date paiement</th>
+                        <td>{{ honoraire.date_paiement|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Historique des paiements -->
+{% if honoraire.paiements.all %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="bi bi-clock-history me-2"></i>Historique des paiements
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Mode de paiement</th>
+                        <th>Référence</th>
+                        <th class="text-end">Montant</th>
+                        <th>Commentaire</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for paiement in honoraire.paiements.all %}
+                    <tr>
+                        <td>{{ paiement.date_paiement|date:"d/m/Y" }}</td>
+                        <td>{{ paiement.get_mode_paiement_display }}</td>
+                        <td>{{ paiement.reference_paiement }}</td>
+                        <td class="text-end">{{ paiement.montant|floatformat:2 }} DH</td>
+                        <td>{{ paiement.commentaire|default:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modal de paiement -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enregistrer le paiement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{% url 'cabinet:honoraire_mark_paid' honoraire.id %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Mode de paiement</label>
+                        <select name="mode_paiement" class="form-select" required>
+                            <option value="ESPECES">Espèces</option>
+                            <option value="CHEQUE">Chèque</option>
+                            <option value="VIREMENT">Virement</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Référence du paiement</label>
+                        <input type="text" name="reference_paiement" class="form-control">
+                        <div class="form-text">Numéro de chèque, référence du virement, etc.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date de paiement</label>
+                        <input type="date" name="date_paiement" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Commentaire</label>
+                        <textarea name="commentaire" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Enregistrer le paiement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer l'honoraire <strong>{{ honoraire.reference }}</strong> ?
+                Cette action est irréversible.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{% url 'cabinet:honoraire_delete' honoraire.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

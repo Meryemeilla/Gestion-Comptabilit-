@@ -1,0 +1,29 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Détail de l'honoraire{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:dashboard' %}">Tableau de bord</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:honoraire_list' %}">Honoraires</a></li>
+        <li class="breadcrumb-item active">Détail</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>Détail de l'honoraire</h3>
+    </div>
+    <div class="card-body">
+        <p><strong>Numéro :</strong> {{ honoraire.id }}</p>
+        <p><strong>Type :</strong> {{ honoraire.type }}</p>
+        <p><strong>Montant :</strong> {{ honoraire.montant }}</p>
+        <p><strong>Statut :</strong> {{ honoraire.get_statut_reglement_display }}</p>
+        <p><strong>Date :</strong> {{ honoraire.date }}</p>
+        <a href="{% url 'cabinet:honoraire_list' %}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+</div>
+{% endblock %}

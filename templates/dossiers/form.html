@@ -1,0 +1,735 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+    {% if form.instance.pk %}Modifier{% else %}Nouveau{% endif %} dossier - Cabinet Comptable
+{% endblock %}
+
+{% block breadcrumb %}
+<style>
+     .sf-breadcrumb-container {
+        background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1rem;
+    }
+
+    .sf-breadcrumb {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Utility classes */
+    .text-sf-blue { color: var(--sf-blue); }
+    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
+    .text-sf-gold { color: var(--sf-gold); }
+</style>
+<nav aria-label="breadcrumb" class="sf-breadcrumb-container">
+    <ol class="breadcrumb sf-breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dashboard' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dossier_list' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                <i class="bi bi-folder me-2"></i>Dossiers
+            </a>
+        </li>
+        <li class="breadcrumb-item active text-sf-gold">
+            <i class="bi {% if form.instance.pk %}bi-pencil-square{% else %}bi-plus-circle{% endif %} me-2"></i>
+            {% if form.instance.pk %}Modifier {{ form.instance.code }}{% else %}Nouveau dossier{% endif %}
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .sf-form-label {
+        font-weight: 600;
+        color: var(--sf-dark-blue);
+        margin-bottom: 0.5rem;
+    }
+    
+    .sf-form-control {
+        border-radius: 0.35rem;
+        border: 1px solid #d1d3e2;
+        padding: 0.75rem 1rem;
+        transition: border-color 0.3s;
+    }
+    
+    .sf-form-control:focus {
+        border-color: var(--sf-blue);
+        box-shadow: 0 0 0 0.2rem rgba(54, 96, 146, 0.25);
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-primary:hover {
+        background-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+    
+    .section-title {
+        color: var(--sf-blue);
+        border-bottom: 1px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-select {
+        border-radius: 0.35rem;
+        border: 1px solid #d1d3e2;
+        padding: 0.75rem 1rem;
+    }
+    textarea.form-control {
+    width: 100%;
+    min-height: 120px;
+    resize: vertical;
+    font-family: sans-serif;
+}
+
+</style>
+
+<div class="container-fluid py-4">
+    <!-- En-tête de page -->
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-folder me-2"></i>
+            {% if form.instance.pk %}Modifier le dossier{% else %}Nouveau dossier{% endif %}
+        </h1>
+        <a href="{% url 'cabinet:dossier_list' %}" class="btn sf-btn-outline">
+            <i class="bi bi-arrow-left me-2"></i> Retour à la liste
+        </a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data"  autocomplete="off"  class="mb-5">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            {% for field in form %}
+            {% for error in field.errors %}
+                <p>{{ field.label }} : {{ error }}</p>
+            {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+
+
+        <div class="row g-3">
+            <!-- Colonne gauche -->
+            <div class="col-md-6">
+                <!-- Carte Informations de Base -->
+                <div class="card sf-card mb-3">
+                    <div class="sf-card-header">
+                        <h5 class="m-0 font-weight-bold">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Informations de Base
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.code.id_for_label }}">Code du dossier *</label>
+                            {{ form.code }}
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.denomination.id_for_label }}">Dénomination de l'entreprise *</label>
+                            {{ form.denomination }}
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.abreviation.id_for_label }}">Abréviation</label>
+                            {{ form.abreviation }}
+                        </div>
+                         <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.client.id_for_label }}">Client *</label>
+                            {{ form.client }}
+                        </div>
+                        
+
+                    </div>
+                </div>
+
+                <!-- Carte Informations Juridiques et Activité -->
+                <div class="card sf-card">
+                    <div class="sf-card-header">
+                        <h5 class="m-0 font-weight-bold">
+                            <i class="bi bi-building me-2"></i>
+                            Informations Juridiques et Activité
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.forme_juridique.id_for_label }}">Forme juridique *</label>
+                            {{ form.forme_juridique }}
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.date_creation.id_for_label }}">Date de création *</label>
+                            {{ form.date_creation }}
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.secteur_activites.id_for_label }}">Secteur d'activités *</label>
+                            {{ form.secteur_activites }}
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.branche_activite.id_for_label }}">Branche d'activité *</label>
+                            <textarea name="branche_activite" id="id_branche_activite" rows="4" cols="60" class="form-control"></textarea>
+
+                             <!-- {{ form.branche_activite }}  -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne droite -->
+            <div class="col-md-6">
+                <!-- Carte Coordonnées -->
+                <div class="card sf-card mb-3">
+                    <div class="sf-card-header">
+                        <h5 class="m-0 font-weight-bold">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            Coordonnées
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.adresse.id_for_label }}">Adresse *</label>
+                            {{ form.adresse }}
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.email.id_for_label }}">Email</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.fixe.id_for_label }}">Téléphone fixe</label>
+                            {{ form.fixe }}
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.gsm.id_for_label }}">Téléphone mobile</label>
+                            {{ form.gsm }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carte Personnes de Contact -->
+                <div class="card sf-card">
+                    <div class="sf-card-header">
+                        <h5 class="m-0 font-weight-bold">
+                            <i class="bi bi-people me-2"></i>
+                            Personnes de Contact
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.gerant.id_for_label }}">Gérant</label>
+                            {{ form.gerant }}
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.personne_a_contacter.id_for_label }}">Personne à contacter</label>
+                            {{ form.personne_a_contacter }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-1">
+            <!-- Carte Identifiants Officiels -->
+            <div class="col-md-6">
+                <div class="card sf-card h-100">
+                    <div class="sf-card-header">
+                        <h5 class="m-0 font-weight-bold">
+                            <i class="bi bi-file-text me-2"></i>
+                            Identifiants Officiels
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.if_identifiant.id_for_label }}">Identifiant Fiscal (IF)</label>
+                            {{ form.if_identifiant }}
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.ice.id_for_label }}">Identifiant Commun de l'Entreprise (ICE)</label>
+                            {{ form.ice }}
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.tp.id_for_label }}">Taxe Professionnelle (TP)</label>
+                            {{ form.tp }}
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.rc.id_for_label }}">Registre de Commerce (RC)</label>
+                            {{ form.rc }}
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.cnss.id_for_label }}">Numéro CNSS</label>
+                            {{ form.cnss }}
+                        </div>
+                        <div id="preview-identifiants" style="display: none;"></div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carte TVA et Comptable -->
+            <div class="col-md-6">
+                <div class="card sf-card h-100">
+                    <div class="sf-card-header">
+                        <h5 class="m-0 font-weight-bold">
+                            <i class="bi bi-calculator me-2"></i>
+                            TVA et Comptable
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.declaration_tva.id_for_label }}">Déclaration à la TVA *</label>
+                            {{ form.declaration_tva }}
+                        </div>
+                        <div class="sf-form-group">
+                            <label class="sf-form-label" for="{{ form.comptable_traitant.id_for_label }}">Comptable traitant *</label>
+                            {{ form.comptable_traitant }}
+                        </div>
+                    </div>
+                </div>
+            </div>   
+            <!-- Nouvelle Carte Documents -->
+           <div class="col-12 mt-3">
+            <div class="card sf-card">
+                <div class="sf-card-header">
+                    <h5 class="m-0 font-weight-bold">
+                        <i class="bi bi-file-earmark me-2"></i>
+                        Documents associés
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="sf-form-group">
+                        <label class="sf-form-label" for="id_documents">Ajouter des documents</label>
+                        <input type="file" name="documents" id="id_documents" multiple class="form-control sf-form-control" multiple>
+                        <small class="text-muted">Vous pouvez sélectionner plusieurs fichiers en maintenant la touche Ctrl (Windows) ou Cmd (Mac) enfoncée.</small>
+                    </div>
+                    
+                    {% if form.instance.pk and form.instance.documents.all %}
+                    <div class="mt-4">
+                        <h6 class="sf-form-label">Documents existants :</h6>
+                        <div id="documents-container">
+                            <ul class="list-group" id="documents-list">
+                                {% for doc in form.instance.documents.all %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center document-item" 
+                                    data-document-id="{{ doc.pk }}">
+                                    <div class="d-flex align-items-center">
+                                        <a href="{{ doc.fichier.url }}" target="_blank" class="text-decoration-none">
+                                            <i class="bi bi-file-earmark-text me-2"></i>{{ doc.fichier.name|default:"Document" }}
+                                        </a>
+                                        <span class="badge bg-warning text-dark ms-2 marked-badge" style="display:none;">
+                                            À supprimer
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-outline-danger btn-sm toggle-delete-btn"
+                                                data-document-id="{{ doc.pk }}">
+                                            <i class="bi bi-trash"></i> Marquer pour suppression
+                                        </button>
+                                        <input type="hidden" name="keep_documents" value="{{ doc.pk }}">
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            <div id="delete-summary" class="mt-2 text-end" style="display:none;">
+                                <span class="text-danger">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    <span id="delete-count">0</span> document(s) marqué(s) pour suppression
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+   <script>
+
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. Appliquer les styles
+    document.querySelectorAll('input:not([type="file"]), textarea').forEach(el => el.classList.add('sf-form-control'));
+    document.querySelectorAll('select').forEach(el => el.classList.add('form-select'));
+
+    const fileInput = document.getElementById('id_documents');
+    const previewDiv = document.getElementById('preview-identifiants');
+    let allSelectedFiles = [];
+
+    if (!fileInput) return;
+
+    fileInput.addEventListener('change', async function () {
+        const newFiles = Array.from(fileInput.files);
+        if (newFiles.length === 0) return;
+
+        allSelectedFiles = allSelectedFiles.concat(newFiles);  // cumuler
+        previewDiv.innerHTML = '<div class="alert alert-info">Analyse des documents en cours...</div>';
+        previewDiv.style.display = 'block';
+
+        let aggregatedData = {
+            if_identifiant: null,
+            ice: null,
+            tp: null,
+            rc: null,
+            cnss: null,
+            denomination: null,
+            forme_juridique: null,
+            gerant: null,
+            cin: null,
+            adresse: null,
+            numero_certificat: null,
+            date_certificat: null,
+            date_creation: null,
+            branche: null,
+            secteur: null,
+            telephone_fixe:null,
+            telephone_mobile:null,
+            email:null,
+            tva: null,
+            telephone:null
+        };
+
+        try {
+            for (const file of newFiles) {
+                const formData = new FormData();
+                formData.append('documents', file);
+
+                const response = await fetch("{% url 'cabinet:preview_identifiants_ajax' %}", {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+
+                if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+                const data = await response.json();
+
+                for (const key in aggregatedData) {
+                    if (!aggregatedData[key] && data[key]) {
+                        aggregatedData[key] = data[key];
+                    }
+                }
+            }
+            const prioriteTVA = ['TRIMESTRIELLE','MENSUELLE',  'EXONEREE'];
+
+            for (const file of newFiles) {
+                const formData = new FormData();
+                formData.append('documents', file);
+
+                const response = await fetch("{% url 'cabinet:preview_identifiants_ajax' %}", {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+
+                if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+                const data = await response.json();
+
+                for (const key in aggregatedData) {
+                    if (key === 'tva') {
+                        // Priorité sur la TVA
+                        if (data.tva) {
+                            const currentIndex = prioriteTVA.indexOf(aggregatedData.tva);
+                            const newIndex = prioriteTVA.indexOf(data.tva);
+                            if (newIndex !== -1 && (currentIndex === -1 || newIndex < currentIndex)) {
+                                aggregatedData.tva = data.tva;
+                            }
+                        }
+                    } else {
+                        if (!aggregatedData[key] && data[key]) {
+                            aggregatedData[key] = data[key];
+                        }
+                    }
+                }
+            }
+
+
+
+            const fillField = (fieldId, value) => {
+                const field = document.getElementById(fieldId);
+                if (field && value && value.trim() !== "") {
+                    field.value = value;
+                    return true;
+                }
+                return false;
+            };
+
+            const fieldsFilled = {
+                if: fillField('id_if_identifiant', aggregatedData.if_identifiant),
+                ice: fillField('id_ice', aggregatedData.ice),
+                tp: fillField('id_tp', aggregatedData.tp),
+                rc: fillField('id_rc', aggregatedData.rc),
+                cnss: fillField('id_cnss', aggregatedData.cnss),
+                denomination: fillField('id_denomination', aggregatedData.denomination),
+                forme: fillField('id_forme_juridique', aggregatedData.forme_juridique),
+                gerant: fillField('id_gerant', aggregatedData.gerant),
+                cin: fillField('id_cin', aggregatedData.cin),
+                adresse: fillField('id_adresse', aggregatedData.adresse),
+                cert: fillField('id_numero_certificat', aggregatedData.numero_certificat),
+                date_cert: fillField('id_date_certificat', aggregatedData.date_certificat),
+                date_creation: fillField('id_date_creation', aggregatedData.date_creation),
+                branche: fillField('id_branche_activite', aggregatedData.branche),
+                secteur: fillField('id_secteur_activites', aggregatedData.secteur),
+                telephone_fixe:fillField('id_fixe', aggregatedData.telephone_fixe),
+                telephone_mobile:fillField('id_gsm', aggregatedData.telephone_mobile),
+                email:fillField('id_email', aggregatedData.email),
+                tva:fillField('id_declaration_tva', aggregatedData.tva),
+                telephone:fillField('id_gsm', aggregatedData.telephone)
+
+
+            };
+
+            previewDiv.style.display = 'none';
+
+        } catch (error) {
+            console.error("❌ Erreur extraction :", error);
+            previewDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Erreur lors de l'analyse du document : ${error.message}
+                </div>`;
+        }
+    });
+
+    //  2. Soumission classique avec injection de fichiers cumulés
+    const form = document.querySelector('form[method="post"]');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spin me-2"></i> Envoi...';
+            }
+
+            const dataTransfer = new DataTransfer();
+            allSelectedFiles.forEach(f => dataTransfer.items.add(f));
+            fileInput.files = dataTransfer.files;
+
+            setTimeout(() => {
+                form.submit();  //  soumission réelle
+            }, 100);
+
+            //  Laisser le navigateur soumettre le formulaire normalement
+        });
+    }
+
+    // 3. Style animation bouton
+    const style = document.createElement('style');
+    style.textContent = `
+        .bi-arrow-repeat.spin {
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+});
+
+
+</script>
+
+
+
+
+<style>
+    .document-item.marked-for-deletion {
+        background-color: rgba(220, 53, 69, 0.1);
+        border-left: 3px solid #dc3545;
+    }
+    
+    .marked-badge {
+        font-size: 0.75rem;
+    }
+    
+    .toggle-delete-btn.marked {
+        background-color: #dc3545;
+        color: white;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const documentsList = document.getElementById('documents-list');
+    
+    if (documentsList) {
+        documentsList.addEventListener('click', function(e) {
+            if (e.target.closest('.toggle-delete-btn')) {
+                const btn = e.target.closest('.toggle-delete-btn');
+                const documentItem = btn.closest('.document-item');
+                const documentId = btn.getAttribute('data-document-id');
+                const keepInput = documentItem.querySelector('input[name="keep_documents"]');
+                const markedBadge = documentItem.querySelector('.marked-badge');
+                
+                // Basculer l'état
+                documentItem.classList.toggle('marked-for-deletion');
+                btn.classList.toggle('marked');
+                
+                if (documentItem.classList.contains('marked-for-deletion')) {
+                    btn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i> Annuler';
+                    markedBadge.style.display = 'inline-block';
+                    keepInput.disabled = true;
+                } else {
+                    btn.innerHTML = '<i class="bi bi-trash"></i> Marquer pour suppression';
+                    markedBadge.style.display = 'none';
+                    keepInput.disabled = false;
+                }
+                
+                updateDeleteSummary();
+            }
+        });
+    }
+    
+    function updateDeleteSummary() {
+        const markedItems = document.querySelectorAll('.marked-for-deletion');
+        const deleteSummary = document.getElementById('delete-summary');
+        const deleteCount = document.getElementById('delete-count');
+        
+        if (markedItems.length > 0) {
+            deleteSummary.style.display = 'block';
+            deleteCount.textContent = markedItems.length;
+        } else {
+            deleteSummary.style.display = 'none';
+        }
+    }
+    
+    // Gestion de la soumission du formulaire
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const markedItems = document.querySelectorAll('.marked-for-deletion');
+            if (markedItems.length > 0) {
+                const documentIds = Array.from(markedItems).map(item => 
+                    item.getAttribute('data-document-id')
+                );
+                
+                // Ajouter un champ caché avec les IDs à supprimer
+                const deleteInput = document.createElement('input');
+                deleteInput.type = 'hidden';
+                deleteInput.name = 'delete_documents';
+                deleteInput.value = documentIds.join(',');
+                form.appendChild(deleteInput);
+            }
+        });
+    }
+
+});
+</script>
+
+        <!-- Boutons d'action -->
+        <div class="mt-4 text-end sticky-bottom bg-white py-3">
+            <a href="{% url 'cabinet:dossier_list' %}" class="btn sf-btn-outline me-2">
+                <i class="bi bi-x-circle me-2"></i> Annuler
+            </a>
+            <button type="submit" id="submit-btn" class="btn sf-btn-primary" style="color: white;">
+                <i class="bi bi-check-circle me-2"></i>
+                {% if object %}Mettre à jour{% else %}Créer{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+
+
+
+
+{% endblock %}
