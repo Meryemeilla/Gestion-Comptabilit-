@@ -1,0 +1,568 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if form.instance.pk %}Modifier Création Juridique{% else %}Nouvelle Création Juridique{% endif %}
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-page-subtitle {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+    }
+    
+    .sf-form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .sf-form-label {
+        font-weight: 600;
+        color: var(--sf-dark-blue);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .sf-form-control {
+        border-radius: 0.35rem;
+        border: 1px solid #d1d3e2;
+        padding: 0.75rem 1rem;
+        width: 100%;
+        transition: border-color 0.3s;
+    }
+    
+    .sf-form-control:focus {
+        border-color: var(--sf-blue);
+        box-shadow: 0 0 0 0.2rem rgba(54, 96, 146, 0.25);
+    }
+    
+    .sf-checkbox-label {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .sf-checkbox-input {
+        margin-right: 0.5rem;
+    }
+    
+    .sf-date-group {
+        display: flex;
+        align-items: center;
+        margin-top: 0.5rem;
+    }
+    
+    .sf-date-input {
+        margin-right: 1rem;
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-primary:hover {
+        background-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+    
+    .sf-form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .sf-form-section-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+    
+    .sf-note {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-style: italic;
+        margin-top: 0.25rem;
+    }
+
+    /* Styles du fil d'ariane */
+    .sf-breadcrumb-container {
+        background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1rem;
+    }
+
+    .sf-breadcrumb {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Classes utilitaires */
+    .text-sf-blue { color: var(--sf-blue); }
+    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
+    .text-sf-gold { color: var(--sf-gold); }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Fil d'ariane -->
+    <nav aria-label="breadcrumb" class="sf-breadcrumb-container">
+    <ol class="breadcrumb sf-breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dashboard' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'juridique:juridique_creation_list' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                <i class="bi bi-building me-2"></i>Créations Juridiques
+            </a>
+        </li>
+        <li class="breadcrumb-item active text-sf-gold">
+            <i class="bi {% if form.instance.pk %}bi-pencil-square{% else %}bi-plus-circle{% endif %} me-2"></i>
+            {% if form.instance.pk %}Modifier Création Juridique{% else %}Nouvelle Création Juridique{% endif %}
+        </li>
+    </ol>
+</nav>
+
+    <!-- En-tête de page -->
+    <div class="sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-building mr-2"></i>
+            {% if form.instance.pk %}Modifier Création Juridique{% else %}Nouvelle Création Juridique{% endif %}
+        </h1>
+        <p class="sf-page-subtitle">
+            Remplissez le formulaire pour gérer les informations de création juridique
+        </p>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="card sf-card shadow mb-4">
+        <div class="sf-card-header">
+            <h6 class="m-0 font-weight-bold">
+                <i class="bi bi-file-text mr-2"></i>
+                Formulaire de Création Juridique
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="post"  enctype="multipart/form-data">
+                {% csrf_token %}
+               
+                
+                <!-- Section Informations de base -->
+                <div class="sf-form-section">
+                    <h3 class="sf-form-section-title">
+                        <i class="bi bi-info-circle mr-2"></i>
+                        Informations de base
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="sf-form-group">
+                                <label class="sf-form-label">Dossier</label>
+                                {{ form.dossier }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="sf-form-group">
+                                <label class="sf-form-label">Ordre</label>
+                                {{ form.ordre }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="sf-form-group">
+                                <label class="sf-form-label">Forme</label>
+                                {{ form.forme }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sf-form-group">
+                        <label class="sf-form-label">Statut global</label>
+                        {{ form.statut_global }}
+                    </div>
+                    {% block scripts %}
+                        {{ block.super }}
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function () {
+                                const dossierSelect = document.getElementById("id_dossier");
+
+                                // Vérifie si la date est au format YYYY-MM-DD
+                                function isValidDateFormat(dateString) {
+                                    return /^\d{4}-\d{2}-\d{2}$/.test(dateString);
+                                }
+
+                                // Convertit une date DD/MM/YYYY en YYYY-MM-DD
+                                function convertDateToISO(dateStr) {
+                                    if (!dateStr) return '';
+
+                                    // Si la date est déjà au format ISO, on retourne directement
+                                    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                                        return dateStr;
+                                    }
+
+                                    // Sinon, on essaye de parser un format DD/MM/YYYY
+                                    const parts = dateStr.split('/');
+                                    if (parts.length === 3) {
+                                        const [day, month, year] = parts;
+                                        if (day.length === 2 && month.length === 2 && year.length === 4) {
+                                            return `${year}-${month}-${day}`;
+                                        }
+                                    }
+
+                                    return '';
+                                }
+
+                                dossierSelect.addEventListener("change", function () {
+                                    const dossierId = this.value;
+                                    if (!dossierId) return;
+
+                                    fetch(`/juridique/api/dossier-infos/?dossier_id=${dossierId}`)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            const fields = [
+                                                'date_rc', 'numero_rc', 'date_cnss', 'numero_cnss',
+                                                'date_contrat_bail', 'date_statuts', 'date_certificat_negatif',
+                                                'date_tp', 'date_bo', 'date_al', 'date_rq'
+                                            ];
+
+                                            fields.forEach(field => {
+                                                const input = document.getElementById(`id_${field}`);
+                                                if (input) {
+                                                    if (field.startsWith('date_')) {
+                                                        if (data[field]) {
+                                                            let cleanDate = convertDateToISO(data[field]);
+                                                            if (isValidDateFormat(cleanDate)) {
+                                                                input.value = cleanDate;
+                                                            } else {
+                                                                input.value = '';
+                                                            }
+                                                        } else {
+                                                            input.value = '';
+                                                        }
+                                                    } else if (data[field] !== undefined) {
+                                                        input.value = data[field] || '';
+                                                    }
+                                                }
+                                            });
+
+                                            const checkboxes = [
+                                                'rc', 'cnss', 'contrat_bail', 'statuts',
+                                                'certificat_negatif', 'tp', 'bo', 'al', 'rq'
+                                            ];
+
+                                            checkboxes.forEach(field => {
+                                                const checkbox = document.getElementById(`id_${field}`);
+                                                if (checkbox && field in data) {
+                                                    checkbox.checked = data[field];
+                                                }
+                                            });
+                                        })
+                                        .catch(error => {
+                                            console.error("Erreur chargement auto infos dossier :", error);
+                                        });
+                                });
+                            });
+                        </script>
+                        {% endblock %}
+
+
+                </div>
+                
+                <!-- Section Documents obligatoires -->
+                <div class="sf-form-section">
+                    <h3 class="sf-form-section-title">
+                        <i class="bi bi-file-earmark-check mr-2"></i>
+                        Documents obligatoires
+                    </h3>
+                    
+                    <!-- Certificat négatif -->
+                    <div class="sf-form-group">
+                        <label class="sf-checkbox-label">
+                            <!-- <input type="checkbox" name="certificat_negatif" id="id_certificat_negatif" class="sf-checkbox-input"> -->
+                             {{ form.certificat_negatif }}
+
+                            Certificat négatif
+                        </label>
+                        <div class="sf-date-group">
+                            <label class="sf-form-label">Date certificat négatif:</label>
+                            <!-- <input type="date" name="date_certificat_negatif" id="id_date_certificat_negatif" class="sf-form-control sf-date-input"> -->
+                             {{ form.date_certificat_negatif }}
+                            
+                        </div>
+                        
+                    </div>
+                    
+                    <!-- Statuts -->
+                    <div class="sf-form-group">
+                        <label class="sf-checkbox-label">
+                            <!-- <input type="checkbox" name="statuts" id="id_statuts" class="sf-checkbox-input"> -->
+                             {{ form.statuts }}
+                            Statuts
+                        </label>
+                        <div class="sf-date-group">
+                            <label class="sf-form-label">Date statuts:</label>
+                            <!-- <input type="date" name="date_statuts" id="id_date_statuts" class="sf-form-control sf-date-input"> -->
+                             {{ form.date_statuts }}
+                            
+                        </div>
+                        
+                    </div>
+                    
+                    <!-- Contrat de bail -->
+                    <div class="sf-form-group">
+                        <label class="sf-checkbox-label">
+                            <!-- <input type="checkbox" name="contrat_bail" id="id_contrat_bail" class="sf-checkbox-input"> -->
+                             {{ form.contrat_bail }}
+                            Contrat de bail
+                        </label>
+                        <div class="sf-date-group">
+                            <label class="sf-form-label">Date contrat de bail:</label>
+                            <!-- <input type="date" name="date_contrat_bail" id="id_date_contrat_bail" class="sf-form-control sf-date-input"> -->
+                             {{ form.date_contrat_bail }}
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Section Taxe Professionnelle -->
+                <div class="sf-form-section">
+                    <h3 class="sf-form-section-title">
+                        <i class="bi bi-cash-stack mr-2"></i>
+                        Taxe Professionnelle (TP)
+                    </h3>
+                    
+                    <div class="sf-form-group">
+                        <label class="sf-form-label">Date TP:</label>
+                        <!-- <input type="date" name="date_tp" id="id_date_tp" class="sf-form-control"> -->
+                         {{ form.date_tp }}
+                    </div>
+                    
+                    <!-- Registre de Commerce -->
+                    <div class="sf-form-group">
+                        <label class="sf-checkbox-label">
+                            <!-- <input type="checkbox" name="rc" id="id_rc" class="sf-checkbox-input"> -->
+                             {{ form.rc }}
+                            RC (Registre de Commerce)
+                        </label>
+                        <div class="sf-date-group">
+                            <label class="sf-form-label">Date RC:</label>
+                            <!-- <input type="date" name="date_rc" id="id_date_rc" class="sf-form-control sf-date-input"> -->
+                             {{ form.date_rc }}
+                           
+                        </div>
+                        
+                        <div class="sf-form-group">
+                            <label class="sf-form-label">Numéro RC:</label>
+                            <!-- <input type="text" name="numero_rc" id="id_numero_rc" class="sf-form-control"> -->
+                             {{ form.numero_rc }}
+                        </div>
+                    </div>
+                    
+                    <!-- CNSS -->
+                    <div class="sf-form-group">
+                        <label class="sf-checkbox-label">
+                            <!-- <input type="checkbox" name="cnss" id="id_cnss" class="sf-checkbox-input"> -->
+                             {{ form.cnss }}
+                            CNSS
+                        </label>
+                        <div class="sf-date-group">
+                            <label class="sf-form-label">Date CNSS:</label>
+                            <!-- <input type="date" name="date_cnss" id="id_date_cnss" class="sf-form-control sf-date-input"> -->
+                             {{ form.date_cnss }}
+                            
+                        </div>
+                        
+                        <div class="sf-form-group">
+                            <label class="sf-form-label">Numéro CNSS:</label>
+                            <!-- <input type="text" name="numero_cnss" id="id_numero_cnss" class="sf-form-control"> -->
+                             {{ form.numero_cnss }} 
+                        </div>
+                    </div>
+                    
+                    <!-- Autorisation de Location -->
+                    <div class="sf-form-group">
+                        <label class="sf-checkbox-label">
+                            <!-- <input type="checkbox" name="al" id="id_al" class="sf-checkbox-input"> -->
+                             {{ form.al }}
+                            AL (Autorisation de Location)
+                        </label>
+                        <div class="sf-date-group">
+                            <label class="sf-form-label">Date AL:</label>
+                            <!-- <input type="date" name="date_al" id="id_date_al" class="sf-form-control sf-date-input"> -->
+                             {{ form.date_al }}
+                            
+                        </div>
+                       
+                    </div>
+                    
+                    <!-- Bulletin Officiel -->
+                    <div class="sf-form-group">
+                        <label class="sf-checkbox-label">
+                            <!-- <input type="checkbox" name="bo" id="id_bo" class="sf-checkbox-input"> -->
+                             {{ form.bo }}
+                            BO (Bulletin Officiel)
+                        </label>
+                        <div class="sf-date-group">
+                            <label class="sf-form-label">Date BO:</label>
+                            <!-- <input type="date" name="date_bo" id="id_date_bo" class="sf-form-control sf-date-input"> -->
+                             {{ form.date_bo }}
+                        </div>    
+                        
+                    </div>
+                    
+                    <!-- Registre de Qualité -->
+                    <div class="sf-form-group">
+                        <label class="sf-checkbox-label">
+                            <!-- <input type="checkbox" name="rq" id="id_rq" class="sf-checkbox-input"> -->
+                             {{ form.rq }}
+                            RQ (Registre de Qualité)
+                        </label>
+                        <div class="sf-date-group">
+                            <label class="sf-form-label">Date RQ:</label>
+                            <!-- <input type="date" name="date_rq" id="id_date_rq" class="sf-form-control sf-date-input"> -->
+                             {{ form.date_rq }}
+                        </div>  
+                </div>
+                
+                <!-- Section Remarques -->
+                <div class="sf-form-section">
+                    <h3 class="sf-form-section-title">
+                        <i class="bi bi-chat-left-text mr-2"></i>
+                        Remarques
+                    </h3>
+                    <div class="sf-form-group">
+                        <textarea name="remarques" class="sf-form-control" rows="3" placeholder="Ajoutez vos remarques ici..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- Section Fichiers joints -->
+                <div class="sf-form-section">
+                    <h3 class="sf-form-section-title">
+                        <i class="bi bi-paperclip mr-2"></i>
+                        Fichiers joints
+                    </h3>
+                    <div class="sf-form-group">
+                        <label class="sf-form-label">Documents à joindre:</label>
+                        <input type="file" name="fichiers_joints" multiple class="sf-form-control">
+                    </div>
+                </div>
+                
+                <!-- Boutons de soumission -->
+                <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                    <a href="{% url 'juridique:juridique_creation_list' %}" 
+                       class="btn sf-btn-outline mr-3">
+                        <i class="bi bi-x-circle mr-2"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn sf-btn-primary" style="color: white;">
+                        <i class="bi bi-save mr-2"></i> Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Style des champs de formulaire
+    document.addEventListener('DOMContentLoaded', function() {
+        // Style des champs standards
+        document.querySelectorAll('select, input[type="text"], input[type="date"], textarea').forEach(element => {
+            element.classList.add('sf-form-control', 'form-control');
+        });
+        
+        // Style des erreurs de formulaire
+        document.querySelectorAll('.errorlist').forEach(list => {
+            list.classList.add('alert', 'alert-danger', 'mt-2');
+        });
+        
+        // Mettre à jour les dates "Today" avec la date actuelle
+        // const today = new Date().toISOString().split('T')[0];
+        // document.querySelectorAll('input[type="date"]').forEach(input => {
+        //     // if (!input.value) {
+        //     //     input.value = today;
+        //     }
+        // });
+    });
+</script>
+{% endblock %}

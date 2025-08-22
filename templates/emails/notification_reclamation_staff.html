@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Réclamation envoyée</title>
+</head>
+<body style="font-family: Arial, sans-serif; font-size: 15px; color: #333;">
+    <p>Bonjour {{ reclamation.created_by.first_name }},</p>
+
+    <p>Votre réclamation concernant le dossier <strong>{{ dossier.denomination }}</strong> a bien été envoyée au client.</p>
+
+    <p><strong>Dossier :</strong> {{ dossier.code }}<br>
+       <strong>Client :</strong> 
+       {% if dossier.client.user %}
+           {{ dossier.client.user.first_name }} {{ dossier.client.user.last_name }}
+       {% else %}
+           {{ dossier.client.contact_personne }}
+       {% endif %}
+    </p>
+
+    <p><strong>Date :</strong> {{ reclamation.date_creation|date:"d/m/Y à H:i" }}<br>
+       <strong>Type :</strong> {{ reclamation.type_reclamation }}<br>
+       <strong>Priorité :</strong> {{ reclamation.get_priorite_display }}<br>
+       <strong>Classement :</strong> {{ reclamation.get_classement_display }}</p>
+
+    {% if reclamation.description %}
+        <p><strong>Description :</strong><br>
+        {{ reclamation.description|linebreaksbr }}</p>
+    {% endif %}
+
+    <p>Merci,<br>
+    <em>Le système de gestion du Cabinet Comptable</em></p>
+</body>
+</html>

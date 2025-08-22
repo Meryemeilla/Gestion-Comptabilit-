@@ -1,0 +1,304 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    
+    /* Nouveau style pour le breadcrumb */
+    .sf-breadcrumb-container {
+        background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1rem;
+    }
+
+    .sf-breadcrumb {
+        padding: 0;
+        margin: 0;
+        background: transparent;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Utility classes */
+    .text-sf-blue { color: var(--sf-blue); }
+    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
+    .text-sf-gold { color: var(--sf-gold); }
+
+    /* Reste des styles existants inchangés */
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-secondary {
+        background-color: #6c757d;
+        border-color: #5a6268;
+    }
+    
+    .sf-btn-danger {
+        background-color: #dc3545;
+        border-color: #c82333;
+    }
+    
+    .sf-detail-table {
+        width: 100%;
+    }
+    
+    .sf-detail-table th {
+        width: 30%;
+        background-color: var(--sf-light-bg);
+        color: var(--sf-dark-blue);
+        font-weight: 600;
+        padding: 1rem;
+    }
+    
+    .sf-detail-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Styles pour la modal de suppression */
+    .modal-content {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        padding: 1.2rem 1.5rem;
+        background-color: #f8f9fa;
+        border-bottom: none;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        font-size: 1.05rem;
+        text-align: center;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem 1.5rem;
+        gap: 1rem;
+        border-top: none;
+        justify-content: center;
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+        transition: all 0.3s;
+        min-width: 100px;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+    }
+
+    .btn-danger {
+        transition: all 0.3s;
+        background-color: #dc3545;
+        border-color: #dc3545;
+        min-width: 120px;
+    }
+
+    .btn-danger:hover {
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+    }
+
+    .fa-exclamation-triangle {
+        color: #ffc107;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Breadcrumb amélioré -->
+    <nav aria-label="breadcrumb" class="sf-breadcrumb-container">
+        <ol class="breadcrumb sf-breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'cabinet:dashboard' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                    <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'honoraires:honoraire_pv_list' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                    <i class="bi bi-file-earmark-bar-graph me-2"></i>Honoraires PV
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-sf-gold">
+                <i class="bi bi-file-earmark-text me-2"></i>Détail Honoraire PV
+            </li>
+        </ol>
+    </nav>
+
+    <!-- En-tête de page -->
+    <div class="row sf-page-header">
+        <div class="col-12">
+            <h1 class="sf-page-title">
+                <i class="bi bi-file-earmark-text mr-2"></i>
+                Détails de l'Honoraire PV
+            </h1>
+        </div>
+    </div>
+
+    <!-- Carte de détails -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card sf-card shadow">
+                <div class="sf-card-header">
+                    <h5 class="m-0 font-weight-bold">
+                        <i class="bi bi-info-circle mr-2"></i>
+                        Informations sur l'Honoraire PV
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table sf-detail-table">
+                            <tbody>
+                                <tr>
+                                    <th>Code :</th>
+                                    <td>{{ honoraire_pv.code }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Dossier:</th>
+                                    <td>{{ honoraire_pv.dossier.code }} - {{ honoraire_pv.dossier.denomination }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Date de création :</th>
+                                    <td>{{ honoraire_pv.date_creation|date:"d/m/Y" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Montant:</th>
+                                    <td>{{ honoraire_pv.montant_total }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Reste:</th>
+                                    <td>{{ honoraire_pv.reste_pv }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Description:</th>
+                                    <td>{{ honoraire_pv.description }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4 d-flex justify-content-end">
+                        <a href="{% url 'honoraires:honoraire_pv_list' %}" class="btn sf-btn-secondary me-2">
+                            <i class="bi bi-arrow-left mr-2"></i> Retour à la liste
+                        </a>
+                        <a href="{% url 'honoraires:honoraire_pv_update' honoraire_pv.pk %}" class="btn sf-btn-primary me-2">
+                            <i class="bi bi-pencil mr-2"></i> Modifier
+                        </a>
+                        <button type="button" class="btn sf-btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="bi bi-trash mr-2"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title text-dark fs-5 fw-bold">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="mb-0 text-center text-muted">
+                    Êtes-vous sûr de vouloir supprimer l'honoraire PV pour <strong>{{ honoraire_pv.dossier.denomination }}</strong> ?
+                </p>
+                <p class="small text-center text-muted mt-2">
+                    <i class="fas fa-info-circle me-1"></i>Cette action est irréversible
+                </p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                    Annuler
+                </button>
+                <form action="{% url 'honoraires:honoraire_pv_delete' honoraire_pv.pk %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="fas fa-trash-alt me-2"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

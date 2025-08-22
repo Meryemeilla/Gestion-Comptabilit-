@@ -1,0 +1,474 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+{% if object %}Modifier {{ object.nom_complet }}{% else %}Nouveau comptable{% endif %} - Comptables
+{% endblock %}
+
+{% block breadcrumb %}
+<style>
+   .sf-breadcrumb {
+        background: linear-gradient(to right, #f8f9fc 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(54, 96, 146, 0.08);
+        border-left: 4px solid var(--sf-gold);
+        margin-bottom: 1.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-size: 0.93rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.1rem;
+        padding: 0 0.6rem;
+        font-weight: bold;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        background-color: rgba(54, 96, 146, 0.08);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item a i {
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active i {
+        color: var(--sf-gold);
+    }
+     /* Classes utilitaires */
+    .text-sf-blue { color: var(--sf-blue); }
+    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
+    .text-sf-gold { color: var(--sf-gold); }
+</style>
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb sf-breadcrumb" style="background-color: transparent; padding: 0.75rem 0; margin: 0;">
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dashboard' %}" 
+               class="text-sf-blue hover-text-sf-dark-blue"
+               style="text-decoration: none; display: inline-flex; align-items: center;">
+                <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:comptable_list' %}" 
+               class="text-sf-blue hover-text-sf-dark-blue"
+               style="text-decoration: none; display: inline-flex; align-items: center;">
+                <i class="bi bi-person-vcard me-2"></i>Comptables
+            </a>
+        </li>
+        {% if object %}
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:comptable_detail' object.pk %}" 
+               class="text-sf-blue hover-text-sf-dark-blue"
+               style="text-decoration: none; display: inline-flex; align-items: center;">
+                <i class="bi bi-person me-2"></i>{{ object.nom_complet }}
+            </a>
+        </li>
+        <li class="breadcrumb-item active text-sf-gold" 
+            style="font-weight: 500; display: inline-flex; align-items: center;">
+            <i class="bi bi-pencil-square me-2"></i>Modifier
+        </li>
+        {% else %}
+        <li class="breadcrumb-item active text-sf-gold" 
+            style="font-weight: 500; display: inline-flex; align-items: center;">
+            <i class="bi bi-plus-circle me-2"></i>Nouveau
+        </li>
+        {% endif %}
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .sf-form-label {
+        font-weight: 600;
+        color: var(--sf-dark-blue);
+        margin-bottom: 0.5rem;
+    }
+    
+    .sf-form-control {
+        border-radius: 0.35rem;
+        border: 1px solid #d1d3e2;
+        padding: 0.75rem 1rem;
+        transition: border-color 0.3s;
+    }
+    
+    .sf-form-control:focus {
+        border-color: var(--sf-blue);
+        box-shadow: 0 0 0 0.2rem rgba(54, 96, 146, 0.25);
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-primary:hover {
+        background-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+    
+    .section-title {
+        color: var(--sf-blue);
+        border-bottom: 1px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .input-group-text {
+        background-color: #e9ecef;
+        color: #495057;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center sf-page-header">
+        <h1 class="sf-page-title">
+            <i class="bi bi-person-badge mr-2"></i>
+            {% if object %}Modifier {{ object.nom_complet }}{% else %}Nouveau comptable{% endif %}
+        </h1>
+        <a href="{% if object %}{% url 'cabinet:comptable_detail' object.pk %}{% else %}{% url 'cabinet:comptable_list' %}{% endif %}" 
+           class="btn sf-btn-outline">
+            <i class="bi bi-arrow-left mr-2"></i> Annuler
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card sf-card shadow mb-4">
+                <div class="sf-card-header">
+                    <h5 class="m-0 font-weight-bold">
+                        <i class="bi bi-person-lines-fill mr-2"></i>
+                        Fiche comptable
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Section 1: Informations de connexion -->
+                        <div class="mb-4">
+                            <h6 class="section-title">
+                                <i class="bi bi-shield-lock mr-2"></i>Informations de connexion
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="sf-form-group">
+                                        <label class="sf-form-label" for="{{ form.username.id_for_label }}">
+                                            Nom d'utilisateur <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.username }}
+                                        {% if form.username.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.username.errors.0 }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="sf-form-group">
+                                        <label class="sf-form-label" for="{{ form.password.id_for_label }}">
+                                            Mot de passe <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.password }}
+                                        {% if form.password.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.password.errors.0 }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="sf-form-group">
+                                        <label class="sf-form-label" for="{{ form.password_confirm.id_for_label }}">
+                                            Confirmation <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.password_confirm }}
+                                        {% if form.password_confirm.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.password_confirm.errors.0 }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Informations personnelles -->
+                        <div class="mb-4">
+                            <h6 class="section-title">
+                                <i class="bi bi-person-vcard mr-2"></i>Informations personnelles
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="sf-form-group">
+                                        <label class="sf-form-label" for="{{ form.matricule.id_for_label }}">
+                                            Matricule <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.matricule }}
+                                        {% if form.matricule.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.matricule.errors.0 }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="sf-form-group">
+                                        <label class="sf-form-label" for="{{ form.nom.id_for_label }}">
+                                            Nom <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.nom }}
+                                        {% if form.nom.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.nom.errors.0 }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="sf-form-group">
+                                        <label class="sf-form-label" for="{{ form.prenom.id_for_label }}">
+                                            Prénom <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.prenom }}
+                                        {% if form.prenom.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.prenom.errors.0 }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="sf-form-group">
+                                        <label class="sf-form-label" for="{{ form.cnss.id_for_label }}">
+                                            Numéro CNSS
+                                        </label>
+                                        {{ form.cnss }}
+                                        {% if form.cnss.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.cnss.errors.0 }}
+                                        </div>
+                                        {% endif %}
+                                        <small class="form-text text-muted">Format: 8 à 12 chiffres</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Contact -->
+                        <div class="mb-4">
+                            <h6 class="section-title">
+                                <i class="bi bi-telephone mr-2"></i>Coordonnées
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="sf-form-group">
+                                        <label class="sf-form-label" for="{{ form.tel.id_for_label }}">
+                                            Téléphone
+                                        </label>
+                                        {{ form.tel }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="sf-form-group">
+                                        <label class="sf-form-label" for="{{ form.tel_personnel.id_for_label }}">
+                                            Téléphone personnel
+                                        </label>
+                                        {{ form.tel_personnel }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="sf-form-group">
+                                        <label class="sf-form-label" for="{{ form.email.id_for_label }}">
+                                            Email <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                            {{ form.email }}
+                                        </div>
+                                        {% if form.email.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.email.errors.0 }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="sf-form-group">
+                                        <label class="sf-form-label" for="{{ form.email_personnel.id_for_label }}">
+                                            Email personnel
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                            {{ form.email_personnel }}
+                                        </div>
+                                        {% if form.email_personnel.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.email_personnel.errors.0 }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="sf-form-group">
+                                        <label class="sf-form-label" for="{{ form.adresse.id_for_label }}">
+                                            Adresse
+                                        </label>
+                                        {{ form.adresse }}
+                                        {% if form.adresse.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.adresse.errors.0 }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                            <a href="{% if object %}{% url 'cabinet:comptable_detail' object.pk %}{% else %}{% url 'cabinet:comptable_list' %}{% endif %}" 
+                               class="btn sf-btn-outline mr-3">
+                                <i class="bi bi-x-circle mr-2"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn sf-btn-primary" style="color: white;">
+                                <i class="bi bi-check-lg mr-2"></i>
+                                {% if object %}Mettre à jour{% else %}Créer{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Style des champs de formulaire
+        document.querySelectorAll('select, input, textarea').forEach(element => {
+            if (element.type !== 'checkbox' && element.type !== 'radio') {
+                element.classList.add('sf-form-control', 'form-control');
+            }
+        });
+        
+        // Gestion du matricule
+        const matriculeInput = document.getElementById('{{ form.matricule.id_for_label }}');
+        if (matriculeInput) {
+            matriculeInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            });
+        }
+
+        // Gestion du CNSS
+        const cnssInput = document.getElementById('{{ form.cnss.id_for_label }}');
+        if (cnssInput) {
+            cnssInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if (this.value.length > 12) {
+                    this.value = this.value.substring(0, 12);
+                }
+            });
+        }
+
+        // Validation des champs requis
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            const requiredFields = ['matricule', 'nom', 'prenom', 'email'];
+            
+            requiredFields.forEach(function(fieldName) {
+                const field = document.getElementById(`id_${fieldName}`);
+                if (field && !field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Veuillez remplir tous les champs obligatoires.');
+            }
+        });
+    });
+</script>
+{% endblock %}

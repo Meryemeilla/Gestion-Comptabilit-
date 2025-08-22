@@ -1,0 +1,15 @@
+# Environnements virtuels
+env/
+venv/
+envGestion1/
+.venv/
+envGestion/
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+
+# Autres fichiers inutiles
+*.log
+*.sqlite3

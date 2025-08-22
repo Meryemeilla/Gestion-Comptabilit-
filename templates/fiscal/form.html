@@ -1,0 +1,347 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+    {% if document %}Modifier{% else %}Nouveau{% endif %} document fiscal - Cabinet Comptable
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:dashboard' %}">Tableau de bord</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:suivi_tva_list' %}">Documents Fiscaux</a></li>
+        <li class="breadcrumb-item active">
+            {% if document %}Modifier {{ document.reference }}{% else %}Nouveau document{% endif %}
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">
+        {% if document %}
+        Modifier le document fiscal
+        {% else %}
+        Nouveau document fiscal
+        {% endif %}
+    </h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="bi bi-file-earmark-text me-2"></i>
+            {% if document %}
+            Modification du document {{ document.reference }}
+            {% else %}
+            Création d'un nouveau document fiscal
+            {% endif %}
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <!-- Informations principales -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">Informations principales</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="{{ form.dossier.id_for_label }}" class="form-label">Dossier concerné *</label>
+                                {{ form.dossier }}
+                                {% if form.dossier.errors %}
+                                <div class="invalid-feedback d-block">{{ form.dossier.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            {% if form_type == 'acompte' %}
+                                <div class="mb-3">
+                                    <label for="{{ form.annee.id_for_label }}" class="form-label">Année *</label>
+                                    {{ form.annee }}
+                                    {% if form.annee.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.annee.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.montant.id_for_label }}" class="form-label">Montant total *</label>
+                                    {{ form.montant }}
+                                    {% if form.montant.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.montant.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.regularisation.id_for_label }}" class="form-label">Régularisation</label>
+                                    {{ form.regularisation }}
+                                    {% if form.regularisation.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.regularisation.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.a1.id_for_label }}" class="form-label">Acompte 1</label>
+                                    {{ form.a1 }}
+                                    {% if form.a1.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.a1.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.a2.id_for_label }}" class="form-label">Acompte 2</label>
+                                    {{ form.a2 }}
+                                    {% if form.a2.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.a2.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.a3.id_for_label }}" class="form-label">Acompte 3</label>
+                                    {{ form.a3 }}
+                                    {% if form.a3.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.a3.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.a4.id_for_label }}" class="form-label">Acompte 4</label>
+                                    {{ form.a4 }}
+                                    {% if form.a4.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.a4.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            {% elif form_type == 'cmir' %}
+                                <div class="mb-3">
+                                    <label for="{{ form.annee.id_for_label }}" class="form-label">Année *</label>
+                                    {{ form.annee }}
+                                    {% if form.annee.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.annee.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.montant_ir.id_for_label }}" class="form-label">Montant IR *</label>
+                                    {{ form.montant_ir }}
+                                    {% if form.montant_ir.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.montant_ir.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.montant_cm.id_for_label }}" class="form-label">Montant CM *</label>
+                                    {{ form.montant_cm }}
+                                    {% if form.montant_cm.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.montant_cm.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.complement_ir.id_for_label }}" class="form-label">Complément IR</label>
+                                    {{ form.complement_ir }}
+                                    {% if form.complement_ir.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.complement_ir.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            {% elif form_type == 'tva' %}
+                                <!-- Informations principales -->
+                                <div class="mb-4 p-3 border rounded bg-light">
+                                    <h5 class="mb-3 text-primary">Informations principales</h5>
+                                    <div class="mb-3">
+                                        <label for="{{ form.dossier.id_for_label }}" class="form-label">Dossier concerné *</label>
+                                        {{ form.dossier }}
+                                        {% if form.dossier.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.dossier.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="{{ form.annee.id_for_label }}" class="form-label">Année *</label>
+                                        {{ form.annee }}
+                                        {% if form.annee.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.annee.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <!-- Périodes -->
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <div class="p-3 border rounded bg-white">
+                                            <h6 class="mb-3 text-secondary">Mois</h6>
+                                            <div class="form-check mb-2">{{ form.jan }} <label class="form-check-label" for="{{ form.jan.id_for_label }}">Janvier</label></div>
+                                            <div class="form-check mb-2">{{ form.fev }} <label class="form-check-label" for="{{ form.fev.id_for_label }}">Février</label></div>
+                                            <div class="form-check mb-2">{{ form.mars }} <label class="form-check-label" for="{{ form.mars.id_for_label }}">Mars</label></div>
+                                            <div class="form-check mb-2">{{ form.avril }} <label class="form-check-label" for="{{ form.avril.id_for_label }}">Avril</label></div>
+                                            <div class="form-check mb-2">{{ form.mai }} <label class="form-check-label" for="{{ form.mai.id_for_label }}">Mai</label></div>
+                                            <div class="form-check mb-2">{{ form.juin }} <label class="form-check-label" for="{{ form.juin.id_for_label }}">Juin</label></div>
+                                            <div class="form-check mb-2">{{ form.juillet }} <label class="form-check-label" for="{{ form.juillet.id_for_label }}">Juillet</label></div>
+                                            <div class="form-check mb-2">{{ form.aout }} <label class="form-check-label" for="{{ form.aout.id_for_label }}">Août</label></div>
+                                            <div class="form-check mb-2">{{ form.sep }} <label class="form-check-label" for="{{ form.sep.id_for_label }}">Septembre</label></div>
+                                            <div class="form-check mb-2">{{ form.oct }} <label class="form-check-label" for="{{ form.oct.id_for_label }}">Octobre</label></div>
+                                            <div class="form-check mb-2">{{ form.nov }} <label class="form-check-label" for="{{ form.nov.id_for_label }}">Novembre</label></div>
+                                            <div class="form-check mb-2">{{ form.dec }} <label class="form-check-label" for="{{ form.dec.id_for_label }}">Décembre</label></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="p-3 border rounded bg-white">
+                                            <h6 class="mb-3 text-secondary">Trimestres</h6>
+                                            <div class="form-check mb-2">{{ form.t1 }} <label class="form-check-label" for="{{ form.t1.id_for_label }}">T1</label></div>
+                                            <div class="form-check mb-2">{{ form.t2 }} <label class="form-check-label" for="{{ form.t2.id_for_label }}">T2</label></div>
+                                            <div class="form-check mb-2">{{ form.t3 }} <label class="form-check-label" for="{{ form.t3.id_for_label }}">T3</label></div>
+                                            <div class="form-check mb-2">{{ form.t4 }} <label class="form-check-label" for="{{ form.t4.id_for_label }}">T4</label></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% elif form_type == 'depotbilan' %}
+                                <div class="mb-3">
+                                    <label for="{{ form.annee_exercice.id_for_label }}" class="form-label">Année d'exercice *</label>
+                                    {{ form.annee_exercice }}
+                                    {% if form.annee_exercice.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.annee_exercice.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.date_depot.id_for_label }}" class="form-label">Date de dépôt</label>
+                                    {{ form.date_depot }}
+                                    {% if form.date_depot.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.date_depot.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.remarque.id_for_label }}" class="form-label">Remarques</label>
+                                    {{ form.remarque }}
+                                    {% if form.remarque.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.remarque.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.statut.id_for_label }}" class="form-label">Statut</label>
+                                    {{ form.statut }}
+                                    {% if form.statut.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.statut.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            {% elif form_type == 'forfaitaire' %}
+                                <div class="mb-3">
+                                    <label for="{{ form.annee.id_for_label }}" class="form-label">Année *</label>
+                                    {{ form.annee }}
+                                    {% if form.annee.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.annee.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.code_pp.id_for_label }}" class="form-label">Code PP</label>
+                                    {{ form.code_pp }}
+                                    {% if form.code_pp.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.code_pp.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.declaration_annuelle }} <label class="form-check-label" for="{{ form.declaration_annuelle.id_for_label }}">Déclaration annuelle effectuée</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.paiement_annuel }} <label class="form-check-label" for="{{ form.paiement_annuel.id_for_label }}">Paiement annuel effectué</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.a1 }} <label class="form-check-label" for="{{ form.a1.id_for_label }}">1er acompte payé</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.a2 }} <label class="form-check-label" for="{{ form.a2.id_for_label }}">2ème acompte payé</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.a3 }} <label class="form-check-label" for="{{ form.a3.id_for_label }}">3ème acompte payé</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.a4 }} <label class="form-check-label" for="{{ form.a4.id_for_label }}">4ème acompte payé</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.declaration_ir }} 
+                                    <label class="form-check-label" for="{{ form.declaration_ir.id_for_label }}">Déclaration I.R.</label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    {{ form.declaration_9421 }} 
+                                    <label class="form-check-label" for="{{ form.declaration_9421.id_for_label }}">Déclaration 9421</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.tva_due.id_for_label }}" class="form-label">TVA due</label>
+                                    {{ form.tva_due }}
+                                    {% if form.tva_due.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.tva_due.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.tva_deductible.id_for_label }}" class="form-label">TVA déductible</label>
+                                    {{ form.tva_deductible }}
+                                    {% if form.tva_deductible.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.tva_deductible.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.tva_a_payer_reporter.id_for_label }}" class="form-label">TVA à payer/reporter</label>
+                                    {{ form.tva_a_payer_reporter }}
+                                    {% if form.tva_a_payer_reporter.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.tva_a_payer_reporter.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.date_declaration.id_for_label }}" class="form-label">Date de déclaration</label>
+                                    {{ form.date_declaration }}
+                                    {% if form.date_declaration.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.date_declaration.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.date_limite_depot.id_for_label }}" class="form-label">Date limite de dépôt</label>
+                                    {{ form.date_limite_depot }}
+                                    {% if form.date_limite_depot.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.date_limite_depot.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.statut_declaration.id_for_label }}" class="form-label">Statut</label>
+                                    {{ form.statut_declaration }}
+                                    {% if form.statut_declaration.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.statut_declaration.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Détails et statut -->
+                <!-- Cette colonne peut être adaptée ou supprimée selon les besoins spécifiques de chaque type de document -->
+            </div>
+            <div class="mt-4 text-end">
+                <a href="{% url 'cabinet:suivi_tva_list' %}" class="btn btn-secondary me-2">
+                    <i class="bi bi-x-circle"></i> Annuler
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> 
+                    {% if document %}Mettre à jour{% else %}Créer{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.querySelectorAll('input, select, textarea').forEach(function(element) {
+        element.classList.add('form-control');
+    });
+    document.querySelectorAll('select').forEach(function(element) {
+        element.classList.remove('form-control');
+        element.classList.add('form-select');
+    });
+    document.querySelectorAll('input[type="number"]').forEach(function(element) {
+        element.setAttribute('step', '0.01');
+        element.setAttribute('min', '0');
+    });
+    // Ajuster la hauteur du textarea des observations si présent
+    if (document.querySelector('#{{ form.observations.id_for_label }}')) {
+        document.querySelector('#{{ form.observations.id_for_label }}').style.height = '100px';
+    }
+</script>
+{% endblock %}

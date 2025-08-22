@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0">{% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} Honoraire PV</h4>
+
+                <div class="sf-breadcrumb-container mb-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb sf-breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'cabinet:dashboard' %}"><i class="bi bi-speedometer2"></i> Tableau de bord</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'honoraires:honoraire_dashboard' %}"><i class="bi bi-graph-up"></i> Honoraires</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'honoraires:honoraire_pv_list' %}"><i class="bi bi-list-ul"></i> Liste des Honoraires PV</a>
+            </li>
+            <li class="breadcrumb-item active">
+                <i class="bi {% if form.instance.pk %}bi-pencil-square{% else %}bi-plus-circle{% endif %}"></i> {% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} Honoraire PV
+            </li>
+        </ol>
+    </nav>
+</div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Informations sur l'Honoraire PV</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        <a href="{% url 'honoraires:honoraire_pv_list' %}" class="btn btn-secondary">Annuler</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

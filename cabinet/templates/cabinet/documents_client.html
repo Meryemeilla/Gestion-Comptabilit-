@@ -1,0 +1,109 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- En-tête de section -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="bi bi-file-earmark-text-fill text-primary me-2"></i>
+                    Mes documents récents
+                </h2>
+               
+            </div>
+
+            <!-- Liste des documents -->
+            {% if documents %}
+            <div class="card shadow-sm border-0">
+                <div class="list-group list-group-flush">
+                    {% for doc in documents %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">
+                                    <i class="bi 
+                                        {% if doc.fichier.name|lower|slice:'-4:' == '.pdf' %}bi-filetype-pdf text-danger
+                                        {% elif doc.fichier.name|lower|slice:'-5:' == '.docx' %}bi-filetype-docx text-primary
+                                        {% elif doc.fichier.name|lower|slice:'-4:' == '.xls' %}bi-filetype-xls text-success
+                                        {% else %}bi-file-earmark-text
+                                        {% endif %} me-2">
+                                    </i>
+                                    {{ doc.nom }}
+                                </h6>
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar me-1"></i>
+                                    {{ doc.date_document|date:"d/m/Y" }}
+                                    {% if doc.type_document %}
+                                    <span class="ms-3">
+                                        <i class="bi bi-tag me-1"></i>
+                                        {{ doc.get_type_document_display }}
+                                    </span>
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <div>
+                                <a href="{{ doc.fichier.url }}" class="btn btn-sm btn-outline-primary" download>
+                                    <i class="bi bi-download"></i> Télécharger
+                                </a>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <!-- État vide -->
+            <div class="card shadow-sm border-0 text-center py-5">
+                <i class="bi bi-file-earmark-excel display-4 text-muted mb-3"></i>
+                <h5 class="text-muted">Aucun document disponible</h5>
+                <p class="text-muted">Vos documents récents apparaîtront ici</p>
+                <a href="#" class="btn btn-primary mt-2">
+                    <i class="bi bi-upload me-1"></i> Ajouter un document
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- Pagination (optionnelle) -->
+            {% if is_paginated %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Initialisation des tooltips -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+})
+</script>
+{% endblock %}

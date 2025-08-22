@@ -1,0 +1,242 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Documents Fiscaux - Cabinet Comptable{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'cabinet:dashboard' %}">Tableau de bord</a></li>
+        <li class="breadcrumb-item active">Documents Fiscaux</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Gestion des documents fiscaux</h1>
+    <form method="post" action="{% url 'cabinet:fiscal_document_redirect' %}">
+        {% csrf_token %}
+        <div class="input-group mb-3" style="max-width: 400px;">
+            <select class="form-select" name="type_doc" id="type_doc_select" required>
+                <option value="" selected disabled>Choisir le type de document</option>
+                <option value="acomptes">Acomptes</option>
+                <option value="cmir">CM et IR</option>
+                <option value="depotbilan">Dépôt Bilan</option>
+                <option value="tva">TVA</option>
+            </select>
+            <button class="btn btn-primary" type="submit" id="nouveau_doc_btn">Nouveau document</button>
+            <a href="{% url 'cabinet:dashboard' %}" class="btn sf-btn-secondary ml-2">
+                <i class="bi bi-x-circle mr-2"></i> Annuler
+            </a>
+        </div>
+    </form>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const select = document.getElementById('type_doc');
+        const btn = document.getElementById('new-doc-btn');
+        select.addEventListener('change', function() {
+            btn.disabled = !select.value;
+        });
+    });
+    </script>
+</div>
+
+<!-- Filtres et recherche -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control" name="search" 
+                           placeholder="Rechercher..."
+                           value="{{ request.GET.search }}">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <select name="type" class="form-select">
+                    <option value="">Type de document</option>
+                    <option value="ACOMPTES" {% if request.GET.type == 'ACOMPTES' %}selected{% endif %}>Acomptes</option>
+                    <option value="CMIR" {% if request.GET.type == 'CMIR' %}selected{% endif %}>CM et IR</option>
+                    <option value="DEPOTBILAN" {% if request.GET.type == 'DEPOTBILAN' %}selected{% endif %}>Dépôt Bilan</option>
+                    <option value="SUIVIFORFAITAIRE" {% if request.GET.type == 'SUIVIFORFAITAIRE' %}selected{% endif %}>Suivi Forfaitaire</option>
+                    <option value="TVA" {% if request.GET.type == 'TVA' %}selected{% endif %}>TVA</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="annee" class="form-select">
+                    <option value="">Année</option>
+                    {% for annee in annees %}
+                    <option value="{{ annee }}" {% if request.GET.annee == annee|stringformat:"i" %}selected{% endif %}>{{ annee }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary">
+                    <i class="bi bi-search"></i> Rechercher
+                </button>
+            </div>
+            <div class="col-md-3 text-end">
+                <a href="{% url 'cabinet:export_excel' 'fiscal' %}" class="btn btn-outline-success">
+                    <i class="bi bi-file-earmark-excel"></i> Export Excel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Statistiques -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Total documents</h6>
+                <h3 class="card-title mb-0">{{ total_documents }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Documents déposés</h6>
+                <h3 class="card-title mb-0 text-success">{{ documents_deposes }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Documents en retard</h6>
+                <h3 class="card-title mb-0 text-danger">{{ documents_retard }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Taux de conformité</h6>
+                <h3 class="card-title mb-0">{{ taux_conformite|floatformat:1 }}%</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Liste des documents fiscaux -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="bi bi-file-earmark-text me-2"></i>Liste des documents fiscaux ({{ documents|length }})
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        {% if documents %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Référence</th>
+                        <th>Dossier</th>
+                        <th>Type</th>
+                        <th>Période</th>
+                        <th>Date limite</th>
+                        <th>Date dépôt</th>
+                        <th class="text-center">Statut</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for document in documents %}
+                    <tr>
+                        <td><strong>{{ document.reference }}</strong></td>
+                        <td>
+                            <a href="{% url 'cabinet:dossier_detail' document.dossier.id %}">
+                                {{ document.dossier.numero }} - {{ document.dossier.nom }}
+                            </a>
+                        </td>
+                        <td>{{ document.get_type_display }}</td>
+                        <td>{{ document.periode }}</td>
+                        <td>{{ document.date_limite|date:"d/m/Y" }}</td>
+                        <td>
+                            {% if document.date_depot %}
+                            {{ document.date_depot|date:"d/m/Y" }}
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-{{ document.get_statut_color }}">
+                                {{ document.get_statut_display }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'cabinet:fiscal_detail' document.id %}" class="btn btn-sm btn-info">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{% url 'cabinet:fiscal_update' document.id %}" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            {% if document.fichier %}
+                            <a href="{{ document.fichier.url }}" class="btn btn-sm btn-success" target="_blank">
+                                <i class="bi bi-download"></i>
+                            </a>
+                            {% endif %}
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" 
+                                    data-bs-target="#deleteModal{{ document.id }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-file-earmark-x display-4 text-muted"></i>
+            <p class="mt-2">Aucun document fiscal trouvé</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modals de suppression -->
+{% for document in documents %}
+<div class="modal fade" id="deleteModal{{ document.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer le document <strong>{{ document.reference }}</strong> ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{% url 'cabinet:fiscal_delete' document.id %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<!-- Tâches effectuées par l'utilisateur -->
+<div class="card border-info mb-4">
+    <div class="card-header bg-info text-white">
+        <i class="bi bi-check2-circle"></i> Tâches effectuées
+    </div>
+    <div class="card-body">
+        {% if taches_effectuees and taches_effectuees|length > 0 %}
+            <ul class="mb-0">
+                {% for tache in taches_effectuees %}
+                    <li>{{ tache }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <span class="text-muted">Aucune tâche effectuée récemment.</span>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
