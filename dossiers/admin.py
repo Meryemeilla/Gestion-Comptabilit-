@@ -1,9 +1,17 @@
+"""
+Enregistrements et personnalisation Admin Django.
+
+Fichier: dossiers/admin.py
+"""
+
+# ==================== Imports ====================
 from django.contrib import admin
 
 from .models import Dossier
 
 
 @admin.register(Dossier)
+# ==================== Classes ====================
 class DossierAdmin(admin.ModelAdmin):
     list_display = [
         'denomination', 'code', 'forme_juridique', 'declaration_tva',

@@ -1,3 +1,10 @@
+"""
+Modèles Django et logique d’accès aux données.
+
+Fichier: dossiers/models.py
+"""
+
+# ==================== Imports ====================
 from django.db import models
 from django.core.validators import RegexValidator
 from comptables.models import Comptable
@@ -5,12 +12,16 @@ from utilisateurs.models import Client
 from django.conf import settings
 import re
 from PyPDF2 import PdfReader  # Assure-toi que PyPDF2 est installé
+from cabinet.soft_delete_models import SoftDeleteModel, SoftDeleteManager
+from .managers import DossierManager
 
-class Dossier(models.Model):
+# ==================== Classes ====================
+class Dossier(SoftDeleteModel):
     """
     Modèle représentant un dossier d'entreprise
     """
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="dossiers_client", null=True, blank=True, verbose_name="Client")
+    
 
     cree_par = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
@@ -171,6 +182,7 @@ class Dossier(models.Model):
         verbose_name="Déclaration à la TVA"
     )
     annee_extraite_pdf = models.IntegerField(null=True, blank=True)
+    dernier_rappel_tva = models.DateField(null=True, blank=True, verbose_name="Date du dernier rappel TVA")
     # dossier/models.py
 
 
@@ -191,7 +203,9 @@ class Dossier(models.Model):
     # Relations
     comptable_traitant = models.ForeignKey(
         Comptable,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='dossiers',
         verbose_name="Comptable traitant"
     )
@@ -200,6 +214,7 @@ class Dossier(models.Model):
     date_creation_dossier = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
     actif = models.BooleanField(default=True, verbose_name="Actif")
+    # is_deleted = models.BooleanField(default=False)
     
     # Statut du dossier
     STATUT_CHOICES = [
@@ -231,28 +246,39 @@ class Dossier(models.Model):
         verbose_name="Statut fiscal"
     )
 
-    class Meta:
+    objects = DossierManager()
+    all_objects = models.Manager()
+
+    class Meta(SoftDeleteModel.Meta):
         verbose_name = "Dossier"
         verbose_name_plural = "Dossiers"
         ordering = ['denomination']
         unique_together = ['denomination', 'comptable_traitant']
 
     def __str__(self):
-        return f"{self.denomination} ({self.code}) - {self.comptable_traitant.nom_complet}"
+            client_name = self.client.nom_complet if self.client else "Sans client"
+            return f"{client_name} - {self.denomination}"
+
 
     @property
     def est_pm(self):
-        """Vérifie si c'est un dossier PM (Personne Morale)"""
+        """
+        Vérifie si c'est un dossier PM (Personne Morale)
+        """
         return self.forme_juridique in ['SARL', 'SA', 'SNC', 'SCS', 'SCA', 'SASU', 'SAS']
 
     @property
     def est_pp(self):
-        """Vérifie si c'est un dossier PP (Personne Physique)"""
+        """
+        Vérifie si c'est un dossier PP (Personne Physique)
+        """
         return self.forme_juridique in ['EI', 'EIRL', 'AUTO','EURL']
 
     @property
     def est_forfaitaire(self):
-        """Vérifie si c'est un dossier forfaitaire"""
+        """
+        Vérifie si c'est un dossier forfaitaire
+        """
         return self.code in ['F', 'FS']
 
     def type_structure(self):
@@ -262,40 +288,33 @@ class Dossier(models.Model):
 
     @property
     def a_tva(self):
-        """Vérifie si l'entreprise est assujettie à la TVA"""
+        """
+        Vérifie si l'entreprise est assujettie à la TVA
+        """
         return self.declaration_tva in ['MENSUELLE', 'TRIMESTRIELLE']
 
-    def save(self, *args, **kwargs):
-        """
-        Surcharge de la méthode save pour mettre à jour les statistiques du comptable
-        """
-        super().save(*args, **kwargs)
-        if self.comptable_traitant:
-            self.comptable_traitant.calculer_statistiques()
-
-        if self.client and not self.client.nom_entreprise:
-            self.client.nom_entreprise = self.denomination
-            self.client.save()
-
-    def get_statut_fiscal_display(self):
-        if self.statut_fiscal:
-            return dict(self.STATUT_FISCAL_CHOICES).get(self.statut_fiscal, "Non communiqué")
-        return "Non communiqué"
+    def delete(self, *args, **kwargs):
+        self.is_deleted = True
+        self.save()
 
     def save(self, *args, **kwargs):
         # Synchroniser automatiquement le statut en fonction du code
         if self.code == 'D':
             self.statut = 'DELAISSE'
             self.actif = False
+            self.is_deleted = True
         elif self.code == 'L':
             self.statut = 'LIVRE'
             self.actif = False
+            self.is_deleted = True
         elif self.code == 'R':
             self.statut = 'RADIE'
             self.actif = False
+            self.is_deleted = True
         else:
             self.statut = 'EXISTANT'
             self.actif = True
+            self.is_deleted = False
 
         super().save(*args, **kwargs)
 

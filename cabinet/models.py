@@ -1,3 +1,10 @@
+"""
+Modèles Django et logique d’accès aux données.
+
+Fichier: cabinet/models.py
+"""
+
+# ==================== Imports ====================
 from django.db import models
 from django.conf import settings
 from dossiers.models import Dossier
@@ -7,6 +14,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+# ==================== Classes ====================
 class Document(models.Model):
     dossier = models.ForeignKey(Dossier, on_delete=models.CASCADE, related_name='documents')
     fichier = models.FileField(upload_to='documents_dossiers/')

@@ -1,3 +1,10 @@
+"""
+Formulaires Django et validation.
+
+Fichier: cabinet/forms.py
+"""
+
+# ==================== Imports ====================
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
@@ -9,6 +16,7 @@ from django.core.exceptions import ValidationError
 User = get_user_model()
 
 
+# ==================== Classes ====================
 class BaseDossierForm(forms.ModelForm):
     class Meta:
         model = Dossier

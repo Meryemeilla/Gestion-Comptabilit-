@@ -1,8 +1,21 @@
+"""
+Modèles Django et logique d’accès aux données.
+
+Fichier: comptables/models.py
+"""
+
+# ==================== Imports ====================
 from django.db import models
 from django.core.validators import RegexValidator
 from django.conf import settings
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+
+
+# ==================== Classes ====================
+class ComptableManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
 
 
 class Comptable(models.Model):
@@ -101,6 +114,10 @@ class Comptable(models.Model):
     date_modification = models.DateTimeField(auto_now=True)
     actif = models.BooleanField(default=True, verbose_name="Actif")
     is_approved = models.BooleanField(default=False, verbose_name="Approuvé")
+    is_deleted = models.BooleanField(default=False)
+
+    objects = ComptableManager()
+    all_objects = models.Manager()
 
     class Meta:
         verbose_name = "Comptable"
@@ -120,10 +137,10 @@ class Comptable(models.Model):
         """
         from dossiers.models import Dossier
         
-        dossiers = Dossier.objects.filter(comptable_traitant=self, actif=True)
+        dossiers = Dossier.objects.filter(comptable_traitant=self, actif=True, is_deleted=False)
         
-        self.nbre_pm = dossiers.filter(forme_juridique__in=['SARL', 'SA', 'SNC', 'SCS', 'SCA', 'EURL', 'SASU', 'SAS']).count()
-        self.nbre_et = dossiers.filter(forme_juridique__in=['EI', 'EIRL', 'AUTO']).count()
+        self.nbre_pm = dossiers.filter(forme_juridique__in=['SARL', 'SA', 'SNC', 'SCS', 'SCA', 'SASU', 'SAS']).count()
+        self.nbre_et = dossiers.filter(forme_juridique__in=['EI', 'EIRL', 'AUTO', 'EURL', 'PP']).count()
 
         # Les autres calculs seront implémentés selon les besoins
         
@@ -137,6 +154,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
 @receiver(post_delete, sender=Comptable)
+# ==================== Fonctions ====================
 def supprimer_utilisateur_associe(sender, instance, **kwargs):
         if instance.user:
             instance.user.delete()

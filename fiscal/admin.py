@@ -1,3 +1,10 @@
+"""
+Enregistrements et personnalisation Admin Django.
+
+Fichier: fiscal/admin.py
+"""
+
+# ==================== Imports ====================
 from django.contrib import admin
 
 from django.contrib import admin
@@ -5,6 +12,7 @@ from .models import SuiviTVA, Acompte, CMIR, DepotBilan, SuiviForfaitaire
 
 
 @admin.register(SuiviTVA)
+# ==================== Classes ====================
 class SuiviTVAAdmin(admin.ModelAdmin):
     list_display = [
         'code','dossier', 'annee', 'pourcentage_mensuel_complete', 'pourcentage_trimestriel_complete'

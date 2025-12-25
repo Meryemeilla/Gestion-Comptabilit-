@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0">{% if trashed_view %}Corbeille des Dossiers{% else %}Liste des Dossiers{% endif %}</h4>
+
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">Dossiers</a></li>
+                        <li class="breadcrumb-item active">{% if trashed_view %}Corbeille{% else %}Liste{% endif %}</li>
+                    </ol>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title mb-0">{% if trashed_view %}Dossiers Supprimés{% else %}Tous les Dossiers{% endif %}</h4>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <form method="GET" action="">
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control" placeholder="Rechercher un dossier..." value="{{ search }}">
+                            <button class="btn btn-primary" type="submit">Rechercher</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-6 text-end">
+                    {% if not trashed_view %}
+                    <a href="{% url 'dossiers:corbeille_generique' %}" class="btn btn-warning"><i class="ri-delete-bin-line"></i> Corbeille</a>
+                    {% else %}
+                    <a href="{% url 'cabinet:dossier_list' %}" class="btn btn-info"><i class="ri-list-check"></i> Tous les Dossiers</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-nowrap align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Dénomination</th>
+                            <th>ICE</th>
+                            <th>RC</th>
+                            <th>Forme Juridique</th>
+                            <th>Statut Fiscal</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dossier in page_obj %}
+                        <tr>
+                            <td>{{ dossier.code }}</td>
+                            <td>{{ dossier.denomination }}</td>
+                            <td>{{ dossier.ice }}</td>
+                            <td>{{ dossier.rc }}</td>
+                            <td>{{ dossier.get_forme_juridique_display }}</td>
+                            <td>{{ dossier.get_statut_fiscal_display }}</td>
+                            <td>
+                                {% if trashed_view %}
+                                <a href="{% url 'dossiers:restore_dossier' dossier.pk %}" class="btn btn-success btn-sm">Restaurer</a>
+                                {% else %}
+                                <a href="#" class="btn btn-info btn-sm">Détails</a>
+                                <a href="#" class="btn btn-primary btn-sm">Modifier</a>
+                                <a href="{% url 'dossiers:delete_dossier' dossier.pk %}" class="btn btn-danger btn-sm">Supprimer</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">Aucun dossier trouvé.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row justify-content-center mt-4">
+                <div class="col-md-auto">
+                    <ul class="pagination pagination-lg justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if trashed_view %}&trashed_view=True{% endif %}">Précédent</a></li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if trashed_view %}&trashed_view=True{% endif %}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if trashed_view %}&trashed_view=True{% endif %}">Suivant</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

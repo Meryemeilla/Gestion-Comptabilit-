@@ -63,18 +63,16 @@
     }
 
     .auth-logo {
-        width: 80px;
-        height: 80px;
-        background-color: var(--light-gray);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        width: 150px;
+        height: auto;
+        display: block;
         margin: 0 auto 20px;
-        border: 2px solid var(--accent-color);
-        color: var(--primary-color);
-        font-weight: bold;
-        font-size: 28px;
+    }
+
+    .auth-logo img {
+        width: 100%;
+        height: auto;
+        display: block;
     }
 
     .auth-title {
@@ -216,7 +214,7 @@
         .auth-card {
             padding: 40px 25px;
         }
-        
+
         .auth-links {
             flex-direction: column;
             gap: 12px;
@@ -225,8 +223,15 @@
 
     /* Animation */
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .auth-card {
@@ -237,7 +242,9 @@
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-header">
-            <div class="auth-logo">SF</div>
+            <div class="auth-logo">
+                <img src="{% static 'Logo.png' %}" alt="Logo SF Comptabilité">
+            </div>
             <h1 class="auth-title">SF COMPTABILITÉ</h1>
             <div class="auth-subtitle">Expertise Comptable & Conseil Fiscal</div>
         </div>
@@ -245,21 +252,23 @@
         <div class="divider"></div>
 
         {% if form.errors %}
-            <div class="alert-danger">
-                <i class="fas fa-exclamation-circle"></i> Identifiants incorrects. Veuillez réessayer.
-            </div>
+        <div class="alert-danger">
+            <i class="fas fa-exclamation-circle"></i> Identifiants incorrects. Veuillez réessayer.
+        </div>
         {% endif %}
 
         <form method="post" novalidate>
             {% csrf_token %}
             <div class="form-group">
                 <label for="id_username" class="form-label">Nom d'utilisateur</label>
-                <input type="text" name="username" class="form-control" id="id_username" required autofocus autocomplete="username">
+                <input type="text" name="username" class="form-control" id="id_username" required autofocus
+                    autocomplete="username">
             </div>
 
             <div class="form-group">
                 <label for="id_password" class="form-label">Mot de passe</label>
-                <input type="password" name="password" class="form-control" id="id_password" required autocomplete="current-password">
+                <input type="password" name="password" class="form-control" id="id_password" required
+                    autocomplete="current-password">
             </div>
 
             <button type="submit" class="btn-auth" title="Se connecter">

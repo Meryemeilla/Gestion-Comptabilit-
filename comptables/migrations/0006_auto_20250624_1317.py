@@ -1,6 +1,14 @@
+"""
+Module applicatif.
+
+Fichier: comptables/migrations/0006_auto_20250624_1317.py
+"""
+
+# ==================== Imports ====================
 from django.db import migrations, models
 from django.conf import settings
 
+# ==================== Fonctions ====================
 def create_users_for_comptables(apps, schema_editor):
     Comptable = apps.get_model('comptables', 'Comptable')
     Utilisateur = apps.get_model(settings.AUTH_USER_MODEL.split('.')[0], settings.AUTH_USER_MODEL.split('.')[1])
@@ -29,6 +37,7 @@ def create_users_for_comptables(apps, schema_editor):
         comptable.save()
 
 
+# ==================== Classes ====================
 class Migration(migrations.Migration):
 
     dependencies = [

@@ -1,9 +1,17 @@
+"""
+Module applicatif.
+
+Fichier: cabinet/views_api.py
+"""
+
+# ==================== Imports ====================
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from cabinet.util import extract_text_from_pdf, extraire_infos_dossier
 from django.http import JsonResponse
 from fiscal.models import SuiviTVA
 @csrf_exempt
+# ==================== Handlers ====================
 def analyser_document_view(request):
     if request.method == 'POST' and request.FILES.get('document'):
         file = request.FILES['document']

@@ -1,3 +1,10 @@
+"""
+Formulaires Django et validation.
+
+Fichier: utilisateurs/forms.py
+"""
+
+# ==================== Imports ====================
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import Utilisateur
@@ -5,6 +12,7 @@ from comptables.models import Comptable
 
 
 
+# ==================== Classes ====================
 class ComptableRegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
     telephone = forms.CharField(required=False)

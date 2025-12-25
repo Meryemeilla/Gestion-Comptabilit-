@@ -1,3 +1,10 @@
+"""
+Fonctions utilitaires et helpers techniques.
+
+Fichier: cabinet/utils/email.py
+"""
+
+# ==================== Imports ====================
 from django.core.mail import EmailMessage, send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -12,6 +19,7 @@ os.environ['FONTCONFIG_PATH'] = r'C:\msys64\mingw64\etc\fonts'
 logger = logging.getLogger(__name__)
 
 
+# ==================== Classes ====================
 class EmailService:
     """Service pour l'envoi d'emails"""
     

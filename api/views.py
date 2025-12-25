@@ -1,3 +1,10 @@
+"""
+Django views (gestion des requêtes HTTP).
+
+Fichier: api/views.py
+"""
+
+# ==================== Imports ====================
 from django.shortcuts import render
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter

@@ -1,3 +1,10 @@
+"""
+Module applicatif.
+
+Fichier: config/celery.py
+"""
+
+# ==================== Imports ====================
 from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
@@ -14,6 +21,7 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 
 @app.task(bind=True)
+# ==================== Fonctions ====================
 def debug_task(self):
     print(f'Requête Celery: {self.request!r}')
 

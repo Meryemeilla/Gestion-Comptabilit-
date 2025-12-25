@@ -1,12 +1,20 @@
 #!/usr/bin/env python
+"""
+Module applicatif.
+
+Fichier: manage.py
+"""
+
 """Django's command-line utility for administrative tasks."""
+# ==================== Imports ====================
 import os
 import sys
 
 
+# ==================== Fonctions ====================
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.dev')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

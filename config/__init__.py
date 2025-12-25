@@ -1,3 +1,10 @@
+"""
+Initialisation du module Python.
+
+Fichier: config/__init__.py
+"""
+
+# ==================== Imports ====================
 from __future__ import absolute_import, unicode_literals
 
 # Importer Celery

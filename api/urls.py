@@ -1,3 +1,10 @@
+"""
+Définition des routes URL et namespaces.
+
+Fichier: api/urls.py
+"""
+
+# ==================== Imports ====================
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (

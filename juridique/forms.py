@@ -1,8 +1,16 @@
+"""
+Formulaires Django et validation.
+
+Fichier: juridique/forms.py
+"""
+
+# ==================== Imports ====================
 from django import forms
 from .models import DocumentJuridique
 from django import forms
 from .models import JuridiqueCreation
 
+# ==================== Classes ====================
 class JuridiqueCreationForm(forms.ModelForm):
     class Meta:
         model = JuridiqueCreation

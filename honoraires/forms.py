@@ -1,8 +1,16 @@
+"""
+Formulaires Django et validation.
+
+Fichier: honoraires/forms.py
+"""
+
+# ==================== Imports ====================
 from django import forms
 from django import forms
 from .models import Honoraire, ReglementHonoraire, HonorairePV, ReglementHonorairePV
 
 
+# ==================== Classes ====================
 class HonoraireForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

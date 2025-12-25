@@ -1,6 +1,14 @@
+"""
+Module applicatif.
+
+Fichier: honoraires/management/commands/update_alertes.py
+"""
+
+# ==================== Imports ====================
 from django.core.management.base import BaseCommand
 from honoraires.models import Honoraire, ReglementHonoraire
 
+# ==================== Classes ====================
 class Command(BaseCommand):
     help = "Met à jour les statuts des honoraires et règlements selon les échéances."
 

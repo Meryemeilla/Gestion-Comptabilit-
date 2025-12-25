@@ -1,8 +1,16 @@
+"""
+Tâches asynchrones (Celery, planifications).
+
+Fichier: utilisateurs/tasks.py
+"""
+
+# ==================== Imports ====================
 from celery import shared_task
 from cabinet.utils.email import EmailService
 from utilisateurs.models import Utilisateur
 from django.conf import settings
 @shared_task
+# ==================== Fonctions ====================
 def envoyer_email_creation_client(prenom, username, to_email, password, nom_client, login_url):
 
     print(f" Envoi de l’email à {to_email}")

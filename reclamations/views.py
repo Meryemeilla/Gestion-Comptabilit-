@@ -1,6 +1,14 @@
+"""
+Django views (gestion des requêtes HTTP).
+
+Fichier: reclamations/views.py
+"""
+
+# ==================== Imports ====================
 from django.shortcuts import render, redirect
 from .forms import ReclamationForm
 
+# ==================== Handlers ====================
 def create(request):
     if request.method == 'POST':
         form = ReclamationForm(request.POST, request.FILES, user=request.user)

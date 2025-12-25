@@ -1,13 +1,51 @@
+"""
+Modèles Django et logique d’accès aux données.
+
+Fichier: fiscal/models.py
+"""
+
+# ==================== Imports ====================
 from django.db import models
-from django.db import models
+from django.db.models.query import QuerySet
 from django.core.validators import MinValueValidator
 from decimal import Decimal
 from dossiers.models import Dossier
 import random
 import string
+from cabinet.soft_delete_models import SoftDeleteModel, SoftDeleteManager
 
 
-class SuiviTVA(models.Model):
+# ==================== Classes ====================
+class SoftDeleteManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
+
+    def all_with_deleted(self):
+        return super().get_queryset()
+
+    def deleted_set(self):
+        return super().get_queryset().filter(is_deleted=True)
+
+
+class SoftDeleteModel(models.Model):
+    is_deleted = models.BooleanField(default=False, verbose_name="Supprimé")
+
+    objects = SoftDeleteManager()
+    all_objects = models.Manager()
+
+    class Meta:
+        abstract = True
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.save()
+
+    def restore(self):
+        self.is_deleted = False
+        self.save()
+
+
+class SuiviTVA(SoftDeleteModel):
     """
     Modèle pour le suivi des déclarations TVA mensuelles et trimestrielles
     """
@@ -52,9 +90,12 @@ class SuiviTVA(models.Model):
     # # Métadonnées
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
+    # is_deleted = models.BooleanField(default=False, verbose_name="Supprimé")
+    # is_deleted = models.BooleanField(default=False, verbose_name="Supprimé")
+    # is_deleted = models.BooleanField(default=False, verbose_name="Supprimé")
 
    
-    class Meta:
+    class Meta(SoftDeleteModel.Meta):
         verbose_name = "Suivi TVA"
         verbose_name_plural = "Suivis TVA"
         unique_together = ['dossier', 'annee']
@@ -215,7 +256,7 @@ class SuiviTVA(models.Model):
 #             self.reference = f"PAY-TV-{self.suivi_tva.annee}-{self.pk or 'NEW'}"
 #         super().save(*args, **kwargs)
 
-class Acompte(models.Model):
+class Acompte(SoftDeleteModel):
     """
     Modèle pour le suivi des acomptes
     """
@@ -291,8 +332,8 @@ class Acompte(models.Model):
     # Métadonnées
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
-
-    class Meta:
+    # is_deleted = models.BooleanField(default=False, verbose_name="Supprimé")
+    class Meta(SoftDeleteModel.Meta):
         verbose_name = "Acompte"
         verbose_name_plural = "Acomptes"
         unique_together = ['dossier', 'annee']
@@ -307,7 +348,7 @@ class Acompte(models.Model):
         return self.a1 + self.a2 + self.a3 + self.a4
 
 
-class CMIR(models.Model):
+class CMIR(SoftDeleteModel):
     """
     Modèle pour le suivi des CM (Cotisation Minimale) et IR (Impôt sur le Revenu)
     """
@@ -351,7 +392,7 @@ class CMIR(models.Model):
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
 
-    class Meta:
+    class Meta(SoftDeleteModel.Meta):
         verbose_name = "CM et IR"
         verbose_name_plural = "CM et IR"
         unique_together = ['dossier', 'annee']
@@ -361,7 +402,7 @@ class CMIR(models.Model):
         return f"CM/IR {self.annee} - {self.dossier.denomination}"
 
 
-class SuiviForfaitaire(models.Model):
+class SuiviForfaitaire(SoftDeleteModel):
     """
     Modèle pour le suivi des déclarations et paiements forfaitaires (IR, 9421, acomptes)
    
@@ -434,7 +475,7 @@ class SuiviForfaitaire(models.Model):
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
 
-    class Meta:
+    class Meta(SoftDeleteModel.Meta):
         verbose_name = "Suivi Forfaitaire"
         verbose_name_plural = "Suivis Forfaitaires"
         unique_together = ['dossier', 'annee']
@@ -444,7 +485,7 @@ class SuiviForfaitaire(models.Model):
         return f"Suivi Forfaitaire {self.annee} - {self.dossier.denomination}"
     
 
-class DepotBilan(models.Model):
+class DepotBilan(SoftDeleteModel):
     """
     Modèle pour le suivi des dépôts de bilans
     """
@@ -491,7 +532,7 @@ class DepotBilan(models.Model):
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
 
-    class Meta:
+    class Meta(SoftDeleteModel.Meta):
         verbose_name = "Dépôt de bilan"
         verbose_name_plural = "Dépôts de bilans"
         unique_together = ['dossier', 'annee_exercice']

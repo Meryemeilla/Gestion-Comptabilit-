@@ -1,9 +1,17 @@
+"""
+Formulaires Django et validation.
+
+Fichier: reclamations/forms.py
+"""
+
+# ==================== Imports ====================
 from django import forms
 from django.contrib.auth import get_user_model
 from .models import Reclamation , Dossier 
 from utilisateurs.models import Utilisateur , Client
 User = get_user_model()
 
+# ==================== Classes ====================
 class ReclamationForm(forms.ModelForm):
     code = forms.CharField(label="Code", max_length=100, required=True)
 

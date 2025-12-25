@@ -1,6 +1,14 @@
+"""
+Modèles Django et logique d’accès aux données.
+
+Fichier: utilisateurs/models.py
+"""
+
+# ==================== Imports ====================
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 
+# ==================== Classes ====================
 class Utilisateur(AbstractUser):
     ROLES = [
         ('administrateur', 'Administrateur'),
@@ -12,6 +20,7 @@ class Utilisateur(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLES, default='client')
     telephone = models.CharField(max_length=20, blank=True, null=True)
     tel_personnel = models.CharField(max_length=20, blank=True, null=True)
+    est_celebrite = models.BooleanField(default=False, verbose_name="Est une célébrité")
     groups = models.ManyToManyField(
         Group,
         related_name='utilisateur_set',
@@ -71,6 +80,16 @@ class Client(models.Model):
     adresse = models.TextField(blank=True, null=True)
     date_creation = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def nom_complet(self):
+        """
+        Retourne un nom exploitable pour l'affichage du client
+        """
+        if self.user:
+            return f"{self.user.first_name} {self.user.last_name}".strip()
+        return self.contact_personne or "Client sans nom"
+
+    
     def __str__(self):
         # Exemple pour afficher prénom et nom du user lié s'il existe
         if self.user:

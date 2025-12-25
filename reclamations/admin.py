@@ -1,7 +1,15 @@
+"""
+Enregistrements et personnalisation Admin Django.
+
+Fichier: reclamations/admin.py
+"""
+
+# ==================== Imports ====================
 from django.contrib import admin
 from .models import  Reclamation
 
 @admin.register(Reclamation)
+# ==================== Classes ====================
 class ReclamationAdmin(admin.ModelAdmin):
     list_display = [
         'code', 'dossier', 'type_reclamation', 'date_reception', 'priorite', 'classement'

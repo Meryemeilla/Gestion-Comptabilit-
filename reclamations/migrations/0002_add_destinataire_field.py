@@ -1,7 +1,15 @@
+"""
+Module applicatif.
+
+Fichier: reclamations/migrations/0002_add_destinataire_field.py
+"""
+
+# ==================== Imports ====================
 from django.db import migrations, models
 import django.db.models.deletion
 from django.conf import settings
 
+# ==================== Classes ====================
 class Migration(migrations.Migration):
     dependencies = [
         ('reclamations', '0001_initial'),

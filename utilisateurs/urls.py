@@ -1,3 +1,10 @@
+"""
+Définition des routes URL et namespaces.
+
+Fichier: utilisateurs/urls.py
+"""
+
+# ==================== Imports ====================
 from django.urls import path
 from . import views
 

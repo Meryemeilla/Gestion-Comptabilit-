@@ -1,3 +1,10 @@
+"""
+Définition des routes URL et namespaces.
+
+Fichier: fiscal/urls.py
+"""
+
+# ==================== Imports ====================
 from django.urls import path
 from . import views
 from .views import SuiviFiscalListView

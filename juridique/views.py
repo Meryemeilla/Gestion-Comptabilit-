@@ -1,3 +1,10 @@
+"""
+Django views (gestion des requêtes HTTP).
+
+Fichier: juridique/views.py
+"""
+
+# ==================== Imports ====================
 from django.shortcuts import render
 from .forms import DocumentJuridiqueForm
 from django.db.models import Q
@@ -9,6 +16,7 @@ from .models import JuridiqueCreation, DocumentJuridique, EvenementJuridique
 from cabinet.util import extract_text_from_pdf, extract_date, extract_rc_number, extract_cnss_number
 from django.shortcuts import get_object_or_404
 from dossiers.models import Dossier
+# ==================== Handlers ====================
 class JuridiqueCreationListView(LoginRequiredMixin, ListView):
     model = JuridiqueCreation
     template_name = 'juridique/juridique_creation_list.html'

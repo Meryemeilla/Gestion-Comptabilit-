@@ -31,15 +31,18 @@
         border-left: 4px solid var(--primary-color);
         transition: all 0.3s ease;
     }
+
     .stat-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
+
     .stat-number {
         font-size: 2rem;
         font-weight: 700;
         color: var(--primary-color);
     }
+
     .stat-label {
         color: #666;
         font-size: 0.9rem;
@@ -60,10 +63,12 @@
         border: none;
         border-top: 3px solid var(--accent-color);
     }
+
     .quick-action-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
+
     .quick-action-icon {
         font-size: 2rem;
         color: var(--primary-color);
@@ -80,14 +85,17 @@
         background-color: var(--primary-color);
         color: white;
     }
+
     .module-item {
         border-left: none;
         border-right: none;
         transition: all 0.2s;
     }
+
     .module-item:hover {
         background-color: var(--light-gray);
     }
+
     .add-btn {
         color: var(--accent-color);
     }
@@ -96,6 +104,7 @@
     .client-actions {
         margin-bottom: 2rem;
     }
+
     .client-btn {
         border-radius: 8px;
         padding: 1.5rem 1rem;
@@ -112,22 +121,27 @@
         position: relative;
         overflow: hidden;
     }
+
     .client-btn i {
         font-size: 2.5rem;
         margin-bottom: 1rem;
     }
+
     .client-btn-primary {
         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         color: white;
     }
+
     .client-btn-warning {
         background: linear-gradient(135deg, #ffc107, #fd7e14);
         color: white;
     }
+
     .client-btn:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
     }
+
     .client-btn::after {
         content: '';
         position: absolute;
@@ -139,26 +153,32 @@
         transform: translateX(-100%);
         transition: all 0.3s ease;
     }
+
     .client-btn:hover::after {
         transform: translateX(0);
     }
-   .client-info-card {
+
+    .client-info-card {
         border-radius: 10px;
         overflow: hidden;
         transition: transform 0.3s ease;
     }
+
     .client-info-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
     }
+
     .client-info-header {
         padding: 1rem 1.25rem;
         background: linear-gradient(135deg, #366092 0%, #3a5a9f 100%);
     }
+
     .client-info-item {
         padding: 0.5rem 0;
         border-bottom: 1px solid #f0f0f0;
     }
+
     .client-info-item:last-child {
         border-bottom: none;
     }
@@ -169,10 +189,12 @@
         font-weight: 600;
         font-size: 0.85rem;
     }
+
     .status-pending {
         background-color: #fff3cd;
         color: #856404;
     }
+
     .status-completed {
         background-color: #d4edda;
         color: #155724;
@@ -182,18 +204,27 @@
 <!-- En-tête du tableau de bord -->
 <div class="dashboard-header">
     <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 class="h3 mb-1">SF COMPTABILITÉ</h1>
-            <p class="text-muted mb-0">Expertise Comptable & Conseil Fiscal</p>
+        <div class="d-flex align-items-center">
+            <img src="{% static 'Logo.png' %}" alt="SF Comptabilité" class="me-3" style="height: 60px; width: auto;">
+            <div>
+                <h1 class="h3 mb-1">SF COMPTABILITÉ</h1>
+                <p class="text-muted mb-0">Expertise Comptable & Conseil Fiscal</p>
+            </div>
         </div>
         <div>
             <button class="btn btn-outline-primary me-2" onclick="refreshData()" title="Actualiser les données">
                 <i class="bi bi-arrow-clockwise"></i> Actualiser
             </button>
+            {% if user.is_administrateur %}
+            <a href="{% url 'cabinet:admin_dossier_stats' %}" class="btn btn-outline-info me-2"
+                title="Statistiques Dossiers Admin">
+                <i class="bi bi-bar-chart-line"></i> Stats Dossiers Admin
+            </a>
+            {% endif %}
             {% if user.is_comptable %}
-             <a href="{% url 'password_change' %}" class="btn btn-outline-primary">
-                    <i class="bi bi-key-fill me-1"></i> Modifier mon mot de passe
-             </a>
+            <a href="{% url 'password_change' %}" class="btn btn-outline-primary">
+                <i class="bi bi-key-fill me-1"></i> Modifier mon mot de passe
+            </a>
             {% endif %}
             <a href="{% url 'logout' %}" class="btn btn-danger ms-2" title="Déconnexion">
                 <i class="bi bi-box-arrow-right"></i> Déconnexion
@@ -204,29 +235,29 @@
 
 <!-- Interface client -->
 {% if user.is_client %}
-    <!-- Interface client - Version professionnelle -->
-    <div class="client-actions">
-        <div class="row">
+<!-- Interface client - Version professionnelle -->
+<div class="client-actions">
+    <!-- <div class="row">
             <!-- Bouton Réclamation -->
-            <div class="col-md-6 mb-4">
-                <a href="{% url 'cabinet:reclamation_create' %}" class="client-btn client-btn-warning text-decoration-none">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    <span>Nouvelle réclamation</span>
-                    <small class="mt-2">Signalez un problème ou une demande urgente</small>
-                </a>
-            </div>
-            
-            <!-- Bouton Mes Dossiers -->
-            <div class="col-md-6 mb-4">
-                <a href="{% url 'cabinet:dossier_list' %}" class="client-btn client-btn-primary text-decoration-none">
-                    <i class="bi bi-folder2-open"></i>
-                    <span>Mes dossiers</span>
-                    <small class="mt-2">Accédez à tous vos documents comptables</small>
-                </a>
-            </div>
-        </div>
+    <div class="col-md-6 mb-4">
+        <a href="{% url 'cabinet:reclamation_create' %}" class="client-btn client-btn-warning text-decoration-none">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span>Nouvelle réclamation</span>
+            <small class="mt-2">Signalez un problème ou une demande urgente</small>
+        </a>
+    </div>
 
-        <!-- Section Informations Client - Version améliorée -->
+    <!-- Bouton Mes Dossiers -->
+    <div class="col-md-6 mb-4">
+        <a href="{% url 'cabinet:dossier_list' %}" class="client-btn client-btn-primary text-decoration-none">
+            <i class="bi bi-folder2-open"></i>
+            <span>Mes dossiers</span>
+            <small class="mt-2">Accédez à tous vos documents comptables</small>
+        </a>
+    </div>
+</div>
+
+<!-- Section Informations Client - Version améliorée -->
 <div class="row">
     <div class="col-md-6">
         <div class="card client-info-card shadow-sm border-0">
@@ -235,7 +266,7 @@
                 <i class="bi bi-info-circle-fill me-2"></i>
                 <h5 class="mb-0">Mes informations</h5>
             </div>
-            
+
             <!-- Corps de la carte -->
             <div class="card-body client-info-body">
                 <!-- Lien Modifier mot de passe -->
@@ -262,7 +293,7 @@
                         <span class="text-muted small">Dossiers actifs</span>
                         <span class="badge bg-success text-white">
                             <i class="bi bi-folder2-open me-1"></i>
-                              {{ user.client_profile.dossiers_client.count }}
+                            {{ user.client_profile.dossiers_client.count }}
 
                         </span>
                     </div>
@@ -272,12 +303,12 @@
     </div>
 </div>
 
-            <!-- <div class="col-md-6">
+<!-- <div class="col-md-6">
                 <div class="client-info-card">
                      <div class="client-info-header d-flex align-items-center">
                         <i class="bi bi-clock-history me-2"></i>
                         <span>Activité récente</span>
-                    </div> -->
+                    </div>
                     <!-- <div class="client-info-body">
                         {% if recent_activities %}
                             {% for dossier in recent_activities %}
@@ -292,10 +323,10 @@
                         {% endif %}
                     </div> 
                 </div>
-            </div> -->
+            </div>
         <!-- </div> -->
 
-       <!-- Section Documents Récents - Style harmonisé -->
+<!-- Section Documents Récents - Style harmonisé -->
 <div class="row mt-4">
     <div class="col-12">
         <div class="card client-info-card shadow-sm border-0">
@@ -304,54 +335,57 @@
                 <i class="bi bi-file-earmark-text-fill me-2"></i>
                 <h5 class="mb-0">Documents récents</h5>
             </div>
-            
+
             <!-- Corps de la carte -->
             <div class="card-body client-info-body p-0">
                 {% if recent_documents %}
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="ps-4">Document</th>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Statut</th>
-                                    <th class="text-end pe-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for doc in recent_documents|slice:":5" %}
-                                <tr>
-                                    <td class="ps-4">
-                                        <i class="bi {% if doc.valide %}bi-file-check text-success{% else %}bi-file-earmark-text{% endif %} me-2"></i>
-                                        {{ doc.nom_document }}
-                                    </td>
-                                    <td>{{ doc.date_creation|date:"d/m/Y" }}</td>
-                                    <td>
-                                        <span class="badge bg-info text-dark">
-                                            {{ doc.type_document }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge {% if doc.valide %}bg-success{% else %}bg-warning text-dark{% endif %}">
-                                            {% if doc.valide %}Validé{% else %}En attente{% endif %}
-                                        </span>
-                                    </td>
-                                    <td class="text-end pe-4">
-                                        <a href="{{ doc.fichier.url }}" class="btn btn-sm btn-outline-primary" download title="Télécharger">
-                                            <i class="bi bi-download"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- <div class="text-center py-3 bg-light">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Document</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Statut</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in recent_documents|slice:":5" %}
+                            <tr>
+                                <td class="ps-4">
+                                    <i
+                                        class="bi {% if doc.valide %}bi-file-check text-success{% else %}bi-file-earmark-text{% endif %} me-2"></i>
+                                    {{ doc.nom_document }}
+                                </td>
+                                <td>{{ doc.date_creation|date:"d/m/Y" }}</td>
+                                <td>
+                                    <span class="badge bg-info text-dark">
+                                        {{ doc.type_document }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span
+                                        class="badge {% if doc.valide %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                        {% if doc.valide %}Validé{% else %}En attente{% endif %}
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="{{ doc.fichier.url }}" class="btn btn-sm btn-outline-primary" download
+                                        title="Télécharger">
+                                        <i class="bi bi-download"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- <div class="text-center py-3 bg-light">
                         <a href="{% url 'juridique:documentjuridique_list' %}" class="btn btn-primary btn-sm">
                             <i class="bi bi-folder2-open me-1"></i> Voir tous mes documents
                         </a>
-                    </div> -->
+                    </div>
                 {% else %}
                     <div class="text-center py-4">
                         <i class="bi bi-file-earmark-excel display-6 text-muted mb-3"></i>
@@ -365,357 +399,357 @@
 {% else %}
     <!-- Interface administrateur -->
 
-    <!-- Statistiques principales -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card stat-card h-100">
-                <div class="card-body text-center">
-                    <div class="stat-number">{{ total_dossiers }}</div>
-                    <div class="stat-label">Dossiers actifs</div>
+                <!-- Statistiques principales -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card h-100">
+                            <div class="card-body text-center">
+                                <div class="stat-number">{{ total_dossiers }}</div>
+                                <div class="stat-label">Dossiers actifs</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card h-100">
+                            <div class="card-body text-center">
+                                <div class="stat-number">{{ total_honoraires }}</div>
+                                <div class="stat-label">Honoraires</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card h-100">
+                            <div class="card-body text-center">
+                                <div class="stat-number">{{ total_suivi_tva }}</div>
+                                <div class="stat-label">Déclarations TVA</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card h-100">
+                            <div class="card-body text-center">
+                                <div class="stat-number">{{ reclamations_urgentes }}</div>
+                                <div class="stat-label">Réclamations</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card stat-card h-100">
-                <div class="card-body text-center">
-                    <div class="stat-number">{{ total_honoraires }}</div>
-                    <div class="stat-label">Honoraires</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card stat-card h-100">
-                <div class="card-body text-center">
-                    <div class="stat-number">{{ total_suivi_tva }}</div>
-                    <div class="stat-label">Déclarations TVA</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card stat-card h-100">
-                <div class="card-body text-center">
-                    <div class="stat-number">{{ reclamations_urgentes }}</div>
-                    <div class="stat-label">Réclamations</div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Top 5 comptables -->
-{% if user.is_superuser and not user.is_comptable_prop %}
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card h-100">
-            <div class="card-body">
-                {% if not user.is_comptable_prop %}
-                <h5 class="section-title"><i class="bi bi-trophy me-2"></i>Comptables</h5>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Comptable</th>
-                                <th class="text-end">Dossiers</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for comptable in dossiers_par_comptable %}
-                            <tr>
-                                <td><a href="{% url 'cabinet:comptable_detail' pk=comptable.pk %}">{{ comptable.nom_complet }}</a></td>
-                                <td class="text-end">
-                                <span class="badge bg-primary">{{ comptable.nb_dossiers }}</span>
-                                
-                                </td>
+                <!-- Top 5 comptables -->
+                {% if user.is_superuser and not user.is_comptable_prop %}
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                {% if not user.is_comptable_prop %}
+                                <h5 class="section-title"><i class="bi bi-trophy me-2"></i>Comptables</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Comptable</th>
+                                                <th class="text-end">Dossiers</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for comptable in dossiers_par_comptable %}
+                                            <tr>
+                                                <td><a href="{% url 'cabinet:comptable_detail' pk=comptable.pk %}">{{
+                                                        comptable.nom_complet }}</a></td>
+                                                <td class="text-end">
+                                                    <span class="badge bg-primary">{{ comptable.nb_dossiers }}</span>
 
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="2" class="text-center text-muted">Aucun comptable trouvé</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="text-center mt-3">
-                    <a href="{% url 'cabinet:comptable_list' %}" class="btn btn-primary">
-                        <i class="bi bi-people-fill me-2"></i> Voir tous les comptables avec leurs dossiers
-                    </a>
+                                                </td>
+
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="2" class="text-center text-muted">Aucun comptable trouvé
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <a href="{% url 'cabinet:comptable_list' %}" class="btn btn-primary">
+                                        <i class="bi bi-people-fill me-2"></i> Voir tous les comptables avec leurs
+                                        dossiers
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-    <!-- Section Documents et Événements Juridiques -->
-    <div class="row mb-4">
-        <div class="col-lg-6 mb-4">
-            <div class="card h-100 module-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="bi bi-file-earmark-text me-2"></i>Documents Juridiques
-                    </h5>
-                    <a href="{% url 'juridique:documentjuridique_list' %}" class="btn btn-sm btn-light add-btn" title="Ajouter un document juridique">
-                        <i class="bi bi-plus-circle"></i> Ajouter
-                    </a>
-                </div>
-                <div class="card-body">
-                    {% if documents_is_list %}
-                        <ul class="list-group list-group-flush">
-                            {% for doc in documents_juridiques %}
-                            <li class="list-group-item module-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <a href="{% url 'juridique:documentjuridique_detail' pk=doc.pk %}">{{ doc.description }}</a>
-                                    <small class="text-muted d-block">{{ doc.date_document|date:"d M Y" }}</small>
-                                </div>
-                                <span class="badge bg-secondary">{{ doc.type_document }}</span>
-                            </li>
-                            {% empty %}
-                            <li class="list-group-item text-center text-muted">Aucun document juridique récent.</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        {% if documents_juridiques %}
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item module-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <a href="{% url 'juridique:documentjuridique_detail' pk=documents_juridiques.pk %}">
-                                        {{ documents_juridiques.description }}
-                                    </a>
-                                    <small class="text-muted d-block">{{ documents_juridiques.date_document|date:"d M Y" }}</small>
-                                </div>
-                                <span class="badge bg-secondary">{{ documents_juridiques.type_document }}</span>
-                            </li>
-                        </ul>
-                        {% else %}
-                        <div class="text-center text-muted">Aucun document juridique récent.</div>
-                        {% endif %}
-                    {% endif %}
-                </div>
-                <div class="card-footer text-center">
-                    <a href="{% url 'juridique:documentjuridique_list' %}" class="btn btn-sm btn-outline-primary">Voir tous les documents</a>
-                </div>
-            </div>
-        </div>
-
-        
-        <!-- Événements Juridiques -->
-        <div class="col-lg-6 mb-4">
-            <div class="card h-100 module-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Événements Juridiques</h5>
-                    <a href="{% url 'juridique:evenementjuridique_list' %}" class="btn btn-sm btn-light add-btn" title="Ajouter un événement juridique">
-                        <i class="bi bi-plus-circle"></i> Ajouter
-                    </a>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        {% for event in upcoming_events %}
-                        <li class="list-group-item module-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <a href="{% url 'juridique:evenementjuridique_detail' pk=event.pk %}">{{ event.description }}</a>
-                                <small class="text-muted d-block">{{ event.date_evenement|date:"d M Y" }}</small>
+                <!-- Section Documents et Événements Juridiques -->
+                <div class="row mb-4">
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100 module-card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-file-earmark-text me-2"></i>Documents Juridiques
+                                </h5>
+                                <a href="{% url 'juridique:documentjuridique_list' %}"
+                                    class="btn btn-sm btn-light add-btn" title="Ajouter un document juridique">
+                                    <i class="bi bi-plus-circle"></i> Ajouter
+                                </a>
                             </div>
-                            <span class="badge bg-info">{{ event.type_evenement }}</span>
-                        </li>
-                        {% empty %}
-                        <li class="list-group-item text-center text-muted">Aucun événement juridique à venir.</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                <div class="card-footer text-center">
-                    <a href="{% url 'juridique:evenementjuridique_list' %}" class="btn btn-sm btn-outline-primary">Voir tous les événements</a>
-                </div>
-            </div>
-        </div>
-    </div>
+                            <div class="card-body">
+                                {% if documents_is_list %}
+                                <ul class="list-group list-group-flush">
+                                    {% for doc in documents_juridiques %}
+                                    <li
+                                        class="list-group-item module-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <a href="{% url 'juridique:documentjuridique_detail' pk=doc.pk %}">{{
+                                                doc.description }}</a>
+                                            <small class="text-muted d-block">{{ doc.date_document|date:"d M Y"
+                                                }}</small>
+                                        </div>
+                                        <span class="badge bg-secondary">{{ doc.type_document }}</span>
+                                    </li>
+                                    {% empty %}
+                                    <li class="list-group-item text-center text-muted">Aucun document juridique récent.
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                {% else %}
+                                {% if documents_juridiques %}
+                                <ul class="list-group list-group-flush">
+                                    <li
+                                        class="list-group-item module-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <a
+                                                href="{% url 'juridique:documentjuridique_detail' pk=documents_juridiques.pk %}">
+                                                {{ documents_juridiques.description }}
+                                            </a>
+                                            <small class="text-muted d-block">{{
+                                                documents_juridiques.date_document|date:"d M Y" }}</small>
+                                        </div>
+                                        <span class="badge bg-secondary">{{ documents_juridiques.type_document }}</span>
+                                    </li>
+                                </ul>
+                                {% else %}
+                                <div class="text-center text-muted">Aucun document juridique récent.</div>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="card-footer text-center">
+                                <a href="{% url 'juridique:documentjuridique_list' %}"
+                                    class="btn btn-sm btn-outline-primary">Voir tous les documents</a>
+                            </div>
+                        </div>
+                    </div>
 
-    <!-- Actions rapides -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card quick-action-card">
-                <div class="card-body">
-                    <h5 class="section-title"><i class="bi bi-lightning me-2"></i>Actions rapides</h5>
-                    <div class="row">
-                        {% if user.is_superuser or user_is_comptable %}
-                        <div class="col-md-3 mb-3 text-center">
-                            <a href="{% url 'cabinet:dossier_list' %}" class="text-decoration-none">
-                                <div class="quick-action-icon mb-2"><i class="bi bi-folder-plus"></i></div>
-                                <p class="mb-0">Dossiers</p>
-                            </a>
-                        </div>
-                        {% endif %}
-                        
-                        {% if user.is_superuser %}
-                        <div class="col-md-3 mb-3 text-center">
-                            <a href="{% url 'cabinet:comptable_list' %}" class="text-decoration-none">
-                                <div class="quick-action-icon mb-2"><i class="bi bi-person-plus"></i></div>
-                                <p class="mb-0">Comptables</p>
-                            </a>
-                        </div>
-                        {% endif %}
-                        
-                        <div class="col-md-3 mb-3 text-center">
-                            <a href="{% url 'fiscal:suivi_fiscal' %}" class="text-decoration-none">
-                                <div class="quick-action-icon"><i class="bi bi-journal-text"></i></div>
-                                <div>Suivi fiscal</div>
-                            </a>
-                        </div>
-                        
-                        <div class="col-md-3 mb-3 text-center">
-                            <a href="{% url 'honoraires:honoraire_dashboard' %}" class="text-decoration-none">
-                                <div class="quick-action-icon"><i class="bi bi-cash-coin"></i></div>
-                                <div>Honoraires</div>
-                            </a>
-                        </div>
-                        
-                        <!-- Ligne suivante avec Clients, Créations juridiques et Réclamations -->
-                        {% if user.is_superuser %}
-                        <div class="col-md-3 mb-3 text-center">
-                            <a href="{% url 'cabinet:liste_clients' %}" class="text-decoration-none">
-                                <div class="quick-action-icon mb-2"><i class="bi bi-person-plus"></i></div>
-                                <p class="mb-0">Clients</p>
-                            </a>
-                        </div>
-                        {% endif %}
-                        
-                        {% if user.is_superuser or user_is_comptable %}
-                        <div class="col-md-3 mb-3 text-center">
-                            <a href="{% url 'juridique:juridique_creation_list' %}" class="text-decoration-none">
-                                <div class="quick-action-icon"><i class="bi bi-file-earmark-text"></i></div>
-                                <div>Créations juridiques</div>
-                            </a>
-                        </div>
-                        
-                        <div class="col-md-3 mb-3 text-center">
-                            <a href="{% url 'cabinet:reclamation_list' %}" class="text-decoration-none" style="color: orange;">
-                                <div class="quick-action-icon mb-2" style="color: rgb(255, 225, 0);"><i class="bi bi-exclamation-triangle"></i></div>
-                                <p class="mb-0" style="color: rgb(255, 225, 0);">Réclamations</p>
-                            </a>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Alertes impayés -->
-{% if alertes_honoraires or alertes_reglements %}
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card alert-card border-danger">
-            <div class="card-header bg-danger text-white">
-                <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Alertes : Impayés & Retards</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="list-group list-group-flush">
-                    {% for hon in alertes_honoraires %}
-                    <div class="list-group-item d-flex justify-content-between align-items-center {% if hon.get_statut_reglement_display == 'En retard' %}list-group-item-danger{% else %}list-group-item-warning{% endif %}">
-                        <div>
-                            <span class="badge bg-secondary me-2">Dossier</span>
-                            <strong>{{ hon.dossier.denomination }}</strong>
-                        </div>
-                        <div class="text-end">
-                            <span class="badge {% if hon.get_statut_reglement_display == 'En retard' %}bg-danger{% else %}bg-warning text-dark{% endif %} me-2">
-                                {{ hon.get_statut_reglement_display }}
-                            </span>
-                            {% if hon.date_echeance %}
-                            <span class="text-muted"><i class="bi bi-calendar-event me-1"></i>{{ hon.date_echeance|date:"d/m/Y" }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endfor %}
-                    
-                    {% for reg in alertes_reglements %}
-                    <div class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning">
-                        <div>
-                            <span class="badge bg-primary me-2">Règlement</span>
-                            <strong>{{ reg.honoraire.dossier.denomination }}</strong>
-                        </div>
-                        <div class="text-end">
-                            <span class="badge bg-warning text-dark me-2">
-                                {{ reg.get_statut_reglement_display }}
-                            </span>
-                            {% if reg.date_echeance %}
-                            <span class="text-muted"><i class="bi bi-calendar-event me-1"></i>{{ reg.date_echeance|date:"d/m/Y" }}</span>
-                            {% endif %}
+                    <!-- Événements Juridiques -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100 module-card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Événements Juridiques</h5>
+                                <a href="{% url 'juridique:evenementjuridique_list' %}"
+                                    class="btn btn-sm btn-light add-btn" title="Ajouter un événement juridique">
+                                    <i class="bi bi-plus-circle"></i> Ajouter
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    {% for event in upcoming_events %}
+                                    <li
+                                        class="list-group-item module-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <a href="{% url 'juridique:evenementjuridique_detail' pk=event.pk %}">{{
+                                                event.description }}</a>
+                                            <small class="text-muted d-block">{{ event.date_evenement|date:"d M Y"
+                                                }}</small>
+                                        </div>
+                                        <span class="badge bg-info">{{ event.type_evenement }}</span>
+                                    </li>
+                                    {% empty %}
+                                    <li class="list-group-item text-center text-muted">Aucun événement juridique à
+                                        venir.</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="card-footer text-center">
+                                <a href="{% url 'juridique:evenementjuridique_list' %}"
+                                    class="btn btn-sm btn-outline-primary">Voir tous les événements</a>
+                            </div>
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
-            </div>
-            <div class="card-footer bg-light">
+
+                <!-- Actions rapides -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card quick-action-card">
+                            <div class="card-body">
+                                <h5 class="section-title"><i class="bi bi-lightning me-2"></i>Actions rapides</h5>
+                                <div class="row">
+                                    {% if user.is_superuser or user_is_comptable %}
+                                    <div class="col-md-3 mb-3 text-center">
+                                        <a href="{% url 'cabinet:dossier_list' %}" class="text-decoration-none">
+                                            <div class="quick-action-icon mb-2"><i class="bi bi-folder-plus"></i></div>
+                                            <p class="mb-0">Dossiers</p>
+                                        </a>
+                                    </div>
+                                    {% endif %}
+
+
+
+                                    {% if user.is_superuser %}
+                                    <div class="col-md-3 mb-3 text-center">
+                                        <a href="{% url 'cabinet:comptable_list' %}" class="text-decoration-none">
+                                            <div class="quick-action-icon mb-2"><i class="bi bi-person-plus"></i></div>
+                                            <p class="mb-0">Comptables</p>
+                                        </a>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if user.is_superuser %}
+                                    <div class="col-md-3 mb-3 text-center">
+                                        <a href="{% url 'honoraires:honoraire_list' %}" class="text-decoration-none">
+                                            <div class="quick-action-icon mb-2"><i class="bi bi-cash-coin"></i></div>
+                                            <p class="mb-0">Honoraires</p>
+                                        </a>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if user.is_superuser or user_is_comptable %}
+                                    <div class="col-md-3 mb-3 text-center">
+                                        <a href="{% url 'fiscal:suivitva_list' %}" class="text-decoration-none">
+                                            <div class="quick-action-icon mb-2"><i class="bi bi-calculator"></i></div>
+                                            <p class="mb-0">Fiscal</p>
+                                        </a>
+                                    </div>
+                                    {% endif %}
+
+
+
+                                    <div class="col-md-3 mb-3 text-center">
+                                        <a href="{% url 'dossiers:corbeille_generique' %}" class="text-decoration-none">
+                                            <div class="quick-action-icon"><i class="bi bi-trash"></i></div>
+                                            <div>Corbeille</div>
+                                        </a>
+                                    </div>
+
+                                    <!-- Ligne suivante avec Clients, Créations juridiques et Réclamations -->
+                                    {% if user.is_superuser %}
+                                    <div class="col-md-3 mb-3 text-center">
+                                        <a href="{% url 'cabinet:liste_clients' %}" class="text-decoration-none">
+                                            <div class="quick-action-icon mb-2"><i class="bi bi-person-plus"></i></div>
+                                            <p class="mb-0">Clients</p>
+                                        </a>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if user.is_superuser or user_is_comptable %}
+                                    <div class="col-md-3 mb-3 text-center">
+                                        <a href="{% url 'juridique:juridique_creation_list' %}"
+                                            class="text-decoration-none">
+                                            <div class="quick-action-icon"><i class="bi bi-file-earmark-text"></i></div>
+                                            <div>Créations juridiques</div>
+                                        </a>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3 text-center">
+                                        <a href="{% url 'cabinet:reclamation_list' %}" class="text-decoration-none"
+                                            style="color: orange;">
+                                            <div class="quick-action-icon mb-2" style="color: rgb(255, 225, 0);"><i
+                                                    class="bi bi-exclamation-triangle"></i></div>
+                                            <p class="mb-0" style="color: rgb(255, 225, 0);">Réclamations</p>
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Alertes impayés -->
+                {% if alertes_honoraires or alertes_reglements %}
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card alert-card border-danger">
+                            <div class="card-header bg-danger text-white">
+                                <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Alertes : Impayés &
+                                    Retards</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="list-group list-group-flush">
+                                    {% for hon in alertes_honoraires %}
+                                    <div
+                                        class="list-group-item d-flex justify-content-between align-items-center {% if hon.get_statut_reglement_display == 'En retard' %}list-group-item-danger{% else %}list-group-item-warning{% endif %}">
+                                        <div>
+                                            <span class="badge bg-secondary me-2">Dossier</span>
+                                            <strong>{{ hon.dossier.denomination }}</strong>
+                                        </div>
+                                        <div class="text-end">
+                                            <span
+                                                class="badge {% if hon.get_statut_reglement_display == 'En retard' %}bg-danger{% else %}bg-warning text-dark{% endif %} me-2">
+                                                {{ hon.get_statut_reglement_display }}
+                                            </span>
+                                            {% if hon.date_echeance %}
+                                            <span class="text-muted"><i class="bi bi-calendar-event me-1"></i>{{
+                                                hon.date_echeance|date:"d/m/Y" }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+
+                                    {% for reg in alertes_reglements %}
+                                    <div
+                                        class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning">
+                                        <div>
+                                            <span class="badge bg-primary me-2">Règlement</span>
+                                            <strong>{{ reg.honoraire.dossier.denomination }}</strong>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-warning text-dark me-2">
+                                                {{ reg.get_statut_reglement_display }}
+                                            </span>
+                                            {% if reg.date_echeance %}
+                                            <span class="text-muted"><i class="bi bi-calendar-event me-1"></i>{{
+                                                reg.date_echeance|date:"d/m/Y" }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <!-- <div class="card-footer bg-light">
                 <small class="text-muted"><i class="bi bi-info-circle me-1"></i>{{ alertes_honoraires|length|add:alertes_reglements|length }} alertes en cours</small>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-    <!-- Modules -->
-    <!-- <div class="row">
-         Module Honoraires 
-        <div class="col-md-6 mb-4">
-            <div class="card module-card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-cash-coin me-2"></i>HONORAIRES</h5>
+            </div> -->
+                        </div>
+                    </div>
                 </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center module-item">
-                        Honoraires 
-                        <a href="{% url 'honoraires:honoraire_create' %}" class="add-btn"><i class="bi bi-plus-circle me-1"></i> Add</a>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center module-item">
-                        Honoraires (PV)
-                        <a href="{% url 'honoraires:honoraire_pv_create' %}" class="add-btn"><i class="bi bi-plus-circle me-1"></i> Add</a>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center module-item">
-                        Règlements d'honoraires
-                        <a href="{% url 'honoraires:reglement_honoraire_create' %}" class="add-btn"><i class="bi bi-plus-circle me-1"></i> Add</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        
-         Module Fiscal 
-        <div class="col-md-6 mb-4">
-            <div class="card module-card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>FISCAL</h5>
-                </div>
-                <div class="list-group list-group-flush">
-                    <a href="{% url 'fiscal:acompte_create' %}" class="list-group-item module-item d-flex justify-content-between align-items-center">
-                        Acomptes
-                        <span class="add-btn"><i class="bi bi-plus-circle me-1"></i> Add </span>
-                    </a>
-                    <a href="{% url 'fiscal:cmir_create' %}" class="list-group-item module-item d-flex justify-content-between align-items-center">
-                        CM et IR
-                        <span class="add-btn"><i class="bi bi-plus-circle me-1"></i> Add </span>
-                    </a>
-                    <a href="{% url 'fiscal:depotbilan_create' %}" class="list-group-item module-item d-flex justify-content-between align-items-center">
-                        Dépôts de bilans
-                        <span class="add-btn"><i class="bi bi-plus-circle me-1"></i> Add </span>
-                    </a>
-                    <a href="{% url 'fiscal:suivitva_create' %}" class="list-group-item module-item d-flex justify-content-between align-items-center">
-                        Suivis TVA
-                        <span class="add-btn"><i class="bi bi-plus-circle me-1"></i> Add </span>
-                    </a>
-                    <a href="{% url 'fiscal:suiviforfaitaire_create' %}" class="list-group-item module-item d-flex justify-content-between align-items-center">
-                        Suivis forfaitaires
-                        <span class="add-btn"><i class="bi bi-plus-circle me-1"></i> Add </span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endif %} -->
+                {% endif %}
 
-<!-- Scripts JavaScript -->
-<script>
-    // Actualisation des données
-    function refreshData() {
-        location.reload();
-    }
-</script>
 
-{% endblock %}
+
+                <!-- Modules -->
+                <div class="row">
+
+
+
+
+                    {% endif %}
+
+                    <!-- Scripts JavaScript -->
+                    <script>
+                        // Actualisation des données
+                        function refreshData() {
+                            location.reload();
+                        }
+                    </script>
+
+                    <div class="container-fluid">
+
+
+
+                    </div>
+                    {% endblock %}

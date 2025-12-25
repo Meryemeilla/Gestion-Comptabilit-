@@ -1,3 +1,10 @@
+"""
+Signaux et hooks (post_save, etc.).
+
+Fichier: reclamations/signals.py
+"""
+
+# ==================== Imports ====================
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Reclamation
@@ -7,6 +14,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 @receiver(post_save, sender=Reclamation)
+# ==================== Fonctions ====================
 def envoyer_email_reclamation(sender, instance, created, **kwargs):
     if created:
         print(" Signal déclenché : nouvelle réclamation")

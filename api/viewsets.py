@@ -1,3 +1,10 @@
+"""
+ViewSets API (DRF).
+
+Fichier: api/viewsets.py
+"""
+
+# ==================== Imports ====================
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -25,6 +32,7 @@ from .serializers import (
 )
 
 
+# ==================== Classes ====================
 class ComptableViewSet(viewsets.ModelViewSet):
     queryset = Comptable.objects.all()
     serializer_class = ComptableSerializer

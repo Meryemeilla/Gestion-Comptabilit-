@@ -1,3 +1,10 @@
+"""
+Django views (gestion des requêtes HTTP).
+
+Fichier: fiscal/views.py
+"""
+
+# ==================== Imports ====================
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.urls import reverse_lazy
 from .models import SuiviTVA, Acompte, CMIR, DepotBilan, SuiviForfaitaire
@@ -15,6 +22,7 @@ from django.http import JsonResponse
 
 
 
+# ==================== Handlers ====================
 def get_suivi_tva_data(request, dossier_id):
     try:
         suivi = SuiviTVA.objects.filter(dossier_id=dossier_id).latest('annee')  # récupère le dernier suivi

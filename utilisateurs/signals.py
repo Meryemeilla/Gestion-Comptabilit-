@@ -1,9 +1,17 @@
+"""
+Signaux et hooks (post_save, etc.).
+
+Fichier: utilisateurs/signals.py
+"""
+
+# ==================== Imports ====================
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Utilisateur, Client
 from .tasks import envoyer_email_creation_client  # ⬅️ importe la tâche Celery
 
 @receiver(post_save, sender=Client)
+# ==================== Fonctions ====================
 def creer_utilisateur_pour_client(sender, instance, created, **kwargs):
     if created and not instance.user:
         raw_password = getattr(instance, 'plain_password', None)

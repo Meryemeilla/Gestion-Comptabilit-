@@ -69,9 +69,20 @@
                 <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
             </a>
         </li>
-        <li class="breadcrumb-item active text-sf-gold">
-            <i class="bi bi-exclamation-triangle me-2"></i>Réclamations
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:reclamation_list' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                <i class="bi bi-exclamation-triangle me-2"></i>Réclamations
+            </a>
         </li>
+        {% if request.resolver_match.url_name == 'reclamation_trash_list' %}
+        <li class="breadcrumb-item active text-sf-gold" aria-current="page">
+            <i class="bi bi-trash me-2"></i>Corbeille
+        </li>
+        {% else %}
+        <li class="breadcrumb-item active text-sf-gold" aria-current="page">
+            <i class="bi bi-list-check me-2"></i>Toutes les réclamations
+        </li>
+        {% endif %}
     </ol>
 </nav>
 {% endblock %}
@@ -449,6 +460,7 @@
             
             <!-- Boutons de filtrage envoyés/reçus -->
             <div class="filter-buttons">
+
                 <a href="?filter=envoyees" class="filter-btn {% if request.GET.filter == 'envoyees' %}active{% endif %}">
                     <i class="bi bi-send me-1"></i> Envoyées
                 </a>

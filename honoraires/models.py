@@ -1,3 +1,10 @@
+"""
+Modèles Django et logique d’accès aux données.
+
+Fichier: honoraires/models.py
+"""
+
+# ==================== Imports ====================
 from django.db import models
 
 from django.db import models
@@ -5,9 +12,18 @@ from django.core.validators import MinValueValidator
 from decimal import Decimal
 from dossiers.models import Dossier
 from django.db.models import Sum
+from cabinet.soft_delete_models import SoftDeleteModel, SoftDeleteManager
 
 
-class Honoraire(models.Model):
+# ==================== Classes ====================
+class HonoraireManager(SoftDeleteManager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
+
+
+class Honoraire(SoftDeleteModel):
+    objects = HonoraireManager()
+    all_objects = models.Manager()
     """
     Modèle représentant les honoraires d'un dossier
     """
@@ -59,11 +75,12 @@ class Honoraire(models.Model):
         blank=True,
         verbose_name="Date d'échéance"
     )
+    description = models.TextField(blank=True, null=True, verbose_name="Description")
     # Métadonnées
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
 
-    class Meta:
+    class Meta(SoftDeleteModel.Meta):
         verbose_name = "Honoraire"
         verbose_name_plural = "Honoraires"
 
@@ -159,7 +176,7 @@ class ReglementHonoraire(models.Model):
     TYPE_REGLEMENT_CHOICES = [
         # Types pour Honoraire classique
         ('MENSUEL', 'Mensuel'),
-        ('TRIMESTRIEL', 'Trimestriel'),
+        ('TRIMESTRIELLE', 'Trimestriel'),
         ('ANNUEL', 'Annuel'),
 
     ]
@@ -228,7 +245,7 @@ class ReglementHonoraire(models.Model):
         null=True,
         verbose_name="Remarques"
     )
-
+   
     def update_statut_reglement(self):
         """
         Met à jour le statut du règlement selon la date d'échéance et la date de règlement.

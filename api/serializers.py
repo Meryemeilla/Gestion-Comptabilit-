@@ -1,3 +1,10 @@
+"""
+Sérialiseurs API (DRF).
+
+Fichier: api/serializers.py
+"""
+
+# ==================== Imports ====================
 from rest_framework import serializers
 from comptables.models import Comptable
 from dossiers.models import Dossier
@@ -7,6 +14,7 @@ from reclamations.models import Reclamation
 from juridique.models import JuridiqueCreation, DocumentJuridique, EvenementJuridique
 
 
+# ==================== Classes ====================
 class ComptableSerializer(serializers.ModelSerializer):
     nom_complet = serializers.ReadOnlyField()
     

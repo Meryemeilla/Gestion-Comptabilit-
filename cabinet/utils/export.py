@@ -1,3 +1,10 @@
+"""
+Fonctions utilitaires et helpers techniques.
+
+Fichier: cabinet/utils/export.py
+"""
+
+# ==================== Imports ====================
 from django.http import HttpResponse
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
@@ -23,6 +30,7 @@ from fiscal.models import Acompte , DepotBilan
 
 
 
+# ==================== Classes ====================
 class ExportExcel:
     """Classe pour gérer les exports Excel"""
     

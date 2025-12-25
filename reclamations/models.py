@@ -1,6 +1,18 @@
+"""
+Modèles Django et logique d’accès aux données.
+
+Fichier: reclamations/models.py
+"""
+
+# ==================== Imports ====================
 from django.db import models
 from dossiers.models import Dossier
 from django.conf import settings
+
+# ==================== Classes ====================
+class ReclamationManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
 
 
 class Reclamation(models.Model):
@@ -91,6 +103,10 @@ class Reclamation(models.Model):
     # Métadonnées
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
+    is_deleted = models.BooleanField(default=False, verbose_name="Supprimé")
+
+    objects = ReclamationManager()
+    all_objects = models.Manager()
 
     class Meta:
         verbose_name = "Réclamation"
@@ -99,3 +115,11 @@ class Reclamation(models.Model):
 
     def __str__(self):
         return f"Réclamation {self.type_reclamation} - {self.dossier.denomination}"
+
+    def delete(self, *args, **kwargs):
+        self.is_deleted = True
+        self.save()
+
+    def restore(self, *args, **kwargs):
+        self.is_deleted = False
+        self.save()

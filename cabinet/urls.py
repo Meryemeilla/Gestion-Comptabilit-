@@ -1,3 +1,10 @@
+"""
+Définition des routes URL et namespaces.
+
+Fichier: cabinet/urls.py
+"""
+
+# ==================== Imports ====================
 from django.urls import path, include
 from . import views
 from .views import FiscalDocumentRedirectView
@@ -5,19 +12,22 @@ from .views import lancer_tache_rappel_tva, lancer_tache_reclamation
 from django.contrib.auth import views as auth_views
 from cabinet.views_api import analyser_document_view
 from .views import preview_identifiants_ajax
-from .views import home_view
+from .views import home_view, custom_logout
+from comptables.views import ComptableActiveListView
 app_name = 'cabinet'
 
 urlpatterns = [
     # Page d'accueil et tableau de bord
     path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
+    path('admin-dossier-stats/', views.AdminDossierStatsView.as_view(), name='admin_dossier_stats'),
+    path('accounts/logout/', custom_logout, name='logout'),
     
     path('accueil/', home_view, name='home'),
 
     path('register/client/', views.client_register, name='client_register'),
     
     # Gestion des comptables
-    path('comptables/', views.ComptableListView.as_view(), name='comptable_list'),
+    path('comptables/', ComptableActiveListView.as_view(), name='comptable_list'),
     path('comptables/create/', views.ComptableCreateView.as_view(), name='comptable_create'),
     path('comptables/<int:pk>/', views.ComptableDetailView.as_view(), name='comptable_detail'),
     path('comptables/<int:pk>/edit/', views.ComptableUpdateView.as_view(), name='comptable_edit'),
@@ -30,6 +40,8 @@ urlpatterns = [
     path('dossiers/<int:pk>/', views.DossierDetailView.as_view(), name='dossier_detail'),
     path('dossiers/<int:pk>/edit/', views.DossierUpdateView.as_view(), name='dossier_edit'),
     path('dossiers/<int:pk>/delete/', views.DossierDeleteView.as_view(), name='dossier_delete'),
+    path('dossiers/trash/', views.DossierTrashListView.as_view(), name='dossier_trash_list'),
+    path('dossiers/<int:pk>/restore/', views.dossier_restore, name='dossier_restore'),
     path('comptables/<int:comptable_pk>/assign_dossier/<int:dossier_pk>/', views.assign_dossier_to_comptable, name='assign_dossier_to_comptable'),
 
     
@@ -60,6 +72,8 @@ urlpatterns = [
     path('reclamations/create/', views.ReclamationCreateView.as_view(), name='reclamation_create'),
     path('reclamations/<int:pk>/update/', views.ReclamationUpdateView.as_view(), name='reclamation_update'),
     path('reclamations/<int:pk>/delete/', views.ReclamationDeleteView.as_view(), name='reclamation_delete'),
+    path('reclamations/trash/', views.ReclamationTrashListView.as_view(), name='reclamation_trash_list'),
+    path('reclamations/<int:pk>/restore/', views.reclamation_restore, name='reclamation_restore'),
     path('reclamations/<int:pk>/ajouter-suivi/', views.reclamation_add_suivi, name='reclamation_add_suivi'),
 
     path('mon-compte/modifier-mot-de-passe/', auth_views.PasswordChangeView.as_view(

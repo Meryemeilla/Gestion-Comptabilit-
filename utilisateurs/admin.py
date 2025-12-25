@@ -1,9 +1,17 @@
+"""
+Enregistrements et personnalisation Admin Django.
+
+Fichier: utilisateurs/admin.py
+"""
+
+# ==================== Imports ====================
 from django.contrib import admin
 from .models import Utilisateur, Client
 from dossiers.models import Dossier
 from django import forms
 from dossiers.admin import DossierAdmin
 
+# ==================== Classes ====================
 class UtilisateurAdminForm(forms.ModelForm):
     class Meta:
         model = Utilisateur

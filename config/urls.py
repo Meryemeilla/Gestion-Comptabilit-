@@ -1,3 +1,10 @@
+"""
+Définition des routes URL et namespaces.
+
+Fichier: config/urls.py
+"""
+
+# ==================== Imports ====================
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -5,14 +12,13 @@ from django.conf.urls.static import static
 from django.shortcuts import redirect
 from django.contrib.auth import views as auth_views
 from cabinet.views import home_view
+# ==================== Fonctions ====================
 def redirect_to_login(request):
     return redirect('login')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('honoraires/', include('honoraires.urls')),
-    
-    
+
     path('api/', include('api.urls')),
     path('', home_view, name='home'), 
     path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
@@ -24,9 +30,10 @@ urlpatterns = [
     path('juridique/', include(('juridique.urls', 'juridique'), namespace='juridique')),
     path('fiscal/', include(('fiscal.urls', 'fiscal'), namespace='fiscal')),
     path('honoraires/', include(('honoraires.urls', 'honoraires'), namespace='honoraires')),
+    path('comptables/', include(('comptables.urls', 'comptables'), namespace='comptables'))
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.BASE_DIR / 'static')
 

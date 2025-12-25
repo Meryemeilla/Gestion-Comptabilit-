@@ -1,0 +1,305 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Corbeille{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --sf-blue: #366092;
+        --sf-dark-blue: #2c5282;
+        --sf-gold: #d4af37;
+        --sf-light-bg: #f8f9fc;
+    }
+    .sf-breadcrumb-container {
+        background: transparent;
+    }
+
+    .sf-breadcrumb .breadcrumb-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--sf-blue);
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0 0.5rem;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a {
+        color: var(--sf-blue);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .sf-breadcrumb .breadcrumb-item a:hover {
+        color: var(--sf-dark-blue);
+        transform: translateX(2px);
+    }
+
+    .sf-breadcrumb .breadcrumb-item.active {
+        color: var(--sf-gold);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sf-page-header {
+        border-bottom: 2px solid var(--sf-gold);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .sf-page-title {
+        color: var(--sf-blue);
+        font-weight: 600;
+    }
+    
+    .sf-card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        border-left: 4px solid var(--sf-blue);
+    }
+    
+    .sf-card-header {
+        background-color: var(--sf-blue);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.35rem 0.35rem 0 0 !important;
+    }
+    
+    .sf-form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .sf-form-label {
+        font-weight: 600;
+        color: var(--sf-dark-blue);
+        margin-bottom: 0.5rem;
+    }
+    
+    .sf-form-control {
+        border-radius: 0.35rem;
+        border: 1px solid #d1d3e2;
+        padding: 0.75rem 1rem;
+        transition: border-color 0.3s;
+    }
+    
+    .sf-form-control:focus {
+        border-color: var(--sf-blue);
+        box-shadow: 0 0 0 0.2rem rgba(54, 96, 146, 0.25);
+    }
+    
+    .sf-btn-primary {
+        background-color: var(--sf-blue);
+        border-color: var(--sf-dark-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-primary:hover {
+        background-color: var(--sf-dark-blue);
+    }
+    
+    .sf-btn-outline {
+        color: var(--sf-blue);
+        border-color: var(--sf-blue);
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .sf-btn-outline:hover {
+        background-color: var(--sf-light-bg);
+    }
+    
+    .sf-btn-success {
+        background-color: #28a745;
+        border-color: #218838;
+    }
+    
+    .sf-btn-warning {
+        background-color: #ffc107;
+        border-color: #e0a800;
+    }
+    
+    .sf-btn-danger {
+        background-color: #dc3545;
+        border-color: #c82333;
+    }
+    
+    .sf-btn-info {
+        background-color: #17a2b8;
+        border-color: #138496;
+    }
+    
+    .sf-alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="sf-breadcrumb-container">
+    <ol class="breadcrumb sf-breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'cabinet:dashboard' %}">
+                <i class="bi bi-speedometer2"></i> Tableau de bord
+            </a>
+        </li>
+        <li class="breadcrumb-item active">
+            <i class="bi bi-trash"></i> Corbeille
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid main-content">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 sf-page-header">
+        <h1 class="h3 mb-0 sf-page-title">Corbeille</h1>
+    </div>
+
+    <p class="mb-4">Gérez les éléments supprimés de votre application.</p>
+
+    <div class="card shadow mb-4 sf-card">
+        <div class="card-header py-3 sf-card-header">
+            <h6 class="m-0 font-weight-bold">Éléments supprimés</h6>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <ul class="nav nav-pills mb-3">
+                        <li class="nav-item">
+                            <a class="nav-link {% if not model_name %}active{% endif %}" href="{% url 'dossiers:corbeille_generique' %}">Tous</a>
+                        </li>
+                        {% for name, Model in model_map.items %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if model_name == name %}active{% endif %}" href="{% url 'dossiers:corbeille_generique_model' name %}">{{ name|capfirst }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            {% if model_name %}
+            <h3 class="h5 mb-3 text-gray-800">{{ model_name|capfirst }} supprimés</h3>
+            {% if deleted_items %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in deleted_items %}
+                        <tr>
+                            <td>{{ item.pk }}</td>
+                            <td>
+                                {% if model_name == 'dossier' %}
+                                    {{ item.denomination }}
+                                {% elif model_name == 'honoraire' %}
+                                    {{ item.client.denomination }} - {{ item.montant }}
+                                {% elif model_name == 'reclamation' %}
+                                    {{ item.sujet }}
+                                {% elif model_name == 'comptable' %}
+                                    {{ item.user.get_full_name }}
+                                {% elif model_name == 'acompte' %}
+                                    {{ item.dossier.denomination }} - {{ item.montant }}
+                                {% elif model_name == 'cmir' %}
+                                    {{ item.dossier.denomination }} - {{ item.montant }}
+                                {% elif model_name == 'tva' %}
+                                    {{ item.dossier.denomination }} - {{ item.montant }}
+                                {% elif model_name == 'depotbilan' %}
+                                    {{ item.dossier.denomination }} - {{ item.annee_exercice }}
+                                {% elif model_name == 'suiviforfaitaire' %}
+                                    {{ item.dossier.denomination }} - {{ item.annee_declaration }}
+                                {% else %}
+                                    {{ item }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'dossiers:restore_item' model_name=model_name pk=item.pk %}" class="btn btn-success btn-sm sf-btn-success">Restaurer</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info sf-alert-info" role="alert">
+                Aucun élément {{ model_name }} supprimé.
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="alert alert-info sf-alert-info" role="alert">
+                Sélectionnez un module pour voir les éléments supprimés ou consultez la liste complète ci-dessous.
+            </div>
+            {% for model_data in deleted_items %}
+                <h4 class="h5 mb-3 mt-4 text-gray-800">{{ model_data.model_name|capfirst }}</h4>
+                {% if model_data.items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nom</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in model_data.items %}
+                                <tr>
+                                    <td>{{ item.pk }}</td>
+                                    <td>
+                                        {% if model_data.model_name == 'dossier' %}
+                                            {{ item.denomination }}
+                                        {% elif model_data.model_name == 'honoraire' %}
+                                            {{ item.client.denomination }} - {{ item.montant }}
+                                        {% elif model_data.model_name == 'reclamation' %}
+                                            {{ item.sujet }}
+                                        {% elif model_data.model_name == 'comptable' %}
+                                            {{ item.user.get_full_name }}
+                                        {% elif model_data.model_name == 'acompte' %}
+                                            {{ item.dossier.denomination }} - {{ item.montant }}
+                                        {% elif model_data.model_name == 'cmir' %}
+                                            {{ item.dossier.denomination }} - {{ item.montant }}
+                                        {% elif model_data.model_name == 'tva' %}
+                                            {{ item.dossier.denomination }} - {{ item.montant }}
+                                        {% elif model_data.model_name == 'depotbilan' %}
+                                            {{ item.dossier.denomination }} - {{ item.annee_exercice }}
+                                        {% elif model_data.model_name == 'suiviforfaitaire' %}
+                                            {{ item.dossier.denomination }} - {{ item.annee_declaration }}
+                                        {% else %}
+                                            {{ item }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'dossiers:restore_item' model_name=model_data.model_name pk=item.pk %}" class="btn btn-success btn-sm sf-btn-success">Restaurer</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info sf-alert-info" role="alert">
+                        Aucun élément {{ model_data.model_name }} supprimé.
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

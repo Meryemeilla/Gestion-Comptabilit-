@@ -1,9 +1,17 @@
+"""
+Enregistrements et personnalisation Admin Django.
+
+Fichier: juridique/admin.py
+"""
+
+# ==================== Imports ====================
 from django.contrib import admin
 from django.contrib import admin
 from .models import JuridiqueCreation, DocumentJuridique, EvenementJuridique
 
 
 @admin.register(JuridiqueCreation)
+# ==================== Classes ====================
 class JuridiqueCreationAdmin(admin.ModelAdmin):
     list_display = [
        'dossier', 'statut_global', 'pourcentage_completion', 'date_creation'

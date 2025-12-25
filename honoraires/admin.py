@@ -1,8 +1,16 @@
+"""
+Enregistrements et personnalisation Admin Django.
+
+Fichier: honoraires/admin.py
+"""
+
+# ==================== Imports ====================
 from django.contrib import admin
 from django.contrib import admin
 from .models import Honoraire, ReglementHonoraire, HonorairePV
 
 
+# ==================== Classes ====================
 class ReglementHonoraireInline(admin.TabularInline):
     model = ReglementHonoraire
     extra = 0

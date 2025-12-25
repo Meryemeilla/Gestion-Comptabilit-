@@ -1,3 +1,10 @@
+"""
+Définition des routes URL et namespaces.
+
+Fichier: juridique/urls.py
+"""
+
+# ==================== Imports ====================
 from django.urls import path
 from cabinet.views import DocumentsClientView
 from .views import (

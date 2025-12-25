@@ -1,3 +1,10 @@
+"""
+Django views (gestion des requêtes HTTP).
+
+Fichier: utilisateurs/views.py
+"""
+
+# ==================== Imports ====================
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import views as auth_views
@@ -9,6 +16,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
 from comptables.models import Comptable # Import Comptable model
 
+# ==================== Handlers ====================
 def home(request):
     return render(request, 'home.html')
 

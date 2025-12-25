@@ -272,9 +272,20 @@
                     <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
                 </a>
             </li>
-            <li class="breadcrumb-item active text-sf-gold">
-                <i class="bi bi-cash-coin me-2"></i>Honoraires
+            <li class="breadcrumb-item">
+                <a href="{% url 'honoraires:honoraire_list' %}" class="text-sf-blue hover-text-sf-dark-blue">
+                    <i class="bi bi-cash-coin me-2"></i>Honoraires
+                </a>
             </li>
+            {% if request.resolver_match.url_name == 'honoraire_trash_list' %}
+            <li class="breadcrumb-item active text-sf-gold">
+                <i class="bi bi-trash me-2"></i>Corbeille
+            </li>
+            {% else %}
+            <li class="breadcrumb-item active text-sf-gold">
+                <i class="bi bi-list-check me-2"></i>Tous les honoraires
+            </li>
+            {% endif %}
         </ol>
     </nav>
 
@@ -291,6 +302,7 @@
                     <a href="{% url 'honoraires:honoraire_create' %}" class="btn sf-btn-primary" style="color: white;">
                         <i class="bi bi-plus-circle mr-2"></i> Ajouter un Honoraire
                     </a>
+
                     <a href="{% url 'cabinet:export_excel' 'honoraires'%}" class="btn" style="border-color: #28a745; color: #28a745;">
                             <i class="bi bi-file-earmark-excel mr-2" style="color: #28a745;"></i> Export Excel
                     </a>

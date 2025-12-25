@@ -183,6 +183,9 @@
     .text-sf-blue { color: var(--sf-blue); }
     .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
     .text-sf-gold { color: var(--sf-gold); }
+    .sf-required-empty { border: 2px solid #e03131 !important; background: #fff5f5; }
+    .sf-required-title { color: #e03131 !important; }
+
 </style>
 
 <div class="container-fluid py-4">
@@ -304,7 +307,7 @@
                                                 'date_contrat_bail', 'date_statuts', 'date_certificat_negatif',
                                                 'date_tp', 'date_bo', 'date_al', 'date_rq'
                                             ];
-
+                                            
                                             fields.forEach(field => {
                                                 const input = document.getElementById(`id_${field}`);
                                                 if (input) {
@@ -327,7 +330,7 @@
 
                                             const checkboxes = [
                                                 'rc', 'cnss', 'contrat_bail', 'statuts',
-                                                'certificat_negatif', 'tp', 'bo', 'al', 'rq'
+                                                'certificat_negatif', 'bo', 'al', 'rq'
                                             ];
 
                                             checkboxes.forEach(field => {
@@ -336,6 +339,7 @@
                                                     checkbox.checked = data[field];
                                                 }
                                             });
+                                            updateRequiredVisuals();
                                         })
                                         .catch(error => {
                                             console.error("Erreur chargement auto infos dossier :", error);
@@ -350,6 +354,8 @@
                 
                 <!-- Section Documents obligatoires -->
                 <div class="sf-form-section">
+                    <div class="sf-form-section" id="docs-obligatoires">
+
                     <h3 class="sf-form-section-title">
                         <i class="bi bi-file-earmark-check mr-2"></i>
                         Documents obligatoires
@@ -512,7 +518,7 @@
                         Remarques
                     </h3>
                     <div class="sf-form-group">
-                        <textarea name="remarques" class="sf-form-control" rows="3" placeholder="Ajoutez vos remarques ici..."></textarea>
+                        <textarea name="remarques" id="id_remarques" class="sf-form-control" rows="3" placeholder="Ajoutez vos remarques ici..."></textarea>
                     </div>
                 </div>
                 
@@ -538,10 +544,63 @@
                         <i class="bi bi-save mr-2"></i> Enregistrer
                     </button>
                 </div>
+                </div>
             </form>
         </div>
     </div>
 </div>
+ <script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Tous les champs texte, date, textarea et checkbox
+  const inputs = document.querySelectorAll(
+    'input[type="text"], input[type="date"], input[type="checkbox"], textarea, select'
+  );
+
+  // Champs à ignorer (jamais rouges)
+  const ignoredFields = ['id_ordre', 'id_forme', 'id_remarques', 'id_dossier'];
+
+  // Récupère le label associé à un champ
+  function getLabel(input) {
+    if (input.type === 'checkbox') {
+      return input.closest('label.sf-checkbox-label');
+    }
+    const group = input.closest('.sf-date-group, .sf-form-group');
+    return group ? group.querySelector('label.sf-form-label') : null;
+  }
+
+  // Applique rouge/noir à un champ + son label
+  function paint(input) {
+    if (ignoredFields.includes(input.id)) return; // 🔥 ignorer certains champs
+
+    const lbl = getLabel(input);
+    const filled = (input.type === 'checkbox') ? input.checked : !!String(input.value || '').trim();
+
+    if (filled) {
+      if (input.type !== 'checkbox') input.classList.remove('sf-required-empty');
+      if (lbl) lbl.classList.remove('sf-required-title');
+    } else {
+      if (input.type !== 'checkbox') input.classList.add('sf-required-empty');
+      if (lbl) lbl.classList.add('sf-required-title');
+    }
+  }
+
+  function updateAll() { inputs.forEach(paint); }
+
+  // Exposé global pour rappel après préremplissage fetch
+  window.updateRequiredVisuals = updateAll;
+
+  // 1) Au chargement initial
+  updateAll();
+
+  // 2) Quand l'utilisateur modifie un champ
+  inputs.forEach(input => {
+    input.addEventListener('input', () => paint(input));
+    input.addEventListener('change', () => paint(input));
+  });
+});
+</script>
+
+
 
 <script>
     // Style des champs de formulaire

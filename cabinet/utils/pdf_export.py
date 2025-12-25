@@ -1,6 +1,14 @@
+"""
+Fonctions utilitaires et helpers techniques.
+
+Fichier: cabinet/utils/pdf_export.py
+"""
+
+# ==================== Imports ====================
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from weasyprint import HTML, CSS
+# WeasyPrint import rendu paresseux au niveau des méthodes
+# from weasyprint import HTML, CSS
 from datetime import datetime
 import io
 
@@ -15,11 +23,12 @@ os.environ['FONTCONFIG_PATH'] = r'C:\msys64\mingw64\etc\fonts'
 
 
 
+# ==================== Classes ====================
 class ExportPDF:
     """Classe pour gérer les exports PDF"""
     
     def __init__(self):
-        self.css_style = CSS(string='''
+        self.css_style_string = '''
             @page {
                 size: A4;
                 margin: 2cm;
@@ -137,9 +146,23 @@ class ExportPDF:
             }
         }
         
+        try:
+            from weasyprint import HTML, CSS
+        except Exception:
+            return HttpResponse(
+                "Export PDF indisponible: dépendances WeasyPrint manquantes ou non chargées.",
+                status=503
+            )
+        css_style = CSS(string=self.css_style_string)
         html_content = render_to_string('pdf/rapport_comptables.html', context)
         html = HTML(string=html_content)
-        pdf = html.write_pdf(stylesheets=[self.css_style])
+        try:
+            pdf = html.write_pdf(stylesheets=[css_style])
+        except Exception:
+            return HttpResponse(
+                "Export PDF indisponible: erreur d’exécution WeasyPrint/GTK (write_pdf).",
+                status=503
+            )
         
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="rapport_comptables_{datetime.now().strftime("%Y%m%d")}.pdf"'
@@ -187,9 +210,23 @@ class ExportPDF:
             'repartition_forme': repartition_forme,
         }
         
+        try:
+            from weasyprint import HTML, CSS
+        except Exception:
+            return HttpResponse(
+                "Export PDF indisponible: dépendances WeasyPrint manquantes ou non chargées.",
+                status=503
+            )
+        css_style = CSS(string=self.css_style_string)
         html_content = render_to_string('pdf/rapport_dossiers.html', context)
         html = HTML(string=html_content)
-        pdf = html.write_pdf(stylesheets=[self.css_style])
+        try:
+            pdf = html.write_pdf(stylesheets=[css_style])
+        except Exception:
+            return HttpResponse(
+                "Export PDF indisponible: erreur d’exécution WeasyPrint/GTK (write_pdf).",
+                status=503
+            )
         
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="rapport_dossiers_{datetime.now().strftime("%Y%m%d")}.pdf"'
@@ -228,9 +265,23 @@ class ExportPDF:
             }
         }
         
+        try:
+            from weasyprint import HTML, CSS
+        except Exception:
+            return HttpResponse(
+                "Export PDF indisponible: dépendances WeasyPrint manquantes ou non chargées.",
+                status=503
+            )
+        css_style = CSS(string=self.css_style_string)
         html_content = render_to_string('pdf/rapport_honoraires.html', context)
         html = HTML(string=html_content)
-        pdf = html.write_pdf(stylesheets=[self.css_style])
+        try:
+            pdf = html.write_pdf(stylesheets=[css_style])
+        except Exception:
+            return HttpResponse(
+                "Export PDF indisponible: erreur d’exécution WeasyPrint/GTK (write_pdf).",
+                status=503
+            )
         
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="rapport_honoraires_{datetime.now().strftime("%Y%m%d")}.pdf"'
@@ -251,6 +302,16 @@ class ExportPDF:
             jan=True, fev=True, mars=True, avril=True, mai=True, juin=True,
             juillet=True, aout=True, sep=True, oct=True, nov=True, dec=True
         ).count()
+
+        # Préparer le rendu et gérer l'import WeasyPrint paresseux
+        try:
+            from weasyprint import HTML, CSS
+        except Exception:
+            return HttpResponse(
+                "Export PDF indisponible: dépendances WeasyPrint manquantes ou non chargées.",
+                status=503
+            )
+        css_style = CSS(string=self.css_style_string)
         dossiers_trimestriel_complet = suivis.filter(t1=True, t2=True, t3=True, t4=True).count()
         
         context = {
@@ -267,9 +328,15 @@ class ExportPDF:
             }
         }
         
-        html_content = render_to_string('pdf/rapport_suivi_tva.html', context)
+        html_content = render_to_string('pdf/suivi_tva.html', context)
         html = HTML(string=html_content)
-        pdf = html.write_pdf(stylesheets=[self.css_style])
+        try:
+            pdf = html.write_pdf(stylesheets=[css_style])
+        except Exception:
+            return HttpResponse(
+                "Export PDF indisponible: erreur d’exécution WeasyPrint/GTK (write_pdf).",
+                status=503
+            )
         
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="suivi_tva_{annee}_{datetime.now().strftime("%Y%m%d")}.pdf"'

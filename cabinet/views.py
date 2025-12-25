@@ -1,3 +1,10 @@
+"""
+Django views (gestion des requêtes HTTP).
+
+Fichier: cabinet/views.py
+"""
+
+# ==================== Imports ====================
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView, View
 from django import forms
@@ -5,8 +12,9 @@ from django.db.models import ProtectedError
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.db.models import Count, Q, Sum
+from django.db.models.functions import ExtractYear, ExtractMonth
 from django.utils import timezone
 from django.urls import reverse_lazy
 from datetime import datetime, timedelta
@@ -17,12 +25,12 @@ from utilisateurs.models import Client
 from django.contrib.auth.decorators import login_required
 from comptables.models import Comptable
 from dossiers.models import Dossier
+from dossiers.services import get_stats_by_year_month, get_total_cards, get_sector_counts, get_branche_counts
 from honoraires.models import Honoraire, ReglementHonoraire, HonorairePV, ReglementHonorairePV
 from fiscal.models import Acompte, CMIR, DepotBilan, SuiviTVA, SuiviForfaitaire
 from reclamations.models import Reclamation
 from juridique.models import JuridiqueCreation, DocumentJuridique, EvenementJuridique
 from .utils.export import ExportExcel
-from .utils.pdf_export import ExportPDF
 from .utils.email import EmailService
 from django.contrib import messages
 from django.http import HttpResponseForbidden
@@ -39,6 +47,7 @@ from django.contrib.auth.decorators import user_passes_test
 from cabinet.forms import ClientUpdateForm
 from django.contrib.auth.decorators import login_required
 from utilisateurs.models import Utilisateur
+# ==================== Handlers ====================
 class DashboardView(RoleRequiredMixin, LoginRequiredMixin, TemplateView):
     allowed_roles = ['administrateur', 'manager', 'comptable', 'client']
     template_name = 'dashboard.html'
@@ -147,7 +156,33 @@ class DashboardView(RoleRequiredMixin, LoginRequiredMixin, TemplateView):
         context['upcoming_events'] = EvenementJuridique.objects.filter(date_evenement__gte=timezone.now()).order_by('date_evenement')[:5]
 
         return context
+class HonoraireDashboardView(RoleRequiredMixin, LoginRequiredMixin, TemplateView):
+    allowed_roles = ['comptable', 'administrateur']
+    template_name = 'honoraires/dashboard.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Alertes : honoraires non payés ou en retard
+        alertes_honoraires = Honoraire.objects.filter(
+            statut_reglement__in=['EN_ATTENTE', 'EN_RETARD']
+        )
+
+        # Alertes : règlements non payés ou en retard
+        alertes_reglements = ReglementHonoraire.objects.filter(
+            statut_reglement__in=['EN_ATTENTE', 'EN_RETARD']
+        )
+
+        # Premier honoraire pour créer un règlement
+        first_honoraire = Honoraire.objects.first()
+
+        context.update({
+            'alertes_honoraires': alertes_honoraires,
+            'alertes_reglements': alertes_reglements,
+            'first_honoraire_pk': first_honoraire.pk if first_honoraire else None
+        })
+
+        return context
 # views.py
 class DocumentsClientView(LoginRequiredMixin, TemplateView):
     template_name = "cabinet/documents_client.html"
@@ -403,6 +438,10 @@ class ComptableDetailView(RoleRequiredMixin, LoginRequiredMixin, DetailView):
             'dossiers_pp': actifs.filter(forme_juridique__in=['EI', 'EIRL', 'AUTO']).count(),
             'dossiers_forfaitaires': actifs.filter(code__in=['F', 'FS']).count(),
             'dossiers_avec_tva': actifs.filter(declaration_tva__in=['MENSUELLE', 'TRIMESTRIELLE']).count(),
+            'dossiers_tva_mensuelle': actifs.filter(declaration_tva='MENSUELLE').count(),
+            'dossiers_tva_trimestrielle': actifs.filter(declaration_tva='TRIMESTRIELLE').count(),
+            'total_dossiers_pm': all_dossiers.filter(forme_juridique__in=['SARL', 'SA', 'SNC', 'SCS', 'SCA', 'EURL', 'SASU', 'SAS']).count(),
+            'total_dossiers_pp': all_dossiers.filter(forme_juridique__in=['EI', 'EIRL', 'AUTO']).count(),
         }
 
         context['comptable'] = comptable
@@ -410,6 +449,47 @@ class ComptableDetailView(RoleRequiredMixin, LoginRequiredMixin, DetailView):
         return context
 
 from utilisateurs.tasks import envoyer_email_creation_comptable
+
+class AdminDossierStatsView(RoleRequiredMixin, LoginRequiredMixin, TemplateView):
+    allowed_roles = ['administrateur']
+    template_name = 'cabinet/admin_dossier_stats.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Statistiques par année et par mois via service
+        stats_data = get_stats_by_year_month()
+
+        # Convertir les mois numériques en noms de mois pour l'affichage
+        month_names = {
+            1: 'Janvier', 2: 'Février', 3: 'Mars', 4: 'Avril', 5: 'Mai', 6: 'Juin',
+            7: 'Juillet', 8: 'Août', 9: 'Septembre', 10: 'Octobre', 11: 'Novembre', 12: 'Décembre'
+        }
+        for stat in stats_data:
+            stat['month'] = month_names.get(stat['month'], stat['month'])
+
+        context['stats'] = list(stats_data)
+
+        # Totaux des cartes via service
+        cards = get_total_cards()
+        context.update({
+            'total_dossiers': cards.get('total_dossiers', 0),
+            'total_pp': cards.get('total_pp', 0),
+            'total_pm': cards.get('total_pm', 0),
+            'tva_mensuelle': cards.get('tva_mensuelle', 0),
+            'tva_trimestrielle': cards.get('tva_trimestrielle', 0),
+            'tva_exoneree': cards.get('tva_exoneree', 0),
+            'total_radie': cards.get('total_radie', 0),
+            'total_livre': cards.get('total_livre', 0),
+            'total_delaisse': cards.get('total_delaisse', 0),
+        })
+
+        # Statistiques par secteur et par branche via services
+        context['stats_par_secteur'] = list(get_sector_counts())
+        context['stats_par_branche'] = list(get_branche_counts())
+
+        return context
+
 
 class ComptableCreateView(RoleRequiredMixin, LoginRequiredMixin, CreateView):
     allowed_roles = ['administrateur', 'manager']
@@ -499,6 +579,8 @@ class ComptableDeleteView(RoleRequiredMixin, LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('cabinet:comptable_list')
 
     def delete(self, request, *args, **kwargs):
+        messages.success(request, 'Comptable supprimé avec succès.')
+        return super().delete(request, *args, **kwargs)
         comptable = self.get_object()
         user = comptable.user
         if user:
@@ -529,6 +611,7 @@ class DossierListView(RoleRequiredMixin, LoginRequiredMixin, ListView):
     template_name = 'dossiers/list.html'
     context_object_name = 'dossiers'
     paginate_by = 20
+    queryset = Dossier.objects.filter(is_deleted=False)
     
     def get_queryset(self):
         queryset = Dossier.objects.select_related('comptable_traitant').filter(actif=True)
@@ -813,13 +896,19 @@ def delete_document(request, pk):
         return redirect('cabinet:dossier_edit', pk=dossier_id)
     except Exception as e:
         messages.error(request, f"Erreur lors de la suppression : {str(e)}")
-        return redirect('dossiers:client_dossiers')
+        return redirect('cabinet:dossier_list')
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from .util import extraire_infos_identifiants
 import tempfile
 from django.views.decorators.http import require_POST
-
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.views.decorators.http import require_http_methods
+@require_http_methods(["GET", "POST"])
+def custom_logout(request):
+    logout(request)
+    return redirect('/accounts/login/')
 @csrf_exempt
 @require_POST
 def preview_identifiants_ajax(request):
@@ -899,7 +988,7 @@ logger = logging.getLogger(__name__)
 class DossierUpdateView(LoginRequiredMixin, UpdateView):
     model = Dossier
     template_name = 'dossiers/form.html'
-    success_url = reverse_lazy('dossiers:client_dossiers')
+    success_url = reverse_lazy('cabinet:dossier_list')
 
     def get_form_class(self):
         if self.request.user.is_client():
@@ -1022,6 +1111,13 @@ class DossierDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     template_name = 'dossiers/delete.html'
     success_url = reverse_lazy('cabinet:dossier_list')
 
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.is_deleted = True
+        self.object.save()
+        messages.success(request, "Le dossier a été déplacé vers la corbeille.")
+        return HttpResponseRedirect(self.get_success_url())
+
     def test_func(self):
         return self.request.user.is_superuser or self.request.user.is_staff
 
@@ -1029,15 +1125,47 @@ class DossierDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 
-class HonoraireDetailView(LoginRequiredMixin, DetailView):
-    model = Honoraire
-    template_name = 'honoraires/detail.html'
-    context_object_name = 'honoraire'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['reglements'] = self.get_object().reglements.order_by('-date_reglement')
-        return context
+class DossierTrashListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Dossier
+    template_name = 'dossiers/trash_list.html'
+    context_object_name = 'dossiers'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = Dossier.objects.filter(is_deleted=True)
+        
+        if self.request.user.is_comptable():
+            try:
+                comptable_profile = self.request.user.comptable_profile
+                queryset = queryset.filter(comptable_traitant=comptable_profile)
+            except Comptable.DoesNotExist:
+                queryset = Dossier.objects.none()
+        elif self.request.user.is_client():
+            queryset = queryset.filter(client=self.request.user.client_profile)
+        
+        search_query = self.request.GET.get('search')
+        if search_query:
+            queryset = queryset.filter(
+                Q(denomination__icontains=search_query) |
+                Q(code__icontains=search_query) |
+                Q(abreviation__icontains=search_query) |
+                Q(ice__icontains=search_query) |
+                Q(rc__icontains=search_query)
+            )
+        return queryset
+
+    def test_func(self):
+        return self.request.user.is_superuser or self.request.user.is_staff or self.request.user.is_comptable() or self.request.user.is_client()
+
+@login_required
+def dossier_restore(request, pk):
+    dossier = get_object_or_404(Dossier, pk=pk, is_deleted=True)
+    if request.method == 'POST':
+        dossier.is_deleted = False
+        dossier.save()
+        messages.success(request, "Le dossier a été restauré avec succès.")
+        return redirect('cabinet:dossier_trash_list')
+    return redirect('cabinet:dossier_trash_list')
 
 
 class HonoraireCreateView(RoleRequiredMixin, LoginRequiredMixin, CreateView):
@@ -1225,53 +1353,28 @@ class ReclamationListView(RoleRequiredMixin, LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         user = self.request.user
+        queryset = Reclamation.objects.filter(is_deleted=False)
 
-        if user.role == 'client':
+        if user.is_superuser or user.role == 'administrateur':
+            pass  # Superusers and admins see all non-deleted reclamations
+        elif user.role == 'comptable':
+            queryset = queryset.filter(Q(dossier__comptable=user) | Q(created_by=user) | Q(destinataire=user))
+        elif user.role == 'client':
             client = getattr(user, 'client_profile', None)
             if client:
-                queryset = Reclamation.objects.filter(dossier__client=client)
-
-                filtre = self.request.GET.get('filter')
-                if filtre == 'envoyees':
-                    queryset = queryset.filter(created_by=user)
-                elif filtre == 'recues':
-                    queryset = queryset.filter(destinataire=user)
-                # Si aucun filtre, on garde tout (envoyées + reçues)
+                queryset = queryset.filter(dossier__client=client)
             else:
                 queryset = Reclamation.objects.none()
-
-
-        elif user.role == 'comptable':
-            queryset = Reclamation.objects.filter(
-                Q(destinataire=user) | Q(created_by=user)
-            )
-
-            filtre = self.request.GET.get('filter')
-            if filtre == 'envoyees':
-                queryset = queryset.filter(created_by=user)
-            elif filtre == 'recues':
-                queryset = queryset.filter(destinataire=user)
-
-
-        elif user.role == 'administrateur':
-            queryset = Reclamation.objects.filter(
-                Q(created_by__role='comptable') |
-                Q(destinataire__role='comptable')
-            )
-
-            filtre = self.request.GET.get('filter')
-            if filtre == 'envoyees':
-                # Réclamations créées par les comptables
-                queryset = queryset.filter(created_by__role='comptable')
-            elif filtre == 'recues':
-                # Réclamations reçues par les comptables
-                queryset = queryset.filter(destinataire__role='comptable')
-
         elif user.role == 'manager':
-            queryset = Reclamation.objects.all()
-
+            pass  # Managers see all non-deleted reclamations
         else:
             queryset = Reclamation.objects.none()
+
+        filtre = self.request.GET.get('filter')
+        if filtre == 'envoyees':
+            queryset = queryset.filter(created_by=user)
+        elif filtre == 'recues':
+            queryset = queryset.filter(destinataire=user)
 
         # Filtres supplémentaires
         search = self.request.GET.get('search')
@@ -1485,17 +1588,42 @@ class ReclamationDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy("cabinet:reclamation_list")
 
     def delete(self, request, *args, **kwargs):
-        messages.success(request, 'Réclamation supprimé avec succès.')
-        return super().delete(request, *args, **kwargs)
+        self.object = self.get_object()
+        self.object.delete()  # Call the custom delete method for soft deletion
+        messages.success(request, 'Réclamation supprimée avec succès.')
+        return HttpResponseRedirect(self.get_success_url())
     
     def dispatch(self, request, *args, **kwargs):
         reclamation = self.get_object()
 
         # Ne pas autoriser la modificatio)/suppression si créée par un administrateur
-        if reclamation.created_by.role == 'administrateur':
-            return self.handle_no_permission()
 
-        return super().dispatch(request, *args, **kwargs)
+
+class ReclamationTrashListView(RoleRequiredMixin, LoginRequiredMixin, ListView):
+    allowed_roles = ['superuser', 'administrateur', 'comptable', 'client']
+    model = Reclamation
+    template_name = 'reclamations/list.html'
+    context_object_name = 'reclamations'
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return Reclamation.objects.filter(is_deleted=True)
+        elif user.role == 'administrateur':
+            return Reclamation.objects.filter(is_deleted=True)
+        elif user.role == 'comptable':
+            return Reclamation.objects.filter(is_deleted=True)
+        elif user.role == 'client':
+            return Reclamation.objects.filter(client=user.client, is_deleted=True)
+        return Reclamation.objects.none()
+
+
+@login_required
+def reclamation_restore(request, pk):
+    reclamation = get_object_or_404(Reclamation, pk=pk, is_deleted=True)
+    reclamation.restore()
+    messages.success(request, 'Réclamation restaurée avec succès.')
+    return redirect('cabinet:reclamation_trash_list')
 
 
 
@@ -1611,16 +1739,25 @@ def export_reclamations(request):
 
 class ExportPDFView(LoginRequiredMixin, View):
     def get(self, request, type):
+        try:
+            from .utils.pdf_export import ExportPDF
+        except Exception as e:
+            return HttpResponse(
+                "Export PDF indisponible: dépendances WeasyPrint manquantes ou non chargées.",
+                status=503
+            )
+
         exporter = ExportPDF()
-        
         if type == 'rapport-comptables':
-            response = exporter.export_rapport_comptables()
+            return exporter.export_rapport_comptables()
         elif type == 'rapport-dossiers':
-            response = exporter.export_rapport_dossiers()
+            return exporter.export_rapport_dossiers()
+        elif type == 'rapport-honoraires':
+            return exporter.export_rapport_honoraires()
+        elif type == 'suivi-tva':
+            return exporter.export_suivi_tva_pdf()
         else:
-            return HttpResponse('Type d\'export non supporté', status=400)
-        
-        return response
+            return HttpResponse("Type d'export non supporté", status=400)
 
 
 class SendEmailView(LoginRequiredMixin, View):
@@ -1759,7 +1896,6 @@ def client_register(request):
 
 from django.http import JsonResponse
 from reclamations.tasks import send_rappel_tva_task, send_reclamation_email_task
-
 def lancer_tache_rappel_tva(request):
     send_rappel_tva_task.delay()
     return JsonResponse({'status': 'Tâche rappel TVA lancée'})

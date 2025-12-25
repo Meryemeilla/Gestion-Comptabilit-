@@ -1,3 +1,10 @@
+"""
+Tâches asynchrones (Celery, planifications).
+
+Fichier: reclamations/tasks.py
+"""
+
+# ==================== Imports ====================
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from cabinet.utils.email import EmailService
@@ -31,6 +38,7 @@ logger =  logging.getLogger(__name__)
 
 
 @shared_task
+# ==================== Fonctions ====================
 def send_reclamation_email_task(reclamation_id):
     reclamation = Reclamation.objects.get(id=reclamation_id)
     email_service = EmailService()

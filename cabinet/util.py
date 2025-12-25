@@ -1,4 +1,11 @@
+"""
+Module applicatif.
+
+Fichier: cabinet/util.py
+"""
+
 # cabinet/utils.py
+# ==================== Imports ====================
 import fitz  # PyMuPDF
 import pytesseract
 from PIL import Image
@@ -9,6 +16,7 @@ import dateparser
 
 from datetime import datetime
 
+# ==================== Fonctions ====================
 def parse_french_date(date_str):
     mois_fr = {
         'janvier': '01', 'février': '02', 'fevrier': '02', 'mars': '03',

@@ -1,5 +1,12 @@
+"""
+Définition des routes URL et namespaces.
+
+Fichier: honoraires/urls.py
+"""
+
+# ==================== Imports ====================
 from django.urls import path
-from .views import (HonoraireCreateView, ReglementHonoraireCreateView, ReglementHonoraireListView, HonorairePVCreateView,
+from .views import (HonoraireTrashListView, HonoraireCreateView, ReglementHonoraireCreateView, ReglementHonoraireListView, HonorairePVCreateView,
                     ReglementHonorairePVCreateView, HonoraireListView, HonoraireDetailView, HonoraireUpdateView,
                     HonoraireDeleteView, HonorairePVListView, HonorairePVDetailView, HonorairePVUpdateView,
                     HonorairePVDeleteView, HonoraireDashboardView)
@@ -20,5 +27,6 @@ urlpatterns = [
     path('<int:pk>/', HonoraireDetailView.as_view(), name='honoraire_detail'),
     path('<int:pk>/update/', HonoraireUpdateView.as_view(), name='honoraire_update'),
     path('<int:pk>/delete/', HonoraireDeleteView.as_view(), name='honoraire_delete'),
+    path('trash/', HonoraireTrashListView.as_view(), name='honoraire_trash_list'),
     path('reglement-pv/create/', ReglementHonorairePVCreateView.as_view(), name='reglement_pv_create'),
    ]

@@ -1,3 +1,10 @@
+"""
+Enregistrements et personnalisation Admin Django.
+
+Fichier: comptables/admin.py
+"""
+
+# ==================== Imports ====================
 from django.contrib import admin
 
 
@@ -5,6 +12,7 @@ from .models import Comptable
 
 
 @admin.register(Comptable)
+# ==================== Classes ====================
 class ComptableAdmin(admin.ModelAdmin):
     list_display = [
         'matricule', 'nom', 'prenom', 'email', 'tel', 
