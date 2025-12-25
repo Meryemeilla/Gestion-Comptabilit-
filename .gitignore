@@ -16,6 +16,7 @@ documents_dossiers/
 env/
 venv/
 envGestion/
+.env/
 .env
 
 # IDE
