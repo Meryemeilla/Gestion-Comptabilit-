@@ -8,13 +8,15 @@ Fichier: comptables/migrations/0004_create_groups_and_users.py
 
 # ==================== Imports ====================
 from django.db import migrations
+from django.conf import settings
 
 
 # ==================== Fonctions ====================
 def create_user_groups(apps, schema_editor):
     Group = apps.get_model('auth', 'Group')
     Permission = apps.get_model('auth', 'Permission')
-    User = apps.get_model('auth', 'User')
+    app_label, model_name = settings.AUTH_USER_MODEL.split('.')
+    User = apps.get_model(app_label, model_name)
     ContentType = apps.get_model('contenttypes', 'ContentType')
 
     # Modèles par application pour les permissions des Comptables
@@ -73,6 +75,9 @@ def create_user_groups(apps, schema_editor):
             admin_user.groups.add(admin_group)
 
 def remove_user_groups(apps, schema_editor):
+    Group = apps.get_model('auth', 'Group')
+    app_label, model_name = settings.AUTH_USER_MODEL.split('.')
+    User = apps.get_model(app_label, model_name)
     Group.objects.filter(name__in=['Administrateurs', 'Comptables']).delete()
     User.objects.filter(username='admin_cabinet').delete()
 
