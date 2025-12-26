@@ -95,9 +95,38 @@ class Migration(migrations.Migration):
             name='dossier',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='suivis_forfaitaires', to='dossiers.dossier', verbose_name='Dossier'),
         ),
-        migrations.AlterField(
-            model_name='suiviforfaitaire',
-            name='paiement_annuel',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=12, null=True, verbose_name='Montant Paiement Annuel'),
+        migrations.RunSQL(
+            sql="""
+DO $$
+BEGIN
+IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name='fiscal_suiviforfaitaire'
+      AND column_name='paiement_annuel'
+      AND data_type='boolean'
+) THEN
+    ALTER TABLE fiscal_suiviforfaitaire
+    ALTER COLUMN paiement_annuel
+    TYPE numeric(12,2)
+    USING CASE WHEN paiement_annuel THEN 1 ELSE 0 END;
+END IF;
+END $$;
+""",
+            reverse_sql="""
+DO $$
+BEGIN
+IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name='fiscal_suiviforfaitaire'
+      AND column_name='paiement_annuel'
+      AND data_type='numeric'
+) THEN
+    ALTER TABLE fiscal_suiviforfaitaire
+    ALTER COLUMN paiement_annuel
+    TYPE boolean
+    USING paiement_annuel <> 0;
+END IF;
+END $$;
+"""
         ),
     ]
