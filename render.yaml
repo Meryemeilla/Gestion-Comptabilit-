@@ -11,7 +11,5 @@ services:
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: config.settings.prod
-      - key: DATABASE_URL
-        value: postgresql://gestion_comptabilite_db_user:f9If8YSjvcM6eolHzZt9L20Q3kILPvbA@dpg-d57c9ve3jp1c73at4esg-a.oregon-postgres.render.com/gestion_comptabilite_db
       - key: PYTHON_VERSION
         value: 3.11
