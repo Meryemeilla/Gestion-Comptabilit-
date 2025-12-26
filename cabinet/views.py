@@ -54,7 +54,7 @@ class DashboardView(RoleRequiredMixin, LoginRequiredMixin, TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['user_is_comptable'] = self.request.user.groups.filter(name='Comptables').exists()
+        context['user_is_comptable'] = getattr(self.request.user, 'role', None) == 'comptable' or (hasattr(self.request.user, 'is_comptable') and self.request.user.is_comptable())
         
         # Statistiques générales
         context['total_comptables'] = Comptable.objects.filter(actif=True).count()
