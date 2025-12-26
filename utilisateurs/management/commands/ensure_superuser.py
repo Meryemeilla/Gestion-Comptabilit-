@@ -1,3 +1,4 @@
+import sys
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -11,6 +12,7 @@ class Command(BaseCommand):
         parser.add_argument('--email', default='admin@example.com', help='Email pour le compte admin')
 
     def handle(self, *args, **options):
+        print("--- STARTING ENSURE_SUPERUSER ---", file=sys.stderr)
         User = get_user_model()
         username = options['username']
         password = options['password']
@@ -20,9 +22,7 @@ class Command(BaseCommand):
         try:
             self.stdout.write(f"Checking for user: {username}")
 
-            user, created = User.objects.get_or_create(username=username, defaults={
-                'email': email,
-            })
+            user, created = User.objects.get_or_create(username=username, defaults={'email': email})
             user.is_staff = True
             user.is_superuser = True
             user.is_active = True
@@ -32,12 +32,13 @@ class Command(BaseCommand):
                 user.email = email
             user.set_password(password)
             user.save()
+
             if created:
                 self.stdout.write(self.style.SUCCESS(f"Superutilisateur '{username}' créé avec succès."))
             else:
                 self.stdout.write(self.style.SUCCESS(f"Superutilisateur '{username}' mis à jour avec succès."))
-            
-            # Verify
+
+            # Verification
             u = User.objects.get(username=username)
             self.stdout.write(f"--- DEBUG: Verification ---")
             self.stdout.write(f"User: {u.username}")
@@ -52,4 +53,3 @@ class Command(BaseCommand):
         except Exception as e:
             self.stderr.write(f"--- KEY ERROR ---: {e}")
             raise CommandError(f"Échec de création/réinitialisation du superutilisateur: {e}")
-
