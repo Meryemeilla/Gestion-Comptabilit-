@@ -97,13 +97,13 @@ EMAIL_HEADERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('POSTGRES_DB', default='gestionComptableDB'),
+        'NAME': env('POSTGRES_DB', default='gestion_comptable_db'),
         'HOST': env('POSTGRES_HOST', default='localhost'),
         'PORT': env('POSTGRES_PORT', default='5432'),
         'USER': env('POSTGRES_USER', default='admin'),
         'PASSWORD': env('POSTGRES_PASSWORD', default='admin123'),
         'TEST': {
-            'NAME': env('POSTGRES_TEST_DB', default='test_gestionComptableDB'),
+            'NAME': env('POSTGRES_TEST_DB', default='test_gestion_comptable_db'),
             'MIRROR': 'default'
         },
     }
