@@ -527,13 +527,13 @@ class ExportExcel:
         for row_idx, suivi in enumerate(suivis, start=3):
             worksheet.cell(row=row_idx, column=1, value=suivi.code)
             worksheet.cell(row=row_idx, column=2, value=suivi.pp)
-            worksheet.cell(row=row_idx, column=3, value=float(suivi.ir))
-            worksheet.cell(row=row_idx, column=4, value=float(suivi.code_9421))
-            worksheet.cell(row=row_idx, column=5, value=float(suivi.paiement_annuel))  # propriété calculée
-            worksheet.cell(row=row_idx, column=6, value=float(suivi.acompte_1))
-            worksheet.cell(row=row_idx, column=7, value=float(suivi.acompte_2))
-            worksheet.cell(row=row_idx, column=8, value=float(suivi.acompte_3))
-            worksheet.cell(row=row_idx, column=9, value=float(suivi.acompte_4))
+            worksheet.cell(row=row_idx, column=3, value=suivi.ir)
+            worksheet.cell(row=row_idx, column=4, value=suivi.code_9421)
+            worksheet.cell(row=row_idx, column=5, value=float(suivi.paiement_annuel or 0))
+            worksheet.cell(row=row_idx, column=6, value=float(suivi.acompte_1 or 0))
+            worksheet.cell(row=row_idx, column=7, value=float(suivi.acompte_2 or 0))
+            worksheet.cell(row=row_idx, column=8, value=float(suivi.acompte_3 or 0))
+            worksheet.cell(row=row_idx, column=9, value=float(suivi.acompte_4 or 0))
             
 
         self.auto_adjust_columns(worksheet)
