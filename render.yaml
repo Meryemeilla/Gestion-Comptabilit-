@@ -11,3 +11,5 @@ services:
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: config.settings.prod
+      - key: PYTHON_VERSION
+        value: 3.11
