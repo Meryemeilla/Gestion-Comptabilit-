@@ -92,11 +92,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='suiviforfaitaire',
-            name='declaration_annuelle',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=12, null=True, verbose_name='Montant Déclaration Annuelle'),
-        ),
-        migrations.AlterField(
-            model_name='suiviforfaitaire',
             name='dossier',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='suivis_forfaitaires', to='dossiers.dossier', verbose_name='Dossier'),
         ),
