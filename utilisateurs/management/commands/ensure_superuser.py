@@ -48,6 +48,10 @@ class Command(BaseCommand):
             self.stdout.write(f"Is Superuser: {u.is_superuser}")
             self.stdout.write(f"Is Active: {u.is_active}")
             self.stdout.write(f"Has Password: {u.has_usable_password()}")
+            if hasattr(u, 'comptable_profile'):
+                self.stdout.write(f"Comptable Profile: Exists, Approved={u.comptable_profile.is_approved}")
+            else:
+                self.stdout.write("Comptable Profile: None")
             self.stdout.write(f"--- DEBUG: Completed ---")
 
         except Exception as e:

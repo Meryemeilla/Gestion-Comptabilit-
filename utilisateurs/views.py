@@ -37,7 +37,7 @@ def role_based_redirect(request, user):
             'redirect_path': 'N/A'
         }
 
-        if user.is_superuser or user.is_administrateur:
+        if user.is_administrateur():
             debug_info['redirect_path'] = 'cabinet:dashboard'
             print(f"DEBUG REDIRECT: {debug_info}")
             return reverse_lazy('cabinet:dashboard')
