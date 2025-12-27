@@ -41,7 +41,7 @@ def role_based_redirect(request, user):
             debug_info['redirect_path'] = 'cabinet:dashboard'
             print(f"DEBUG REDIRECT: {debug_info}")
             return reverse_lazy('cabinet:dashboard')
-        elif user.is_comptable:
+        elif user.is_comptable():
             try:
                 comptable_profile = user.comptable_profile
                 debug_info['comptable_profile_exists'] = True
@@ -62,7 +62,7 @@ def role_based_redirect(request, user):
                 logout(request)
                 print(f"DEBUG REDIRECT: {debug_info}")
                 return reverse_lazy('login')
-        elif user.is_client:
+        elif user.is_client():
             debug_info['redirect_path'] = 'cabinet:dashboard'
             print(f"DEBUG REDIRECT: {debug_info}")
             return reverse_lazy('cabinet:dashboard')
@@ -73,7 +73,7 @@ def role_based_redirect(request, user):
 
 class CustomLoginView(auth_views.LoginView):
     template_name = 'registration/login.html'
-    redirect_authenticated_user = True
+    redirect_authenticated_user = False
 
     def form_valid(self, form):
         username = form.cleaned_data.get('username')
@@ -91,7 +91,7 @@ class CustomLoginView(auth_views.LoginView):
             return self.form_invalid(form)
 
     def get_success_url(self):
-        return role_based_redirect(self.request.user, self.request)
+        return role_based_redirect(self.request, self.request.user)
 
 class CustomLogoutView(auth_views.LogoutView):
     next_page = reverse_lazy('home')

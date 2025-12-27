@@ -205,7 +205,8 @@
 <div class="dashboard-header">
     <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
-            <img src="{% static 'images/Logo.png' %}" alt="SF Comptabilité" class="me-3" style="height: 60px; width: auto;">
+            <img src="{% static 'images/Logo.png' %}" alt="SF Comptabilité" class="me-3"
+                style="height: 60px; width: auto;">
             <div>
                 <h1 class="h3 mb-1">SF COMPTABILITÉ</h1>
                 <p class="text-muted mb-0">Expertise Comptable & Conseil Fiscal</p>
@@ -397,7 +398,7 @@
     </div>
 </div>
 {% else %}
-         Interface administrateur -->
+         <!--Interface administrateur -->
 
                 <!-- Statistiques principales -->
                 <div class="row mb-4">
@@ -454,13 +455,14 @@
                                         <tbody>
                                             {% for comptable in dossiers_par_comptable %}
                                             <tr>
-                                                <td><a href="{% url 'cabinet:comptable_detail' pk=comptable.pk %}">{{
-                                                        comptable.nom_complet }}</a></td>
+                                                <td>
+                                                    <a href="{% url 'cabinet:comptable_detail' pk=comptable.pk %}">
+                                                        {{ comptable.nom }} {{ comptable.prenom }}
+                                                    </a>
+                                                </td>
                                                 <td class="text-end">
                                                     <span class="badge bg-primary">{{ comptable.nb_dossiers }}</span>
-
                                                 </td>
-
                                             </tr>
                                             {% empty %}
                                             <tr>
@@ -503,10 +505,8 @@
                                     <li
                                         class="list-group-item module-item d-flex justify-content-between align-items-center">
                                         <div>
-                                            <a href="{% url 'juridique:documentjuridique_detail' pk=doc.pk %}">{{
-                                                doc.description }}</a>
-                                            <small class="text-muted d-block">{{ doc.date_document|date:"d M Y"
-                                                }}</small>
+                                            <a href="{% url 'juridique:documentjuridique_detail' pk=doc.pk %}">{{ doc.description }}</a>
+                                            <small class="text-muted d-block">{{ doc.date_document|date:"d M Y" }}</small>
                                         </div>
                                         <span class="badge bg-secondary">{{ doc.type_document }}</span>
                                     </li>
@@ -522,11 +522,8 @@
                                         class="list-group-item module-item d-flex justify-content-between align-items-center">
                                         <div>
                                             <a
-                                                href="{% url 'juridique:documentjuridique_detail' pk=documents_juridiques.pk %}">
-                                                {{ documents_juridiques.description }}
-                                            </a>
-                                            <small class="text-muted d-block">{{
-                                                documents_juridiques.date_document|date:"d M Y" }}</small>
+                                                href="{% url 'juridique:documentjuridique_detail' pk=documents_juridiques.pk %}">{{ documents_juridiques.description }}</a>
+                                            <small class="text-muted d-block">{{ documents_juridiques.date_document|date:"d M Y" }}</small>
                                         </div>
                                         <span class="badge bg-secondary">{{ documents_juridiques.type_document }}</span>
                                     </li>
@@ -560,10 +557,8 @@
                                     <li
                                         class="list-group-item module-item d-flex justify-content-between align-items-center">
                                         <div>
-                                            <a href="{% url 'juridique:evenementjuridique_detail' pk=event.pk %}">{{
-                                                event.description }}</a>
-                                            <small class="text-muted d-block">{{ event.date_evenement|date:"d M Y"
-                                                }}</small>
+                                            <a href="{% url 'juridique:evenementjuridique_detail' pk=event.pk %}">{{ event.description }}</a>
+                                            <small class="text-muted d-block">{{ event.date_evenement|date:"d M Y" }}</small>
                                         </div>
                                         <span class="badge bg-info">{{ event.type_evenement }}</span>
                                     </li>
@@ -694,8 +689,7 @@
                                                 {{ hon.get_statut_reglement_display }}
                                             </span>
                                             {% if hon.date_echeance %}
-                                            <span class="text-muted"><i class="bi bi-calendar-event me-1"></i>{{
-                                                hon.date_echeance|date:"d/m/Y" }}</span>
+                                            <span class="text-muted"><i class="bi bi-calendar-event me-1"></i>{{ hon.date_echeance|date:"d/m/Y" }}</span>
                                             {% endif %}
                                         </div>
                                     </div>
@@ -713,8 +707,7 @@
                                                 {{ reg.get_statut_reglement_display }}
                                             </span>
                                             {% if reg.date_echeance %}
-                                            <span class="text-muted"><i class="bi bi-calendar-event me-1"></i>{{
-                                                reg.date_echeance|date:"d/m/Y" }}</span>
+                                            <span class="text-muted"><i class="bi bi-calendar-event me-1"></i>{{ reg.date_echeance|date:"d/m/Y" }}</span>
                                             {% endif %}
                                         </div>
                                     </div>
