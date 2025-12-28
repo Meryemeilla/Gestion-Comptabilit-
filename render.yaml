@@ -6,11 +6,9 @@ services:
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
       chmod +x start.sh
-      
-    startCommand: ./start.sh
-    autoDeploy: true
+    startCommand: bash start.sh
     envVars:
-      - key: DJANGO_SETTINGS_MODULE
-        value: config.settings.prod
       - key: PYTHON_VERSION
         value: 3.11
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
