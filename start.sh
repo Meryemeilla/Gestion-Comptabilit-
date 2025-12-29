@@ -14,11 +14,11 @@ python manage.py ensure_superuser --username admin --password Admin123! --email 
 
 
 # Lancement des workers Celery en arrière-plan (Solution Gratuite)
-echo "Lancement de Celery Worker avec REDIS_URL=${REDIS_URL}..."
-celery -A config -b "${REDIS_URL:-redis://redis-cache:6379/0}" worker --loglevel=info --concurrency=2 &
+echo "Lancement de Celery Worker..."
+celery -A config -b "$REDIS_URL" worker --loglevel=info --concurrency=2 &
 
 echo "Lancement de Celery Beat..."
-celery -A config -b "${REDIS_URL:-redis://redis-cache:6379/0}" beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler &
+celery -A config -b "$REDIS_URL" beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler &
 
 # Lancer l'application (Processus principal)
 echo "Lancement de gunicorn..."
