@@ -20,3 +20,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 _db_url = env('DATABASE_URL', default=None)
 if _db_url:
     DATABASES['default'] = dj_database_url.config(default=_db_url, conn_max_age=600, ssl_require=True)
+
+# Celery Configuration
+CELERY_BROKER_URL = env('REDIS_URL', default='redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = env('REDIS_URL', default='redis://localhost:6379/0')
