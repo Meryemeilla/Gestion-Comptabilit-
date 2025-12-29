@@ -10,7 +10,7 @@ import os
 from celery import Celery
 
 # Indique à Django les settings
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.prod')
 
 app = Celery('gestion_comptabilite')
 
