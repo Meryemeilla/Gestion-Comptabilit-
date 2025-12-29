@@ -3,6 +3,7 @@ services:
   - type: web
     name: gestion-comptabilite
     env: python
+    plan: free
     buildCommand: |
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
@@ -23,10 +24,11 @@ services:
           name: redis-cache
           property: connectionString
 
-  # Service Celery Worker
+  # Service Celery Worker (Nécessite un plan payant sur Render)
   - type: worker
     name: celery-worker
     env: python
+    plan: starter
     buildCommand: pip install -r requirements.txt
     startCommand: celery -A config worker --loglevel=info
     envVars:
@@ -42,10 +44,11 @@ services:
           name: redis-cache
           property: connectionString
 
-  # Service Celery Beat
+  # Service Celery Beat (Nécessite un plan payant sur Render)
   - type: worker
     name: celery-beat
     env: python
+    plan: starter
     buildCommand: pip install -r requirements.txt
     startCommand: celery -A config beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     envVars:
@@ -63,11 +66,8 @@ services:
 
 databases:
   - name: gestion-comptable-db
-    databaseName: gestion_comptable
-    user: admin
-
-previewsEnabled: true
+    plan: free
 
 redis:
   - name: redis-cache
-    ipAllowList: [] # Seuls les services internes peuvent se connecter
+    plan: free
