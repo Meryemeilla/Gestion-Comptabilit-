@@ -233,15 +233,23 @@ def ajouter_client_par_admin(request):
 
             # Appelle explicitement la tâche Celery ici
             raw_password = form.cleaned_data.get('password1')  # Récupère le mot de passe défini dans le formulaire
+            
+            # URL de connexion dynamique basée sur le domaine actuel
+            login_url = request.build_absolute_uri('/accounts/login/')
 
-            envoyer_email_creation_client.delay(
-                to_email=client.email,
-                password=raw_password,
-                nom_client=client.nom_entreprise,
-                prenom=user.first_name,
-                username=user.username,
-                login_url='https://gestion-comptabilite.onrender.com/accounts/login/'
-            )
+            try:
+                envoyer_email_creation_client.delay(
+                    to_email=client.email,
+                    password=raw_password,
+                    nom_client=client.nom_entreprise,
+                    prenom=user.first_name,
+                    username=user.username,
+                    login_url=login_url
+                )
+            except Exception as e:
+                # Log l'erreur mais ne bloque pas la navigation de l'admin
+                print(f"Erreur Celery lors de l'ajout client: {e}")
+                messages.warning(request, "Le client a été créé, mais l'email de bienvenue n'a pas pu être envoyé (problème de connexion au serveur de tâches).")
 
             messages.success(request, "Client ajouté avec succès.")
             return redirect('cabinet:liste_clients')
