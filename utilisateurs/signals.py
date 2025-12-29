@@ -30,8 +30,10 @@ def creer_utilisateur_pour_client(sender, instance, created, **kwargs):
 
         print("Tâche Celery appelée pour l'email")
         envoyer_email_creation_client.delay(
+            prenom=user.first_name or instance.contact_personne,
+            username=user.username,
             to_email=instance.email,
             password=raw_password,
-            nom_client=instance.nom,
-            login_url='http://127.0.0.1:8000/accounts/login/?next=/'
+            nom_client=instance.nom_entreprise or instance.contact_personne,
+            login_url="https://gestion-comptabilite.onrender.com/accounts/login/"
         )

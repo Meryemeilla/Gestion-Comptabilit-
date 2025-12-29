@@ -13,20 +13,27 @@ from django.conf import settings
 # ==================== Fonctions ====================
 def envoyer_email_creation_client(prenom, username, to_email, password, nom_client, login_url):
 
-    print(f" Envoi de l’email à {to_email}")
-    EmailService().send_template_email(
-        to_emails=[to_email],
-        subject="Votre compte client a été créé",
-        template_name="bienvenue_client",
-        context={
-            'prenom': prenom,
-            'username': username,
-            'email': to_email,
-            'password': password,
-            'nom_client': nom_client,
-            'login_url': login_url,
-        }
-    )
+    print(f"--- CELERY TASK: Tentative d'envoi d'email à {to_email} ---")
+    try:
+        success = EmailService().send_template_email(
+            to_emails=[to_email],
+            subject="Votre compte client a été créé",
+            template_name="bienvenue_client",
+            context={
+                'prenom': prenom,
+                'username': username,
+                'email': to_email,
+                'password': password,
+                'nom_client': nom_client,
+                'login_url': login_url,
+            }
+        )
+        if success:
+            print(f"--- CELERY TASK: Email envoyé avec SUCCÈS à {to_email} ---")
+        else:
+            print(f"--- CELERY TASK: ÉCHEC de l'envoi d'email à {to_email} ---")
+    except Exception as e:
+        print(f"--- CELERY TASK: ERREUR CRITIQUE lors de l'envoi à {to_email} : {str(e)} ---")
 
 @shared_task
 def envoyer_email_nouveau_client(user_id):

@@ -240,7 +240,7 @@ def ajouter_client_par_admin(request):
                 nom_client=client.nom_entreprise,
                 prenom=user.first_name,
                 username=user.username,
-                login_url='http://127.0.0.1:8000/accounts/login/?next=/'
+                login_url='https://gestion-comptabilite.onrender.com/accounts/login/'
             )
 
             messages.success(request, "Client ajouté avec succès.")
