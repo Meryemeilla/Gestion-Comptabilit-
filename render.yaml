@@ -24,51 +24,11 @@ services:
           name: redis-cache
           property: connectionString
 
-  # Service Celery Worker (Nécessite un plan payant sur Render)
-  - type: worker
-    name: celery-worker
-    env: python
-    plan: starter
-    buildCommand: pip install -r requirements.txt
-    startCommand: celery -A config worker --loglevel=info
-    envVars:
-      - key: DJANGO_SETTINGS_MODULE
-        value: config.settings.prod
-      - key: DATABASE_URL
-        fromDatabase:
-          name: gestion-comptable-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: redis-cache
-          property: connectionString
-
-  # Service Celery Beat (Nécessite un plan payant sur Render)
-  - type: worker
-    name: celery-beat
-    env: python
-    plan: starter
-    buildCommand: pip install -r requirements.txt
-    startCommand: celery -A config beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    envVars:
-      - key: DJANGO_SETTINGS_MODULE
-        value: config.settings.prod
-      - key: DATABASE_URL
-        fromDatabase:
-          name: gestion-comptable-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: redis-cache
-          property: connectionString
-
   # Service Redis (Cache & Broker)
   - type: redis
     name: redis-cache
     plan: free
-    ipAllowList: [] # Seuls les services internes de ce blueprint peuvent se connecter
+    ipAllowList: []
 
 databases:
   - name: gestion-comptable-db
