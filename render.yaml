@@ -19,10 +19,7 @@ services:
           name: gestion-comptable-db
           property: connectionString
       - key: REDIS_URL
-        fromService:
-          type: redis
-          name: redis-cache
-          property: connectionString
+        value: redis://redis-cache:6379/0
 
   # Service Redis (Cache & Broker)
   - type: redis
