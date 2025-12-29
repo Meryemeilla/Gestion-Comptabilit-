@@ -64,10 +64,12 @@ services:
           name: redis-cache
           property: connectionString
 
+  # Service Redis (Cache & Broker)
+  - type: redis
+    name: redis-cache
+    plan: free
+    ipAllowList: [] # Seuls les services internes de ce blueprint peuvent se connecter
+
 databases:
   - name: gestion-comptable-db
-    plan: free
-
-redis:
-  - name: redis-cache
     plan: free
