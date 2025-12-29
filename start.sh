@@ -14,6 +14,13 @@ python manage.py ensure_superuser --username admin --password Admin123! --email 
 
 
 # Lancement des workers Celery en arrière-plan (Solution Gratuite)
+echo "Vérification REDIS_URL : ${REDIS_URL}"
+
+# Ajout de /0 si la base de donnée n'est pas précisée
+if [[ -n "$REDIS_URL" && ! "$REDIS_URL" =~ /[0-9]+$ ]]; then
+    export REDIS_URL="${REDIS_URL}/0"
+fi
+
 echo "Lancement de Celery Worker..."
 celery -A config -b "$REDIS_URL" worker --loglevel=info --concurrency=2 &
 

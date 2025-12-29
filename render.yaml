@@ -22,7 +22,7 @@ services:
         fromService:
           type: redis
           name: redis-cache
-          property: internalConnectionString
+          property: connectionString
 
   # Service Redis (Cache & Broker)
   - type: redis
