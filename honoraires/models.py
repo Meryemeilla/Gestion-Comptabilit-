@@ -159,7 +159,7 @@ class HonorairePV(models.Model):
 
     @property
     def total_reglements_pv(self):
-        return self.reglement_pv.aggregate(Sum('montant'))['montant__sum'] or 0
+        return self.reglements_honoraire_pv.aggregate(Sum('montant'))['montant__sum'] or 0
 
     @property
     def reste_pv(self):

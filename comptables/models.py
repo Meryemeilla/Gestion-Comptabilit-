@@ -10,6 +10,7 @@ from django.core.validators import RegexValidator
 from django.conf import settings
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 
 
 # ==================== Classes ====================
@@ -35,11 +36,11 @@ class Comptable(models.Model):
     )
     nom = models.CharField(
         max_length=100, 
-        verbose_name="Nom"
+        verbose_name=_("Nom")
     )
     prenom = models.CharField(
         max_length=100, 
-        verbose_name="Prénom"
+        verbose_name=_("Prénom")
     )
     cnss = models.CharField(
         max_length=20, 

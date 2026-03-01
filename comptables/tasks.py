@@ -8,6 +8,7 @@ Fichier: comptables/tasks.py
 from celery import shared_task
 from django.core.mail import send_mail
 from django.conf import settings
+from django.utils.formats import date_format
 from datetime import date
 from .models import Comptable
 import logging
@@ -22,7 +23,7 @@ def send_monthly_reports_task():
     Cette tâche est programmée pour s'exécuter le premier jour de chaque mois.
     """
     today = date.today()
-    month_name = today.strftime("%B")
+    month_name = date_format(today, 'F')
     year = today.year
     
     # Récupérer tous les comptables actifs

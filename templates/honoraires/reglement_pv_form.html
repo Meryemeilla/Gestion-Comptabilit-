@@ -12,7 +12,7 @@
                 {% csrf_token %}
                 {{ form|crispy }}
                 <button type="submit" class="btn btn-success mt-3">Enregistrer</button>
-                <a href="{% url 'cabinet:honoraire_list' %}" class="btn btn-secondary mt-3">Annuler</a>
+                <a href="{% url 'honoraires:honoraire_list' %}" class="btn btn-secondary mt-3">Annuler</a>
             </form>
         </div>
     </div>

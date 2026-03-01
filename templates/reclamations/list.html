@@ -5,7 +5,7 @@
 
 {% block breadcrumb %}
 <style>
-   .sf-breadcrumb-container {
+    .sf-breadcrumb-container {
         background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
         border-radius: 8px;
         padding: 0.85rem 1.5rem;
@@ -26,7 +26,7 @@
         font-size: 0.95rem;
     }
 
-    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    .sf-breadcrumb .breadcrumb-item+.breadcrumb-item::before {
         content: "›";
         color: var(--sf-blue);
         font-size: 1.2rem;
@@ -58,9 +58,17 @@
     }
 
     /* Classes utilitaires */
-    .text-sf-blue { color: var(--sf-blue); }
-    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
-    .text-sf-gold { color: var(--sf-gold); }
+    .text-sf-blue {
+        color: var(--sf-blue);
+    }
+
+    .hover-text-sf-dark-blue:hover {
+        color: var(--sf-dark-blue);
+    }
+
+    .text-sf-gold {
+        color: var(--sf-gold);
+    }
 </style>
 <nav aria-label="breadcrumb" class="sf-breadcrumb-container">
     <ol class="breadcrumb sf-breadcrumb">
@@ -70,7 +78,7 @@
             </a>
         </li>
         <li class="breadcrumb-item">
-            <a href="{% url 'cabinet:reclamation_list' %}" class="text-sf-blue hover-text-sf-dark-blue">
+            <a href="{% url 'reclamations:reclamation_list' %}" class="text-sf-blue hover-text-sf-dark-blue">
                 <i class="bi bi-exclamation-triangle me-2"></i>Réclamations
             </a>
         </li>
@@ -96,73 +104,73 @@
         --sf-gold: #d4af37;
         --sf-light-bg: #f8f9fc;
     }
-    
+
     .sf-page-header {
         border-bottom: 2px solid var(--sf-gold);
         padding-bottom: 0.5rem;
         margin-bottom: 2rem;
     }
-    
+
     .sf-page-title {
         color: var(--sf-blue);
         font-weight: 600;
     }
-    
+
     .sf-card {
         border: none;
         box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
         border-left: 4px solid var(--sf-blue);
     }
-    
+
     .sf-card-header {
         background-color: var(--sf-blue);
         color: white;
         padding: 1rem 1.5rem;
         border-radius: 0.35rem 0.35rem 0 0 !important;
     }
-    
+
     .sf-form-group {
         margin-bottom: 1.5rem;
     }
-    
+
     .sf-form-label {
         font-weight: 600;
         color: var(--sf-dark-blue);
         margin-bottom: 0.5rem;
     }
-    
+
     .sf-form-control {
         border-radius: 0.35rem;
         border: 1px solid #f2f2f4;
         padding: 0.75rem 1rem;
         transition: border-color 0.3s;
     }
-    
+
     .sf-form-control:focus {
         border-color: var(--sf-blue);
         box-shadow: 0 0 0 0.2rem rgba(54, 96, 146, 0.25);
     }
-    
+
     .sf-btn-primary {
         background-color: var(--sf-blue);
         border-color: var(--sf-dark-blue);
         padding: 0.5rem 1.5rem;
     }
-    
+
     .sf-btn-primary:hover {
         background-color: var(--sf-dark-blue);
     }
-    
+
     .sf-btn-outline {
         color: var(--sf-blue);
         border-color: var(--sf-blue);
         padding: 0.5rem 1.5rem;
     }
-    
+
     .sf-btn-outline:hover {
         background-color: var(--sf-light-bg);
     }
-    
+
     /* Nouveaux styles pour Priorité et Classement */
     .priority-badge {
         display: inline-flex;
@@ -170,51 +178,56 @@
         padding: 0.5rem 1rem;
         border-radius: 0.35rem;
         font-weight: 600;
-        background-color: #e3f2fd; /* Bleu clair */
+        background-color: #e3f2fd;
+        /* Bleu clair */
     }
-    
+
     .priority-badge.urgent {
-        background-color: #ffebee; /* Rouge clair */
+        background-color: #ffebee;
+        /* Rouge clair */
         color: #c62828;
     }
-    
+
     .classification-badge {
         display: inline-flex;
         align-items: center;
         padding: 0.5rem 1rem;
         border-radius: 0.35rem;
         font-weight: 600;
-        background-color: #e8f5e9; /* Vert clair */
+        background-color: #e8f5e9;
+        /* Vert clair */
     }
-    
+
     .classification-badge.clos {
-        background-color: #f3e5f5; /* Violet clair */
+        background-color: #f3e5f5;
+        /* Violet clair */
     }
-    
+
     .classification-badge.reporte {
-        background-color: #fff8e1; /* Jaune clair */
+        background-color: #fff8e1;
+        /* Jaune clair */
     }
-    
+
     .time-note {
         font-size: 0.85rem;
         color: #6c757d;
         margin-top: 0.5rem;
     }
-    
+
     .today-option {
         display: flex;
         align-items: center;
         margin-left: 1rem;
     }
-    
+
     .today-option input[type="checkbox"] {
         margin-right: 0.5rem;
     }
-    
+
     .search-box {
         position: relative;
     }
-    
+
     .search-box i {
         position: absolute;
         left: 1rem;
@@ -222,11 +235,11 @@
         transform: translateY(-50%);
         color: #6c757d;
     }
-    
+
     .search-box input {
         padding-left: 2.5rem;
     }
-    
+
     .table-hover tbody tr:hover {
         background-color: rgba(54, 96, 146, 0.05);
     }
@@ -289,7 +302,7 @@
         margin-right: 0.3rem;
         border-radius: 0.35rem;
     }
-    
+
     .sf-actions-group {
         display: flex;
         justify-content: center;
@@ -346,23 +359,24 @@
         font-size: 0.875rem;
         line-height: 1.5;
     }
+
     .sf-btn-outline {
         color: var(--sf-blue);
         border-color: var(--sf-blue);
         padding: 0.5rem 1.5rem;
     }
-    
+
     .sf-btn-outline:hover {
         background-color: var(--sf-light-bg);
     }
-    
+
     /* Styles pour les boutons de filtrage envoyés/reçus */
     .filter-buttons {
         display: flex;
         gap: 0.5rem;
         margin-left: auto;
     }
-    
+
     .filter-btn {
         padding: 0.5rem 1rem;
         border-radius: 0.35rem;
@@ -370,18 +384,18 @@
         transition: all 0.3s;
         border: 1px solid transparent;
     }
-    
+
     .filter-btn.active {
         background-color: var(--sf-blue);
         color: white;
     }
-    
+
     .filter-btn:not(.active) {
         background-color: white;
         color: var(--sf-blue);
         border-color: var(--sf-blue);
     }
-    
+
     .filter-btn:not(.active):hover {
         background-color: var(--sf-light-bg);
     }
@@ -395,16 +409,16 @@
             Gestion des réclamations
         </h1>
         <div class="d-flex align-items-center">
-        <a href="{% url 'cabinet:reclamation_create' %}" class="btn sf-btn-primary" style="color: white;">
-            <i class="bi bi-plus-circle mr-2"></i> Nouvelle réclamation
-        </a>
-        <a href="{% url 'cabinet:dashboard' %}" class="btn sf-btn-secondary ml-2">
-            <i class="bi bi-x-circle mr-2"></i> Annuler
-        </a>
+            <a href="{% url 'reclamations:reclamation_create' %}" class="btn sf-btn-primary" style="color: white;">
+                <i class="bi bi-plus-circle mr-2"></i> Nouvelle réclamation
+            </a>
+            <a href="{% url 'cabinet:dashboard' %}" class="btn sf-btn-secondary ml-2">
+                <i class="bi bi-x-circle mr-2"></i> Annuler
+            </a>
         </div>
     </div>
 
-   <!-- Filtres et recherche -->
+    <!-- Filtres et recherche -->
     <div class="card sf-card shadow mb-4">
         <div class="sf-card-header">
             <h5 class="m-0 font-weight-bold">
@@ -416,19 +430,20 @@
                 <!-- Champ de recherche -->
                 <div class="col-md-6">
                     <input type="text" class="form-control sf-form-control" name="search"
-                        placeholder="Rechercher par code ou dossier..."
-                        value="{{ search_query }}">
+                        placeholder="Rechercher par code ou dossier..." value="{{ search_query }}">
                 </div>
 
                 <!-- Sélecteur de classement -->
                 <div class="col-md-3">
                     <select name="classement" class="form-select sf-form-control">
                         <option value="">Tous les classements</option>
-                        <option value="EN_COURS" {% if selected_classement == 'EN_COURS' %}selected{% endif %}>En Cours</option>
-                        <option value="RESOLU" {% if selected_classement == 'RESOLU' %}selected{% endif %}>Résolu</option>
-                        <option value="CLOS" {% if selected_classement == 'CLOS' %}selected{% endif %}>Clos</option>
-                        <option value="REPORTE" {% if selected_classement == 'REPORTE' %}selected{% endif %}>Reporté</option>
-                        <option value="ANNULE" {% if selected_classement == 'ANNULE' %}selected{% endif %}>Annulé</option>
+                        <option value="EN_COURS" {% if selected_classement=='EN_COURS' %}selected{% endif %}>En Cours
+                        </option>
+                        <option value="RESOLU" {% if selected_classement=='RESOLU' %}selected{% endif %}>Résolu</option>
+                        <option value="CLOS" {% if selected_classement=='CLOS' %}selected{% endif %}>Clos</option>
+                        <option value="REPORTE" {% if selected_classement=='REPORTE' %}selected{% endif %}>Reporté
+                        </option>
+                        <option value="ANNULE" {% if selected_classement=='ANNULE' %}selected{% endif %}>Annulé</option>
                     </select>
                 </div>
 
@@ -438,13 +453,13 @@
                     <button type="submit" class="btn sf-btn-outline flex-grow-0">
                         <i class="bi bi-search me-2"></i> Rechercher
                     </button>
-                    
+
                     <!-- Bouton Export Excel -->
-                    <a href="{% url 'cabinet:export_excel' 'reclamations' %}?search={{ search_query|urlencode }}&classement={{ selected_classement|urlencode }}" 
-                    class="btn" style="border-color: #28a745; color: #28a745;">
-                            <i class="bi bi-file-earmark-excel mr-2" style="color: #28a745;"></i>Export Excel 
+                    <a href="{% url 'cabinet:export_excel' 'reclamations' %}?search={{ search_query|urlencode }}&classement={{ selected_classement|urlencode }}"
+                        class="btn" style="border-color: #28a745; color: #28a745;">
+                        <i class="bi bi-file-earmark-excel mr-2" style="color: #28a745;"></i>Export Excel
                     </a>
-                   
+
                 </div>
             </form>
         </div>
@@ -457,11 +472,12 @@
             <h5 class="m-0 font-weight-bold">
                 <i class="bi bi-list-ul me-2"></i>Liste des réclamations ({{ reclamations|length }})
             </h5>
-            
+
             <!-- Boutons de filtrage envoyés/reçus -->
             <div class="filter-buttons">
 
-                <a href="?filter=envoyees" class="filter-btn {% if request.GET.filter == 'envoyees' %}active{% endif %}">
+                <a href="?filter=envoyees"
+                    class="filter-btn {% if request.GET.filter == 'envoyees' %}active{% endif %}">
                     <i class="bi bi-send me-1"></i> Envoyées
                 </a>
                 <a href="?filter=recues" class="filter-btn {% if request.GET.filter == 'recues' %}active{% endif %}">
@@ -490,14 +506,14 @@
                     </thead>
                     <tbody>
                         {% for reclamation in reclamations %}
-                        
-                          <tr>
+
+                        <tr>
                             <td>{{ reclamation.code|default:"-" }}</td>
                             <td>
                                 {% if reclamation.dossier %}
-                                    {{ reclamation.dossier.denomination|default:"-" }}
+                                {{ reclamation.dossier.denomination|default:"-" }}
                                 {% else %}
-                                    -
+                                -
                                 {% endif %}
                             </td>
                             <td>{{ reclamation.type_reclamation|default:"-" }}</td>
@@ -508,39 +524,41 @@
                                 </span>
                             </td>
                             <td class="text-center">
-                                <span class="classification-badge {% if reclamation.classement == 'CLOS' %}clos{% elif reclamation.classement == 'REPORTE' %}reporte{% endif %}">
+                                <span
+                                    class="classification-badge {% if reclamation.classement == 'CLOS' %}clos{% elif reclamation.classement == 'REPORTE' %}reporte{% endif %}">
                                     {{ reclamation.get_classement_display|default:"-" }}
                                 </span>
                             </td>
                             <td class="text-center">
                                 {% if reclamation.document %}
-                                    <a href="{{ reclamation.document.url }}" class="btn btn-sm btn-success" target="_blank">
-                                        Télécharger
-                                    </a>
+                                <a href="{{ reclamation.document.url }}" class="btn btn-sm btn-success" target="_blank">
+                                    Télécharger
+                                </a>
                                 {% else %}
-                                    <span class="text-muted">Aucun</span>
+                                <span class="text-muted">Aucun</span>
                                 {% endif %}
                             </td>
                             <td class="text-center">
                                 <div class="sf-actions-group">
-                                    <a href="{% url 'cabinet:reclamation_detail' reclamation.id %}" 
-                                    class="btn sf-btn-info btn-sm text-white" title="Voir détails">
+                                    <a href="{% url 'reclamations:reclamation_detail' reclamation.id %}"
+                                        class="btn sf-btn-info btn-sm text-white" title="Voir détails">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                {% if reclamation.created_by == user and reclamation.created_by.role != 'administrateur' %}
-                                    <a href="{% url 'cabinet:reclamation_update' reclamation.id %}" 
-                                    class="btn sf-btn-warning btn-sm" title="Modifier">
+                                    {% if reclamation.created_by == user and reclamation.created_by.role !=
+                                    'administrateur' %}
+                                    <a href="{% url 'reclamations:reclamation_update' reclamation.id %}"
+                                        class="btn sf-btn-warning btn-sm" title="Modifier">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <button type="button" class="btn sf-btn-danger btn-sm text-white" title="Supprimer"
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal{{ reclamation.id }}">
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal{{ reclamation.id }}">
                                         <i class="bi bi-trash"></i>
                                     </button>
-                                {% endif %}
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
-                        
+
                         {% endfor %}
                     </tbody>
                 </table>
@@ -579,7 +597,8 @@
                 <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
                     Annuler
                 </button>
-                <form action="{% url 'cabinet:reclamation_delete' reclamation.id %}" method="post" class="d-inline">
+                <form action="{% url 'reclamations:reclamation_delete' reclamation.id %}" method="post"
+                    class="d-inline">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger px-4">
                         <i class="fas fa-trash-alt me-2"></i> Supprimer

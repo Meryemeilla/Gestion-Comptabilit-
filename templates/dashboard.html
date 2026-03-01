@@ -217,7 +217,7 @@
                 <i class="bi bi-arrow-clockwise"></i> Actualiser
             </button>
             {% if user.is_administrateur %}
-            <a href="{% url 'cabinet:admin_dossier_stats' %}" class="btn btn-outline-info me-2"
+            <a href="{% url 'dossiers:admin_dossier_stats' %}" class="btn btn-outline-info me-2"
                 title="Statistiques Dossiers Admin">
                 <i class="bi bi-bar-chart-line"></i> Stats Dossiers Admin
             </a>
@@ -241,7 +241,8 @@
     <!-- <div class="row">
             Bouton Réclamation -->
     <div class="col-md-6 mb-4">
-        <a href="{% url 'cabinet:reclamation_create' %}" class="client-btn client-btn-warning text-decoration-none">
+        <a href="{% url 'reclamations:reclamation_create' %}"
+            class="client-btn client-btn-warning text-decoration-none">
             <i class="bi bi-exclamation-triangle"></i>
             <span>Nouvelle réclamation</span>
             <small class="mt-2">Signalez un problème ou une demande urgente</small>
@@ -250,7 +251,7 @@
 
     <!-- Bouton Mes Dossiers -->
     <div class="col-md-6 mb-4">
-        <a href="{% url 'cabinet:dossier_list' %}" class="client-btn client-btn-primary text-decoration-none">
+        <a href="{% url 'dossiers:dossier_list' %}" class="client-btn client-btn-primary text-decoration-none">
             <i class="bi bi-folder2-open"></i>
             <span>Mes dossiers</span>
             <small class="mt-2">Accédez à tous vos documents comptables</small>
@@ -456,7 +457,7 @@
                                             {% for comptable in dossiers_par_comptable %}
                                             <tr>
                                                 <td>
-                                                    <a href="{% url 'cabinet:comptable_detail' pk=comptable.pk %}">
+                                                    <a href="{% url 'comptables:comptable_detail' pk=comptable.pk %}">
                                                         {{ comptable.nom }} {{ comptable.prenom }}
                                                     </a>
                                                 </td>
@@ -474,7 +475,7 @@
                                     </table>
                                 </div>
                                 <div class="text-center mt-3">
-                                    <a href="{% url 'cabinet:comptable_list' %}" class="btn btn-primary">
+                                    <a href="{% url 'comptables:comptable_list' %}" class="btn btn-primary">
                                         <i class="bi bi-people-fill me-2"></i> Voir tous les comptables avec leurs
                                         dossiers
                                     </a>
@@ -505,8 +506,10 @@
                                     <li
                                         class="list-group-item module-item d-flex justify-content-between align-items-center">
                                         <div>
-                                            <a href="{% url 'juridique:documentjuridique_detail' pk=doc.pk %}">{{ doc.description }}</a>
-                                            <small class="text-muted d-block">{{ doc.date_document|date:"d M Y" }}</small>
+                                            <a href="{% url 'juridique:documentjuridique_detail' pk=doc.pk %}">{{
+                                                doc.description }}</a>
+                                            <small class="text-muted d-block">{{ doc.date_document|date:"d M Y"
+                                                }}</small>
                                         </div>
                                         <span class="badge bg-secondary">{{ doc.type_document }}</span>
                                     </li>
@@ -522,8 +525,10 @@
                                         class="list-group-item module-item d-flex justify-content-between align-items-center">
                                         <div>
                                             <a
-                                                href="{% url 'juridique:documentjuridique_detail' pk=documents_juridiques.pk %}">{{ documents_juridiques.description }}</a>
-                                            <small class="text-muted d-block">{{ documents_juridiques.date_document|date:"d M Y" }}</small>
+                                                href="{% url 'juridique:documentjuridique_detail' pk=documents_juridiques.pk %}">{{
+                                                documents_juridiques.description }}</a>
+                                            <small class="text-muted d-block">{{
+                                                documents_juridiques.date_document|date:"d M Y" }}</small>
                                         </div>
                                         <span class="badge bg-secondary">{{ documents_juridiques.type_document }}</span>
                                     </li>
@@ -557,8 +562,10 @@
                                     <li
                                         class="list-group-item module-item d-flex justify-content-between align-items-center">
                                         <div>
-                                            <a href="{% url 'juridique:evenementjuridique_detail' pk=event.pk %}">{{ event.description }}</a>
-                                            <small class="text-muted d-block">{{ event.date_evenement|date:"d M Y" }}</small>
+                                            <a href="{% url 'juridique:evenementjuridique_detail' pk=event.pk %}">{{
+                                                event.description }}</a>
+                                            <small class="text-muted d-block">{{ event.date_evenement|date:"d M Y"
+                                                }}</small>
                                         </div>
                                         <span class="badge bg-info">{{ event.type_evenement }}</span>
                                     </li>
@@ -585,7 +592,7 @@
                                 <div class="row">
                                     {% if user.is_superuser or user_is_comptable %}
                                     <div class="col-md-3 mb-3 text-center">
-                                        <a href="{% url 'cabinet:dossier_list' %}" class="text-decoration-none">
+                                        <a href="{% url 'dossiers:dossier_list' %}" class="text-decoration-none">
                                             <div class="quick-action-icon mb-2"><i class="bi bi-folder-plus"></i></div>
                                             <p class="mb-0">Dossiers</p>
                                         </a>
@@ -596,7 +603,7 @@
 
                                     {% if user.is_superuser %}
                                     <div class="col-md-3 mb-3 text-center">
-                                        <a href="{% url 'cabinet:comptable_list' %}" class="text-decoration-none">
+                                        <a href="{% url 'comptables:comptable_list' %}" class="text-decoration-none">
                                             <div class="quick-action-icon mb-2"><i class="bi bi-person-plus"></i></div>
                                             <p class="mb-0">Comptables</p>
                                         </a>
@@ -633,7 +640,7 @@
                                     <!-- Ligne suivante avec Clients, Créations juridiques et Réclamations -->
                                     {% if user.is_superuser %}
                                     <div class="col-md-3 mb-3 text-center">
-                                        <a href="{% url 'cabinet:liste_clients' %}" class="text-decoration-none">
+                                        <a href="{% url 'utilisateurs:liste_clients' %}" class="text-decoration-none">
                                             <div class="quick-action-icon mb-2"><i class="bi bi-person-plus"></i></div>
                                             <p class="mb-0">Clients</p>
                                         </a>
@@ -650,7 +657,7 @@
                                     </div>
 
                                     <div class="col-md-3 mb-3 text-center">
-                                        <a href="{% url 'cabinet:reclamation_list' %}" class="text-decoration-none"
+                                        <a href="{% url 'reclamations:reclamation_list' %}" class="text-decoration-none"
                                             style="color: orange;">
                                             <div class="quick-action-icon mb-2" style="color: rgb(255, 225, 0);"><i
                                                     class="bi bi-exclamation-triangle"></i></div>
@@ -689,7 +696,8 @@
                                                 {{ hon.get_statut_reglement_display }}
                                             </span>
                                             {% if hon.date_echeance %}
-                                            <span class="text-muted"><i class="bi bi-calendar-event me-1"></i>{{ hon.date_echeance|date:"d/m/Y" }}</span>
+                                            <span class="text-muted"><i class="bi bi-calendar-event me-1"></i>{{
+                                                hon.date_echeance|date:"d/m/Y" }}</span>
                                             {% endif %}
                                         </div>
                                     </div>
@@ -707,7 +715,8 @@
                                                 {{ reg.get_statut_reglement_display }}
                                             </span>
                                             {% if reg.date_echeance %}
-                                            <span class="text-muted"><i class="bi bi-calendar-event me-1"></i>{{ reg.date_echeance|date:"d/m/Y" }}</span>
+                                            <span class="text-muted"><i class="bi bi-calendar-event me-1"></i>{{
+                                                reg.date_echeance|date:"d/m/Y" }}</span>
                                             {% endif %}
                                         </div>
                                     </div>

@@ -10,7 +10,7 @@ python manage.py migrate --settings=config.settings.prod
 
 # Créer ou mettre à jour le superuser
 echo "Vérification du superutilisateur..."
-python manage.py ensure_superuser --username admin --password Admin123! --email admin@example.com --settings=config.settings.prod
+python manage.py ensure_superuser --username administrateur --password adminn123 --email admin@example.com --settings=config.settings.prod
 
 
 # Lancement des workers Celery en arrière-plan (Solution Gratuite)

@@ -10,6 +10,7 @@ from django.core.validators import RegexValidator
 from comptables.models import Comptable
 from utilisateurs.models import Client
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 import re
 from PyPDF2 import PdfReader  # Assure-toi que PyPDF2 est installé
 from cabinet.soft_delete_models import SoftDeleteModel, SoftDeleteManager
@@ -31,12 +32,12 @@ class Dossier(SoftDeleteModel):
     )
     # Choix pour les codes de dossier
     CODE_CHOICES = [
-        ('P', 'P - Personne physique'),
-        ('S', 'S - Société'),
-        ('F', 'F - Forfaitaire'),
-        ('R', 'R - Radié'),
-        ('L', 'L - Livré'),
-        ('D', 'D - Délaissé')
+        ('P', _('P - Personne physique')),
+        ('S', _('S - Société')),
+        ('F', _('F - Forfaitaire')),
+        ('R', _('R - Radié')),
+        ('L', _('L - Livré')),
+        ('D', _('D - Délaissé'))
     ]
     
     # Choix pour les formes juridiques
@@ -67,11 +68,11 @@ class Dossier(SoftDeleteModel):
     code = models.CharField(
         max_length=10,
         choices=CODE_CHOICES,
-        verbose_name="Code du dossier"
+        verbose_name=_("Code du dossier")
     )
     denomination = models.CharField(
         max_length=200,
-        verbose_name="Dénomination de l'entreprise"
+        verbose_name=_("Dénomination de l'entreprise")
     )
     abreviation = models.CharField(
         max_length=50,
@@ -298,32 +299,8 @@ class Dossier(SoftDeleteModel):
         self.save()
 
     def save(self, *args, **kwargs):
-        # Synchroniser automatiquement le statut en fonction du code
-        if self.code == 'D':
-            self.statut = 'DELAISSE'
-            self.actif = False
-            self.is_deleted = True
-        elif self.code == 'L':
-            self.statut = 'LIVRE'
-            self.actif = False
-            self.is_deleted = True
-        elif self.code == 'R':
-            self.statut = 'RADIE'
-            self.actif = False
-            self.is_deleted = True
-        else:
-            self.statut = 'EXISTANT'
-            self.actif = True
-            self.is_deleted = False
-
+        # La synchronisation du statut est maintenant gérée par les signaux (signals.py)
         super().save(*args, **kwargs)
-
-        if self.comptable_traitant:
-            self.comptable_traitant.calculer_statistiques()
-
-        if self.client and not self.client.nom_entreprise:
-            self.client.nom_entreprise = self.denomination
-            self.client.save()
     def statut_css_class(self):
         return {
             'EXISTANT': 'statut-existant',

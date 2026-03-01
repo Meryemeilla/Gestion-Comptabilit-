@@ -6,7 +6,8 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'cabinet:dashboard' %}">Tableau de bord</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'cabinet:juridique_list' %}">Documents Juridiques</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'juridique:juridique_creation_list' %}">Documents Juridiques</a>
+        </li>
         {% if request.resolver_match.url_name == 'juridique_trash_list' %}
         <li class="breadcrumb-item active" aria-current="page">Corbeille</li>
         {% else %}
@@ -19,7 +20,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">Gestion des documents juridiques</h1>
-    <a href="{% url 'cabinet:juridique_create' %}" class="btn btn-primary">
+    <a href="{% url 'juridique:juridique_creation_create' %}" class="btn btn-primary">
         <i class="bi bi-file-earmark-plus"></i> Nouveau document
     </a>
 
@@ -35,25 +36,25 @@
             <div class="col-md-3">
                 <div class="search-box">
                     <i class="bi bi-search"></i>
-                    <input type="text" class="form-control" name="search" 
-                           placeholder="Rechercher..."
-                           value="{{ request.GET.search }}">
+                    <input type="text" class="form-control" name="search" placeholder="Rechercher..."
+                        value="{{ request.GET.search }}">
                 </div>
             </div>
             <div class="col-md-2">
                 <select name="type" class="form-select">
                     <option value="">Type de document</option>
-                    <option value="STATUTS" {% if request.GET.type == 'STATUTS' %}selected{% endif %}>Statuts</option>
-                    <option value="PV" {% if request.GET.type == 'PV' %}selected{% endif %}>PV</option>
-                    <option value="CONTRAT" {% if request.GET.type == 'CONTRAT' %}selected{% endif %}>Contrat</option>
-                    <option value="AUTRE" {% if request.GET.type == 'AUTRE' %}selected{% endif %}>Autre</option>
+                    <option value="STATUTS" {% if request.GET.type=='STATUTS' %}selected{% endif %}>Statuts</option>
+                    <option value="PV" {% if request.GET.type=='PV' %}selected{% endif %}>PV</option>
+                    <option value="CONTRAT" {% if request.GET.type=='CONTRAT' %}selected{% endif %}>Contrat</option>
+                    <option value="AUTRE" {% if request.GET.type=='AUTRE' %}selected{% endif %}>Autre</option>
                 </select>
             </div>
             <div class="col-md-2">
                 <select name="annee" class="form-select">
                     <option value="">Année</option>
                     {% for annee in annees %}
-                    <option value="{{ annee }}" {% if request.GET.annee == annee|stringformat:"i" %}selected{% endif %}>{{ annee }}</option>
+                    <option value="{{ annee }}" {% if request.GET.annee==annee|stringformat:"i" %}selected{% endif %}>{{
+                        annee }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -99,7 +100,7 @@
                     <tr>
                         <td><strong>{{ document.reference }}</strong></td>
                         <td>
-                            <a href="{% url 'cabinet:dossier_detail' document.dossier.id %}">
+                            <a href="{% url 'dossiers:dossier_detail' document.dossier.id %}">
                                 {{ document.dossier.numero }} - {{ document.dossier.nom }}
                             </a>
                         </td>
@@ -119,10 +120,12 @@
                             </span>
                         </td>
                         <td class="text-center">
-                            <a href="{% url 'cabinet:juridique_detail' document.id %}" class="btn btn-sm btn-info">
+                            <a href="{% url 'juridique:juridique_creation_detail' document.id %}"
+                                class="btn btn-sm btn-info">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="{% url 'cabinet:juridique_update' document.id %}" class="btn btn-sm btn-warning">
+                            <a href="{% url 'juridique:juridique_creation_update' document.id %}"
+                                class="btn btn-sm btn-warning">
                                 <i class="bi bi-pencil"></i>
                             </a>
                             {% if document.fichier %}
@@ -130,8 +133,8 @@
                                 <i class="bi bi-download"></i>
                             </a>
                             {% endif %}
-                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" 
-                                    data-bs-target="#deleteModal{{ document.id }}">
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteModal{{ document.id }}">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -163,7 +166,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <form action="{% url 'cabinet:juridique_delete' document.id %}" method="post" class="d-inline">
+                <form action="{% url 'juridique:juridique_creation_delete' document.id %}" method="post"
+                    class="d-inline">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Supprimer</button>
                 </form>
@@ -179,13 +183,13 @@
     </div>
     <div class="card-body">
         {% if taches_effectuees and taches_effectuees|length > 0 %}
-            <ul class="mb-0">
-                {% for tache in taches_effectuees %}
-                    <li>{{ tache }}</li>
-                {% endfor %}
-            </ul>
+        <ul class="mb-0">
+            {% for tache in taches_effectuees %}
+            <li>{{ tache }}</li>
+            {% endfor %}
+        </ul>
         {% else %}
-            <span class="text-muted">Aucune tâche effectuée récemment.</span>
+        <span class="text-muted">Aucune tâche effectuée récemment.</span>
         {% endif %}
     </div>
 </div>

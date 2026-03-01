@@ -4,7 +4,7 @@
 
 {% block breadcrumb %}
 <style>
-   .sf-breadcrumb {
+    .sf-breadcrumb {
         background: linear-gradient(to right, #f8f9fc 0%, #ffffff 100%);
         border-radius: 8px;
         padding: 0.85rem 1.5rem;
@@ -26,7 +26,7 @@
         transition: all 0.2s ease;
     }
 
-    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    .sf-breadcrumb .breadcrumb-item+.breadcrumb-item::before {
         content: "›";
         color: var(--sf-blue);
         font-size: 1.1rem;
@@ -67,22 +67,30 @@
     .sf-breadcrumb .breadcrumb-item.active i {
         color: var(--sf-gold);
     }
-     /* Classes utilitaires */
-    .text-sf-blue { color: var(--sf-blue); }
-    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
-    .text-sf-gold { color: var(--sf-gold); }
+
+    /* Classes utilitaires */
+    .text-sf-blue {
+        color: var(--sf-blue);
+    }
+
+    .hover-text-sf-dark-blue:hover {
+        color: var(--sf-dark-blue);
+    }
+
+    .text-sf-gold {
+        color: var(--sf-gold);
+    }
 </style>
 <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb sf-breadcrumb" style="background-color: transparent; padding: 0.75rem 0; margin: 0;">
         <li class="breadcrumb-item">
-            <a href="{% url 'cabinet:dashboard' %}" 
-               style="text-decoration: none; color: #366092; transition: color 0.2s; display: inline-flex; align-items: center;"
-               onmouseover="this.style.color='#2c5282'" 
-               onmouseout="this.style.color='#366092'">
+            <a href="{% url 'cabinet:dashboard' %}"
+                style="text-decoration: none; color: #366092; transition: color 0.2s; display: inline-flex; align-items: center;"
+                onmouseover="this.style.color='#2c5282'" onmouseout="this.style.color='#366092'">
                 <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
             </a>
         </li>
-        <li class="breadcrumb-item active" aria-current="page" 
+        <li class="breadcrumb-item active" aria-current="page"
             style="color: #d4af37; font-weight: 500; display: inline-flex; align-items: center;">
             <i class="bi bi-people me-2"></i>Clients
         </li>
@@ -98,79 +106,79 @@
         --sf-gold: #d4af37;
         --sf-light-bg: #f8f9fc;
     }
-    
+
     .sf-page-header {
         border-bottom: 2px solid var(--sf-gold);
         padding-bottom: 0.5rem;
         margin-bottom: 2rem;
     }
-    
+
     .sf-page-title {
         color: var(--sf-blue);
         font-weight: 600;
     }
-    
+
     .sf-card {
         border: none;
         box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
         border-left: 4px solid var(--sf-blue);
     }
-    
+
     .sf-card-header {
         background-color: var(--sf-blue);
         color: white;
         padding: 1rem 1.5rem;
         border-radius: 0.35rem 0.35rem 0 0 !important;
     }
-    
+
     .sf-form-group {
         margin-bottom: 1.5rem;
     }
-    
+
     .sf-form-label {
         font-weight: 600;
         color: var(--sf-dark-blue);
         margin-bottom: 0.5rem;
     }
-    
+
     .sf-form-control {
         border-radius: 0.35rem;
         border: 1px solid #d1d3e2;
         padding: 0.75rem 1rem;
         transition: border-color 0.3s;
     }
-    
+
     .sf-form-control:focus {
         border-color: var(--sf-blue);
         box-shadow: 0 0 0 0.2rem rgba(54, 96, 146, 0.25);
     }
-    
+
     .sf-btn-primary {
         background-color: var(--sf-blue);
         border-color: var(--sf-dark-blue);
         padding: 0.5rem 1.5rem;
         color: white;
     }
-    
+
     .sf-btn-primary:hover {
         background-color: var(--sf-dark-blue);
         color: white;
     }
-    
+
     .sf-btn-outline {
         color: var(--sf-blue);
         border-color: var(--sf-blue);
         padding: 0.5rem 1.5rem;
     }
-    
+
     .sf-btn-outline:hover {
         background-color: var(--sf-light-bg);
     }
-    
+
     .search-box {
         position: relative;
     }
-    
+
     .search-box i {
         position: absolute;
         left: 1rem;
@@ -178,15 +186,15 @@
         transform: translateY(-50%);
         color: #6c757d;
     }
-    
+
     .search-box input {
         padding-left: 2.5rem;
     }
-    
+
     .table-hover tbody tr:hover {
         background-color: rgba(54, 96, 146, 0.05);
     }
-    
+
     .btn-square {
         width: 2.5rem;
         height: 2.5rem;
@@ -195,7 +203,7 @@
         justify-content: center;
         padding: 0;
     }
-    
+
     .actions-group .btn {
         margin: 0 2px;
     }
@@ -256,10 +264,11 @@
         font-size: 0.875rem;
         line-height: 1.5;
     }
-      /* Bouton de suppression personnalisé */
-   .modal-content {
-    border-radius: 12px;
-    overflow: hidden;
+
+    /* Bouton de suppression personnalisé */
+    .modal-content {
+        border-radius: 12px;
+        overflow: hidden;
     }
 
     .modal-header {
@@ -289,7 +298,8 @@
             Gestion des clients
         </h1>
         <div class="d-flex align-items-center">
-            <a href="{% url 'cabinet:ajouter_client_par_admin' %}" class="btn sf-btn-primary" style="color: white;">
+            <a href="{% url 'utilisateurs:ajouter_client_par_admin' %}" class="btn sf-btn-primary"
+                style="color: white;">
                 <i class="bi bi-person-plus mr-2"></i> Nouveau client
             </a>
             <a href="{% url 'cabinet:dashboard' %}" class="btn sf-btn-outline ml-2">
@@ -310,9 +320,8 @@
                 <div class="col-md-6">
                     <div class="search-box">
                         <i class="bi bi-search"></i>
-                        <input type="text" class="form-control sf-form-control" name="search" 
-                            placeholder="Rechercher par nom, email ou téléphone..."
-                            value="{{ request.GET.search }}">
+                        <input type="text" class="form-control sf-form-control" name="search"
+                            placeholder="Rechercher par nom, email ou téléphone..." value="{{ request.GET.search }}">
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -322,11 +331,12 @@
                 </div>
                 <div class="col-md-3">
                     <div class="d-flex justify-content-end gap-2">
-                        <a href="{% url 'cabinet:export_excel' 'clients' %}" class="btn" style="border-color: #28a745; color: #28a745;">
+                        <a href="{% url 'cabinet:export_excel' 'clients' %}" class="btn"
+                            style="border-color: #28a745; color: #28a745;">
                             <i class="bi bi-file-earmark-excel mr-2" style="color: #28a745;"></i> Export Excel
                         </a>
                         {% if request.GET.search %}
-                        <a href="{% url 'cabinet:liste_clients' %}" class="btn sf-btn-outline">
+                        <a href="{% url 'utilisateurs:liste_clients' %}" class="btn sf-btn-outline">
                             <i class="bi bi-x mr-2"></i> Effacer
                         </a>
                         {% endif %}
@@ -359,13 +369,13 @@
                     <tbody>
                         {% for client in clients %}
                         <tr>
-                            
+
                             <td>
                                 <strong>
                                     {% if client.user %}
-                                        {{ client.user.first_name }} {{ client.user.last_name }}
+                                    {{ client.user.first_name }} {{ client.user.last_name }}
                                     {% else %}
-                                        {{ client.contact_personne }}
+                                    {{ client.contact_personne }}
                                     {% endif %}
                                 </strong>
                             </td>
@@ -381,30 +391,25 @@
                             </td>
                             <td>
                                 {% if client.user %}
-                                    {{ client.user.username }}
+                                {{ client.user.username }}
                                 {% else %}
-                                    -
+                                -
                                 {% endif %}
                             </td>
                             <td class="text-center">
                                 <div class="sf-actions-group">
-                                    <a href="{% url 'cabinet:detail_client' client.id %}" 
-                                    class="btn sf-btn-info btn-sm text-white"
-                                    title="Voir détails">
-                                    <i class="bi bi-eye"></i>
+                                    <a href="{% url 'utilisateurs:detail_client' client.id %}"
+                                        class="btn sf-btn-info btn-sm text-white" title="Voir détails">
+                                        <i class="bi bi-eye"></i>
                                     </a>
-                                    <a href="{% url 'cabinet:modifier_client_par_admin' client.id %}" 
-                                    class="btn sf-btn-warning btn-sm"
-                                    title="Modifier"
-                                    aria-label="Modifier le client {{ client.username }}">
+                                    <a href="{% url 'utilisateurs:modifier_client_par_admin' client.id %}"
+                                        class="btn sf-btn-warning btn-sm" title="Modifier"
+                                        aria-label="Modifier le client {{ client.username }}">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <button type="button" 
-                                        class="btn btn-danger btn-sm"
-                                        title="Supprimer"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteModal{{ client.pk }}">
-                                    <i class="bi bi-trash"></i>
+                                    <button type="button" class="btn btn-danger btn-sm" title="Supprimer"
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal{{ client.pk }}">
+                                        <i class="bi bi-trash"></i>
                                     </button>
 
                                 </div>
@@ -425,7 +430,8 @@
                     Commencez par ajouter un nouveau client.
                     {% endif %}
                 </p>
-                <a href="{% url 'cabinet:ajouter_client_par_admin' %}" class="btn sf-btn-primary" style="color: white;">
+                <a href="{% url 'utilisateurs:ajouter_client_par_admin' %}" class="btn sf-btn-primary"
+                    style="color: white;">
                     <i class="bi bi-person-plus mr-2"></i> Ajouter un client
                 </a>
             </div>
@@ -439,12 +445,14 @@
         <ul class="pagination justify-content-center">
             {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                <a class="page-link"
+                    href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
                     <i class="bi bi-chevron-double-left"></i>
                 </a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                <a class="page-link"
+                    href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
                     <i class="bi bi-chevron-left"></i>
                 </a>
             </li>
@@ -455,25 +463,28 @@
             <li class="page-item active">
                 <span class="page-link">{{ num }}</span>
             </li>
-            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a>
-            </li>
-            {% endif %}
-            {% endfor %}
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <li class="page-item">
+                <a class="page-link"
+                    href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num
+                    }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
 
-            {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
-                    <i class="bi bi-chevron-right"></i>
-                </a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
-                    <i class="bi bi-chevron-double-right"></i>
-                </a>
-            </li>
-            {% endif %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                        <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+                {% endif %}
         </ul>
     </nav>
     {% endif %}
@@ -493,7 +504,8 @@
             </div>
             <div class="modal-body py-4">
                 <p class="mb-0 text-center text-muted">
-                    Êtes-vous sûr de vouloir supprimer le client <strong>{{ client.user.get_full_name|default:client.contact_personne }}</strong> ?
+                    Êtes-vous sûr de vouloir supprimer le client <strong>{{
+                        client.user.get_full_name|default:client.contact_personne }}</strong> ?
                 </p>
                 <p class="small text-center text-muted mt-2">
                     <i class="fas fa-info-circle me-1"></i>Cette action est irréversible
@@ -503,13 +515,13 @@
                 <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
                     Annuler
                 </button>
-                <form action="{% url 'cabinet:supprimer_client' client.id  %}" method="post" class="d-inline">
+                <form action="{% url 'utilisateurs:supprimer_client' client.id  %}" method="post" class="d-inline">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger px-4">
                         <i class="fas fa-trash-alt me-2"></i>Supprimer
                     </button>
                 </form>
-                
+
             </div>
         </div>
     </div>
@@ -521,19 +533,19 @@
 {% block extra_js %}
 <script>
     // Auto-focus sur le champ de recherche
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const searchInput = document.querySelector('input[name="search"]');
         if (searchInput && !searchInput.value) {
             searchInput.focus();
         }
     });
-     // Auto-focus sur le champ de recherche
-    document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus sur le champ de recherche
+    document.addEventListener('DOMContentLoaded', function () {
         const searchInput = document.querySelector('input[name="search"]');
         if (searchInput && !searchInput.value) {
             searchInput.focus();
         }
-        
+
         // Initialiser les tooltips Bootstrap
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {

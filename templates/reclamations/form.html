@@ -25,7 +25,7 @@
         font-size: 0.95rem;
     }
 
-    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    .sf-breadcrumb .breadcrumb-item+.breadcrumb-item::before {
         content: "›";
         color: var(--sf-blue);
         font-size: 1.2rem;
@@ -57,9 +57,17 @@
     }
 
     /* Classes utilitaires */
-    .text-sf-blue { color: var(--sf-blue); }
-    .hover-text-sf-dark-blue:hover { color: var(--sf-dark-blue); }
-    .text-sf-gold { color: var(--sf-gold); }
+    .text-sf-blue {
+        color: var(--sf-blue);
+    }
+
+    .hover-text-sf-dark-blue:hover {
+        color: var(--sf-dark-blue);
+    }
+
+    .text-sf-gold {
+        color: var(--sf-gold);
+    }
 </style>
 <nav aria-label="breadcrumb" class="sf-breadcrumb-container">
     <ol class="breadcrumb sf-breadcrumb">
@@ -69,7 +77,7 @@
             </a>
         </li>
         <li class="breadcrumb-item">
-            <a href="{% url 'cabinet:reclamation_list' %}" class="text-sf-blue hover-text-sf-dark-blue">
+            <a href="{% url 'reclamations:reclamation_list' %}" class="text-sf-blue hover-text-sf-dark-blue">
                 <i class="bi bi-exclamation-triangle me-2"></i>Réclamations
             </a>
         </li>
@@ -89,47 +97,47 @@
         --sf-gold: #d4af37;
         --sf-light-bg: #f8f9fc;
     }
-    
+
     .sf-page-header {
         border-bottom: 2px solid var(--sf-gold);
         padding-bottom: 0.5rem;
         margin-bottom: 2rem;
     }
-    
+
     .sf-page-title {
         color: var(--sf-blue);
         font-weight: 600;
     }
-    
+
     .sf-card {
         border: none;
         box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
         border-left: 4px solid var(--sf-blue);
     }
-    
+
     .sf-card-header {
         background-color: var(--sf-blue);
         color: white;
         padding: 1rem 1.5rem;
         border-radius: 0.35rem 0.35rem 0 0 !important;
     }
-    
+
     .sf-btn-primary {
         background-color: var(--sf-blue);
         border-color: var(--sf-dark-blue);
         padding: 0.5rem 1.5rem;
     }
-    
+
     .sf-btn-primary:hover {
         background-color: var(--sf-dark-blue);
     }
-    
+
     .sf-btn-outline {
         color: var(--sf-blue);
         border-color: var(--sf-blue);
         padding: 0.5rem 1.5rem;
     }
-    
+
     .sf-btn-outline:hover {
         background-color: var(--sf-light-bg);
     }
@@ -142,7 +150,7 @@
             <i class="bi bi-exclamation-triangle me-2"></i>
             {% if reclamation %}Modifier{% else %}Créer{% endif %} une réclamation
         </h1>
-        <a href="{% url 'cabinet:reclamation_list' %}" class="btn sf-btn-outline">
+        <a href="{% url 'reclamations:reclamation_list' %}" class="btn sf-btn-outline">
             <i class="bi bi-arrow-left me-2"></i> Retour à la liste
         </a>
     </div>
@@ -160,19 +168,19 @@
                 {% csrf_token %}
                 {{ form.non_field_errors }}
                 {% for field in form %}
-                    <div class="mb-3">
-                        {{ field.label_tag }}
-                        {{ field }}
-                        {% if field.help_text %}
-                            <div class="form-text">{{ field.help_text }}</div>
-                        {% endif %}
-                        {% for error in field.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                <div class="mb-3">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% for error in field.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
                 {% endfor %}
                 <div class="mt-4 text-end">
-                    <a href="{% url 'cabinet:reclamation_list' %}" class="btn sf-btn-outline me-2">
+                    <a href="{% url 'reclamations:reclamation_list' %}" class="btn sf-btn-outline me-2">
                         <i class="bi bi-x-circle me-2"></i> Annuler
                     </a>
                     <button type="submit" class="btn sf-btn-primary" style="color: white;">
@@ -186,26 +194,26 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Style des champs de formulaire (conservé inchangé)
-    document.querySelectorAll('input, select, textarea').forEach(function(element) {
-        element.classList.add('form-control');
-    });
+    document.addEventListener('DOMContentLoaded', function () {
+        // Style des champs de formulaire (conservé inchangé)
+        document.querySelectorAll('input, select, textarea').forEach(function (element) {
+            element.classList.add('form-control');
+        });
 
-    // Style des selects (conservé inchangé)
-    document.querySelectorAll('select').forEach(function(element) {
-        element.classList.remove('form-control');
-        element.classList.add('form-select');
-    });
+        // Style des selects (conservé inchangé)
+        document.querySelectorAll('select').forEach(function (element) {
+            element.classList.remove('form-control');
+            element.classList.add('form-select');
+        });
 
-    // Ajustement des textareas (conservé inchangé)
-    const textareas = ['{{ form.reponse.id_for_label }}', '{{ form.suivi.id_for_label }}', '{{ form.remarque.id_for_label }}'];
-    textareas.forEach(id => {
-        const el = document.querySelector('#' + id);
-        if (el) {
-            el.style.height = '100px';
-        }
+        // Ajustement des textareas (conservé inchangé)
+        const textareas = ['{{ form.reponse.id_for_label }}', '{{ form.suivi.id_for_label }}', '{{ form.remarque.id_for_label }}'];
+        textareas.forEach(id => {
+            const el = document.querySelector('#' + id);
+            if (el) {
+                el.style.height = '100px';
+            }
+        });
     });
-});
 </script>
 {% endblock %}

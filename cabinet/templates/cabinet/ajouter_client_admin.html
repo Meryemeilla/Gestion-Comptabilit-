@@ -23,7 +23,7 @@
         transition: all 0.2s ease;
     }
 
-    .sf-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    .sf-breadcrumb .breadcrumb-item+.breadcrumb-item::before {
         content: "›";
         color: var(--sf-blue);
         font-size: 1.1rem;
@@ -71,91 +71,91 @@
         --sf-gold: #d4af37;
         --sf-light-bg: #f8f9fc;
     }
-    
+
     .sf-page-header {
         border-bottom: 2px solid var(--sf-gold);
         padding-bottom: 0.5rem;
         margin-bottom: 2rem;
     }
-    
+
     .sf-page-title {
         color: var(--sf-blue);
         font-weight: 600;
     }
-    
+
     .sf-card {
         border: none;
         box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
         border-left: 4px solid var(--sf-blue);
     }
-    
+
     .sf-card-header {
         background-color: var(--sf-blue);
         color: white;
         padding: 1rem 1.5rem;
         border-radius: 0.35rem 0.35rem 0 0 !important;
     }
-    
+
     .sf-form-group {
         margin-bottom: 1.5rem;
     }
-    
+
     .sf-form-label {
         font-weight: 600;
         color: var(--sf-dark-blue);
         margin-bottom: 0.5rem;
     }
-    
+
     .sf-form-control {
         border-radius: 0.35rem;
         border: 1px solid #d1d3e2;
         padding: 0.75rem 1rem;
         transition: border-color 0.3s;
     }
-    
+
     .sf-form-control:focus {
         border-color: var(--sf-blue);
         box-shadow: 0 0 0 0.2rem rgba(54, 96, 146, 0.25);
     }
-    
+
     .sf-btn-primary {
         background-color: var(--sf-blue);
         border-color: var(--sf-dark-blue);
         padding: 0.5rem 1.5rem;
         color: white;
     }
-    
+
     .sf-btn-primary:hover {
         background-color: var(--sf-dark-blue);
         color: white;
     }
-    
+
     .sf-btn-outline {
         color: var(--sf-blue);
         border-color: var(--sf-blue);
         padding: 0.5rem 1.5rem;
     }
-    
+
     .sf-btn-outline:hover {
         background-color: var(--sf-light-bg);
     }
-    
+
     .section-title {
         color: var(--sf-blue);
         border-bottom: 1px solid var(--sf-gold);
         padding-bottom: 0.5rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .input-group-text {
         background-color: #e9ecef;
         color: #495057;
     }
-    
+
     .text-danger {
         color: #dc3545;
     }
-    
+
     .field-requirements {
         font-size: 0.8rem;
         color: #6c757d;
@@ -165,22 +165,21 @@
 <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb sf-breadcrumb" style="background-color: transparent; padding: 0.75rem 0; margin: 0;">
         <li class="breadcrumb-item">
-            <a href="{% url 'cabinet:dashboard' %}" 
-               class="text-sf-blue hover-text-sf-dark-blue"
-               style="text-decoration: none; display: inline-flex; align-items: center;">
+            <a href="{% url 'cabinet:dashboard' %}" class="text-sf-blue hover-text-sf-dark-blue"
+                style="text-decoration: none; display: inline-flex; align-items: center;">
                 <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
             </a>
         </li>
         <li class="breadcrumb-item">
-            <a href="{% url 'cabinet:liste_clients' %}" 
-               class="text-sf-blue hover-text-sf-dark-blue"
-               style="text-decoration: none; display: inline-flex; align-items: center;">
+            <a href="{% url 'utilisateurs:liste_clients' %}" class="text-sf-blue hover-text-sf-dark-blue"
+                style="text-decoration: none; display: inline-flex; align-items: center;">
                 <i class="bi bi-people me-2"></i>Clients
             </a>
         </li>
-        <li class="breadcrumb-item active text-sf-gold" 
+        <li class="breadcrumb-item active text-sf-gold"
             style="font-weight: 500; display: inline-flex; align-items: center;">
-            <i class="bi bi-pencil-square me-2"></i>{% if modification %}Modifier {{ form.instance.username }}{% elif admin_creation %}Créer un client{% else %}Inscription{% endif %}
+            <i class="bi bi-pencil-square me-2"></i>{% if modification %}Modifier {{ form.instance.username }}{% elif
+            admin_creation %}Créer un client{% else %}Inscription{% endif %}
         </li>
     </ol>
 </nav>
@@ -188,7 +187,8 @@
     <div class="d-flex justify-content-between align-items-center sf-page-header">
         <h1 class="sf-page-title">
             <i class="bi bi-pencil-square mr-2"></i>
-            {% if modification %}Modifier le client{% elif admin_creation %}Créer un client{% else %}Inscription Client{% endif %}
+            {% if modification %}Modifier le client{% elif admin_creation %}Créer un client{% else %}Inscription
+            Client{% endif %}
         </h1>
         <a href="{% url 'cabinet:dashboard' %}" class="btn sf-btn-outline">
             <i class="bi bi-arrow-left mr-2"></i> Retour
@@ -207,13 +207,13 @@
                 <div class="card-body">
                     <form method="post" novalidate>
                         {% csrf_token %}
-                        
+
                         {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                {% for error in form.non_field_errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
                         {% endif %}
 
                         <div class="mb-4">
@@ -221,6 +221,7 @@
                                 <i class="bi bi-person-vcard mr-2"></i>Informations personnelles
                             </h6>
                             <div class="row">
+                                {% if not modification %}
                                 <div class="col-md-6">
                                     <div class="sf-form-group">
                                         <label class="sf-form-label" for="{{ form.username.id_for_label }}">
@@ -237,6 +238,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                {% endif %}
                                 <div class="col-md-6">
                                     <div class="sf-form-group">
                                         <label class="sf-form-label" for="{{ form.first_name.id_for_label }}">
@@ -306,7 +308,8 @@
                                 <div class="col-md-6">
                                     <div class="sf-form-group">
                                         <label class="sf-form-label" for="{{ form.password1.id_for_label }}">
-                                            Mot de passe {% if not modification %}<span class="text-danger">*</span>{% endif %}
+                                            {% if modification %}Nouveau mot de passe{% else %}Mot de passe <span
+                                                class="text-danger">*</span>{% endif %}
                                         </label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="bi bi-lock"></i></span>
@@ -320,9 +323,11 @@
                                         {% if not admin_creation and not modification %}
                                         <div class="field-requirements">
                                             <ul>
-                                                <li>Votre mot de passe ne doit pas être trop similaire à vos autres informations personnelles.</li>
+                                                <li>Votre mot de passe ne doit pas être trop similaire à vos autres
+                                                    informations personnelles.</li>
                                                 <li>Votre mot de passe doit contenir au moins 8 caractères.</li>
-                                                <li>Votre mot de passe ne peut pas être un mot de passe couramment utilisé.</li>
+                                                <li>Votre mot de passe ne peut pas être un mot de passe couramment
+                                                    utilisé.</li>
                                                 <li>Votre mot de passe ne peut pas être entièrement numérique.</li>
                                             </ul>
                                         </div>
@@ -334,11 +339,12 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                               
+
                                 <div class="col-md-6">
                                     <div class="sf-form-group">
                                         <label class="sf-form-label" for="{{ form.password2.id_for_label }}">
-                                            Confirmation {% if not modification %}<span class="text-danger">*</span>{% endif %}
+                                            Confirmation {% if not modification %}<span class="text-danger">*</span>{%
+                                            endif %}
                                         </label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="bi bi-lock"></i></span>
@@ -350,15 +356,16 @@
                                         </div>
                                         {% endif %}
                                         <div class="field-requirements">
-                                            {% if modification %}Confirmez le nouveau mot de passe{% else %}Entrez le même mot de passe que précédemment, pour vérification.{% endif %}
+                                            {% if modification %}Confirmez le nouveau mot de passe{% else %}Entrez le
+                                            même mot de passe que précédemment, pour vérification.{% endif %}
                                         </div>
                                     </div>
                                 </div>
-                                
+
                             </div>
                         </div>
                         {% if modification %}
-                            <input type="hidden" name="modification" value="1">
+                        <input type="hidden" name="modification" value="1">
                         {% endif %}
                         <div class="d-flex justify-content-end mt-4 pt-3 border-top">
                             <a href="{% url 'cabinet:dashboard' %}" class="btn sf-btn-outline mr-3">
@@ -366,7 +373,8 @@
                             </a>
                             <button type="submit" class="btn sf-btn-primary">
                                 <i class="bi bi-check-lg mr-2"></i>
-                                {% if modification %}Mettre à jour{% elif admin_creation %}Créer le compte{% else %}S'inscrire{% endif %}
+                                {% if modification %}Mettre à jour{% elif admin_creation %}Créer le compte{% else
+                                %}S'inscrire{% endif %}
                             </button>
                         </div>
                     </form>
@@ -377,31 +385,34 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Style des champs de formulaire
         document.querySelectorAll('select, input, textarea').forEach(element => {
             if (element.type !== 'checkbox' && element.type !== 'radio') {
                 element.classList.add('sf-form-control', 'form-control');
             }
         });
-        
+
         // Validation des champs requis
         const form = document.querySelector('form');
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function (e) {
             let isValid = true;
             const requiredFields = ['username', 'first_name', 'last_name', 'email'];
-            {% if not modification and not admin_creation %}
+
+            // On n'ajoute les mots de passe que pour une création (pas une modification)
+            const isCreation = !document.getElementsByName('modification').length;
+            if (isCreation) {
                 requiredFields.push('password1', 'password2');
-            {% endif %}
-            
-            requiredFields.forEach(function(fieldName) {
+            }
+
+            requiredFields.forEach(function (fieldName) {
                 const field = document.getElementById(`id_${fieldName}`);
                 if (field && !field.value.trim()) {
                     field.classList.add('is-invalid');
                     isValid = false;
                 }
             });
-            
+
             if (!isValid) {
                 e.preventDefault();
                 alert('Veuillez remplir tous les champs obligatoires.');

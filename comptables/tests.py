@@ -6,15 +6,11 @@ Fichier: comptables/tests.py
 
 # ==================== Imports ====================
 from django.test import TestCase
-from django.test import TestCase
-
-# Create your tests here.
-
-
-from django.test import TestCase
 from django.contrib.auth import get_user_model
 from .models import Comptable
 from dossiers.models import Dossier
+from unittest.mock import patch
+from .tasks import send_monthly_reports_task
 
 User = get_user_model()
 
@@ -82,4 +78,21 @@ class ComptableModelTest(TestCase):
         comptable_to_delete.delete()
         self.assertFalse(User.objects.filter(username='user_for_delete').exists())
 
+class ComptableTaskTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='taskcomptable', password='password')
+        self.comptable = Comptable.objects.create(
+            user=self.user,
+            nom='Task',
+            prenom='Tester',
+            email='task@example.com'
+        )
 
+    @patch('comptables.tasks.send_mail')
+    def test_send_monthly_reports_task(self, mock_send_mail):
+        # Execute task
+        result = send_monthly_reports_task()
+        
+        # Verify email was sent
+        self.assertTrue(mock_send_mail.called)
+        self.assertIn("Rapports mensuels envoyés", result)

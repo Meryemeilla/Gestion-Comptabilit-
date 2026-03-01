@@ -27,14 +27,21 @@ class Evenement(models.Model):
         'NEW_YEAR_ISLAMIC': "سنة hijri مباركة 🌙📅 نسأل الله أن يجعلها سنة خير وبركة عليكم وعلى ذويكم.",
     }
 
-    nom = models.CharField(max_length=50, choices=NOM_EVENEMENT_CHOICES, unique=True)
+    nom = models.CharField(max_length=100)
     date = models.DateField()
     message = models.TextField(default="")
+    description = models.TextField(blank=True, null=True)
+    type_evenement = models.CharField(
+        max_length=20,
+        choices=[('GREGORIEN', 'Grégorien'), ('ISLAMIQUE', 'Islamique'), ('AUTRE', 'Autre')],
+        default='AUTRE'
+    )
     actif = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = "Événement"
         verbose_name_plural = "Événements"
+        unique_together = ('nom', 'date')
 
     def __str__(self):
         return self.get_nom_display()

@@ -15,7 +15,7 @@ User = get_user_model()
 # ==================== Classes ====================
 class DocumentModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='password')
+        self.user = User.objects.create_user(username='cabinet_doc_user', password='password')
         self.comptable = Comptable.objects.create(user=self.user, nom='Doe', prenom='John', email='john.doe@example.com')
         self.dossier = Dossier.objects.create(
             code='T',
@@ -35,7 +35,7 @@ class DocumentModelTest(TestCase):
 
 class NotificationModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='password')
+        self.user = User.objects.create_user(username='cabinet_notif_user', password='password')
 
     def test_notification_creation(self):
         notification = Notification.objects.create(

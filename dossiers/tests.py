@@ -6,22 +6,19 @@ Fichier: dossiers/tests.py
 
 # ==================== Imports ====================
 from django.test import TestCase
-
-# Create your tests here.
-
-
-from django.test import TestCase
 from .models import Dossier
 from comptables.models import Comptable
 from utilisateurs.models import Client
 from django.contrib.auth import get_user_model
+import uuid
 
 User = get_user_model()
 
 # ==================== Classes ====================
 class DossierModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='password')
+        unique_id = uuid.uuid4().hex[:8]
+        self.user = User.objects.create_user(username=f'testuser_{unique_id}', password='password')
         self.comptable = Comptable.objects.create(user=self.user, nom='Doe', prenom='John', email='john.doe@example.com')
         self.client = Client.objects.create(user=self.user, nom_entreprise='Client Test', email='client@example.com', contact_personne='Test Contact', telephone='1234567890')
 

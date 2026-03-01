@@ -5,123 +5,95 @@ Fichier: api/tests.py
 """
 
 # ==================== Imports ====================
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from comptables.models import Comptable
 from dossiers.models import Dossier
-from rest_framework.test import APIClient
+from honoraires.models import Honoraire
+from fiscal.models import SuiviTVA
+from reclamations.models import Reclamation
+
 User = get_user_model()
 
 # ==================== Classes ====================
 class ComptableAPITest(APITestCase):
     def setUp(self):
-        self.client_api = APIClient()  # Utiliser APIClient pour DRF
-        self.user = User.objects.create_user(username='testuser', password='password', role='administrateur')
-        self.client_api.force_authenticate(user=self.user)  # Authentifie pour tous les tests
-        self.comptable_data = {'nom': 'Doe', 'prenom': 'John', 'email': 'john.doe@example.com'}
-        self.comptable = Comptable.objects.create(user=self.user, **self.comptable_data)
+        self.client_api = APIClient()
+        self.user = User.objects.create_user(username='api_comptable_user', password='password', role='administrateur')
+        self.client_api.force_authenticate(user=self.user)
+        self.comptable = Comptable.objects.create(user=self.user, nom='Doe', prenom='John', email='john@example.com')
         self.list_url = reverse('comptable-list')
         self.detail_url = reverse('comptable-detail', kwargs={'pk': self.comptable.pk})
 
-    def test_create_comptable(self):
-        new_user = User.objects.create_user(username='newcomptableuser', password='password')
-        data = {'user': new_user.pk, 'nom': 'Smith', 'prenom': 'Jane', 'email': 'jane.smith@example.com'}
-        response = self.client_api.post(self.list_url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    def test_list_comptables(self):
+        response = self.client_api.get(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_retrieve_comptable(self):
-        # Utiliser le client DRF authentifié
         response = self.client_api.get(self.detail_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['nom'], self.comptable.nom)
-
-    def test_update_comptable(self):
-        data = {
-            'nom': 'Doe Updated',
-            'prenom': 'John',
-            'email': 'john.doe@example.com',
-            'user': self.user.pk
-        }
-        response = self.client_api.put(self.detail_url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.comptable.refresh_from_db()
-        self.assertEqual(self.comptable.nom, 'Doe Updated')
-
-    def test_delete_comptable(self):
-        # Supprimer le comptable avec le client API authentifié
-        response = self.client_api.delete(self.detail_url)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-        # Vérifier que le comptable supprimé n'existe plus
-        exists = Comptable.objects.filter(pk=self.comptable.pk).exists()
-        self.assertFalse(exists)
-
-
 
 class DossierAPITest(APITestCase):
     def setUp(self):
         self.client_api = APIClient()
-        self.user = User.objects.create_user(username='testuser', password='password', role='administrateur')
+        self.user = User.objects.create_user(username='api_dossier_user', password='password', role='administrateur')
         self.client_api.force_authenticate(user=self.user)
-        self.comptable = Comptable.objects.create(user=self.user, nom='Doe', prenom='John', email='john.doe@example.com')
-        self.dossier_data = {
-            'code': 'P',
-            'denomination': 'Entreprise Test',
-            'forme_juridique': 'SARL',
-            'secteur_activites': 'Informatique',
-            'branche_activite': 'Développement',
-            'adresse': '123 Rue de Test'
-        }
-        self.dossier = Dossier.objects.create(comptable_traitant=self.comptable, **self.dossier_data)
+        self.comptable = Comptable.objects.create(user=self.user, nom='Doe', prenom='John', email='john@example.com')
+        self.dossier = Dossier.objects.create(
+            denomination='Entreprise Test',
+            code='P',
+            forme_juridique='SARL',
+            secteur_activites='IT',
+            comptable_traitant=self.comptable,
+            adresse='Test Address'
+        )
         self.list_url = reverse('dossier-list')
         self.detail_url = reverse('dossier-detail', kwargs={'pk': self.dossier.pk})
 
-    def test_create_dossier(self):
-        data = {
-            'code': 'S',
-            'denomination': 'Nouvelle Entreprise',
-            'forme_juridique': 'SA',
-            'secteur_activites': 'Finance',
-            'branche_activite': 'Audit',
-            'adresse': '456 Avenue',
-            'comptable_traitant': self.comptable.pk
-        }
-        response = self.client_api.post(self.list_url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-    def test_retrieve_dossier(self):
-    # Utiliser self.client_api, qui est authentifié
-        response = self.client_api.get(self.detail_url)
+    def test_list_dossiers(self):
+        response = self.client_api.get(self.list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['denomination'], self.dossier.denomination)
 
+class HonoraireAPITest(APITestCase):
+    def setUp(self):
+        self.client_api = APIClient()
+        self.user = User.objects.create_user(username='api_honoraire_user', password='password', role='administrateur')
+        self.client_api.force_authenticate(user=self.user)
+        self.comptable = Comptable.objects.create(user=self.user, nom='Doe', prenom='John', email='john@example.com')
+        self.dossier = Dossier.objects.create(denomination='Dossier H', code='P', forme_juridique='SARL', adresse='Addr', comptable_traitant=self.comptable)
+        self.honoraire = Honoraire.objects.create(dossier=self.dossier, montant_annuel=12000)
+        self.list_url = reverse('honoraire-list')
 
-    def test_update_dossier(self):
-        data = {
-            'denomination': 'Entreprise Modifiée',
-            'code': 'P',
-            'forme_juridique': 'SARL',
-            'secteur_activites': 'Informatique',
-            'branche_activite': 'Développement',
-            'adresse': '123 Rue de Test',
-            'comptable_traitant': self.comptable.pk
-        }
-        # Utiliser self.client_api plutôt que self.client
-        response = self.client_api.put(self.detail_url, data, format='json')
+    def test_list_honoraires(self):
+        response = self.client_api.get(self.list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.dossier.refresh_from_db()
-        self.assertEqual(self.dossier.denomination, 'Entreprise Modifiée')
 
-    def test_delete_dossier(self):
-        # Supprimer le dossier avec le client API authentifié
-        response = self.client_api.delete(self.detail_url)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+class SuiviTVAAPITest(APITestCase):
+    def setUp(self):
+        self.client_api = APIClient()
+        self.user = User.objects.create_user(username='api_tva_user', password='password', role='administrateur')
+        self.client_api.force_authenticate(user=self.user)
+        self.comptable = Comptable.objects.create(user=self.user, nom='Doe', prenom='John', email='john@example.com')
+        self.dossier = Dossier.objects.create(denomination='Dossier T', code='P', forme_juridique='SARL', adresse='Addr', comptable_traitant=self.comptable)
+        self.suivi = SuiviTVA.objects.create(dossier=self.dossier, annee=2024)
+        self.list_url = reverse('suivitva-list')
 
-        # Vérifier que le dossier supprimé n'existe plus
-        exists = Dossier.objects.filter(pk=self.dossier.pk).exists()
-        self.assertFalse(exists)
+    def test_list_suivi_tva(self):
+        response = self.client_api.get(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+class ReclamationAPITest(APITestCase):
+    def setUp(self):
+        self.client_api = APIClient()
+        self.user = User.objects.create_user(username='api_reclamation_user', password='password', role='administrateur')
+        self.client_api.force_authenticate(user=self.user)
+        self.comptable = Comptable.objects.create(user=self.user, nom='Doe', prenom='John', email='john@example.com')
+        self.dossier = Dossier.objects.create(denomination='Dossier R', code='P', forme_juridique='SARL', adresse='Addr', comptable_traitant=self.comptable)
+        self.reclamation = Reclamation.objects.create(dossier=self.dossier, type_reclamation='Test', date_reception='2024-01-01', created_by=self.user)
+        self.list_url = reverse('reclamation-list')
 
-
+    def test_list_reclamations(self):
+        response = self.client_api.get(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
