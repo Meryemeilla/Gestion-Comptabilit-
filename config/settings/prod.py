@@ -26,7 +26,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Database
 _db_url = env('DATABASE_URL', default=None)
 if _db_url:
-    DATABASES['default'] = dj_database_url.config(default=_db_url, conn_max_age=600, ssl_require=True)
+    DATABASES['default'] = dj_database_url.config(default=_db_url, conn_max_age=0)
 
 # Celery Configuration
 import os
