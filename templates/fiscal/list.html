@@ -53,13 +53,13 @@
             <div class="col-md-2">
                 <select name="type" class="form-select">
                     <option value="">Type de document</option>
-                    <option value="ACOMPTES" {% if request.GET.type=='ACOMPTES' %}selected{% endif %}>Acomptes</option>
-                    <option value="CMIR" {% if request.GET.type=='CMIR' %}selected{% endif %}>CM et IR</option>
-                    <option value="DEPOTBILAN" {% if request.GET.type=='DEPOTBILAN' %}selected{% endif %}>Dépôt Bilan
+                    <option value="ACOMPTES" {% if request.GET.type == 'ACOMPTES' %}selected{% endif %}>Acomptes</option>
+                    <option value="CMIR" {% if request.GET.type == 'CMIR' %}selected{% endif %}>CM et IR</option>
+                    <option value="DEPOTBILAN" {% if request.GET.type == 'DEPOTBILAN' %}selected{% endif %}>Dépôt Bilan
                     </option>
-                    <option value="SUIVIFORFAITAIRE" {% if request.GET.type=='SUIVIFORFAITAIRE' %}selected{% endif %}>
+                    <option value="SUIVIFORFAITAIRE" {% if request.GET.type == 'SUIVIFORFAITAIRE' %}selected{% endif %}>
                         Suivi Forfaitaire</option>
-                    <option value="TVA" {% if request.GET.type=='TVA' %}selected{% endif %}>TVA</option>
+                    <option value="TVA" {% if request.GET.type == 'TVA' %}selected{% endif %}>TVA</option>
                 </select>
             </div>
             <div class="col-md-2">

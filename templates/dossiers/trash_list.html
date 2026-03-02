@@ -381,8 +381,8 @@
                 <div class="col-md-3">
                     <select name="type" class="form-select sf-form-control" autocomplete="off">
                         <option value="">Tous les types</option>
-                        <option value="PM" {% if request.GET.type=='PM' %}selected{% endif %}>Personne Morale</option>
-                        <option value="PP" {% if request.GET.type=='PP' %}selected{% endif %}>Personne Physique</option>
+                        <option value="PM" {% if request.GET.type == 'PM' %}selected{% endif %}>Personne Morale</option>
+                        <option value="PP" {% if request.GET.type == 'PP' %}selected{% endif %}>Personne Physique</option>
                     </select>
                 </div>
                 <div class="col-md-2">

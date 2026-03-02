@@ -414,8 +414,7 @@
                         <td><strong>{{ comptable.matricule }}</strong></td>
                         <td>
                             <strong>{{ comptable.nom_complet }}</strong>
-                            {% if comptable.cnss %}<br><small class="text-muted">CNSS: {{ comptable.cnss }}</small>{%
-                            endif %}
+                            {% if comptable.cnss %}<br><small class="text-muted">CNSS: {{ comptable.cnss }}</small>{% endif %}
                         </td>
                         <td>
                             {% if comptable.tel %}

@@ -43,10 +43,10 @@
             <div class="col-md-2">
                 <select name="type" class="form-select">
                     <option value="">Type de document</option>
-                    <option value="STATUTS" {% if request.GET.type=='STATUTS' %}selected{% endif %}>Statuts</option>
-                    <option value="PV" {% if request.GET.type=='PV' %}selected{% endif %}>PV</option>
-                    <option value="CONTRAT" {% if request.GET.type=='CONTRAT' %}selected{% endif %}>Contrat</option>
-                    <option value="AUTRE" {% if request.GET.type=='AUTRE' %}selected{% endif %}>Autre</option>
+                    <option value="STATUTS" {% if request.GET.type == 'STATUTS' %}selected{% endif %}>Statuts</option>
+                    <option value="PV" {% if request.GET.type == 'PV' %}selected{% endif %}>PV</option>
+                    <option value="CONTRAT" {% if request.GET.type == 'CONTRAT' %}selected{% endif %}>Contrat</option>
+                    <option value="AUTRE" {% if request.GET.type == 'AUTRE' %}selected{% endif %}>Autre</option>
                 </select>
             </div>
             <div class="col-md-2">
