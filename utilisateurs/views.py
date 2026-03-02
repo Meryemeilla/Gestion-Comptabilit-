@@ -151,7 +151,7 @@ def ajouter_client_par_admin(request):
                 messages.warning(request, f"Le client a été créé, mais l'email n'a pas pu être envoyé : {e}")
 
             messages.success(request, "Client ajouté avec succès.")
-            return redirect('utilisateurs:liste_clients')
+            return redirect('liste_clients')
     else:
         form = ClientCreationForm()
 
@@ -177,8 +177,8 @@ def supprimer_client(request, client_id):
             messages.success(request, "Le client a été supprimé avec succès.")
         except ProtectedError:
             messages.error(request, "Impossible de supprimer ce client car il est lié à d'autres données.")
-        return redirect('utilisateurs:liste_clients')
-    return redirect('utilisateurs:liste_clients')
+        return redirect('liste_clients')
+    return redirect('liste_clients')
 
 @login_required
 @user_passes_test(est_admin)
@@ -216,7 +216,7 @@ def modifier_client_par_admin(request, client_id):
         if form.is_valid():
             form.save()
             messages.success(request, "Client modifié avec succès.")
-            return redirect('utilisateurs:liste_clients')
+            return redirect('liste_clients')
     else:
         # Initialize form with data from BOTH models
         initial_data = {
