@@ -47,7 +47,7 @@ def envoyer_email_nouveau_client(user_id):
     from django.contrib.sites.models import Site
 
     current_site = Site.objects.get_current()
-    liste_clients_url = f"https://{current_site.domain}{reverse('cabinet:liste_clients')}"
+    liste_clients_url = f"https://{current_site.domain}{reverse('utilisateurs:liste_clients')}"
 
     EmailService().send_template_email(
         to_emails=[settings.ADMIN_EMAIL],
