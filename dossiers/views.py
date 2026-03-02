@@ -46,7 +46,7 @@ from .forms import DossierForm, BaseDossierForm, ClientDossierForm, ComptableDos
 #         form = DossierForm(request.POST)
 #         if form.is_valid():
 #             form.save()
-#             return redirect('cabinet:dossier_list')
+#             return redirect('dossiers:dossier_list')
 #     else:
 #         form = DossierForm()
 #     return render(request, 'dossiers/form.html', {'form': form})
