@@ -298,8 +298,7 @@
             Gestion des clients
         </h1>
         <div class="d-flex align-items-center">
-            <a href="{% url 'utilisateurs:ajouter_client_par_admin' %}" class="btn sf-btn-primary"
-                style="color: white;">
+            <a href="{% url 'ajouter_client_par_admin' %}" class="btn sf-btn-primary" style="color: white;">
                 <i class="bi bi-person-plus mr-2"></i> Nouveau client
             </a>
             <a href="{% url 'cabinet:dashboard' %}" class="btn sf-btn-outline ml-2">
@@ -398,11 +397,11 @@
                             </td>
                             <td class="text-center">
                                 <div class="sf-actions-group">
-                                    <a href="{% url 'utilisateurs:detail_client' client.id %}"
+                                    <a href="{% url 'detail_client' client.id %}"
                                         class="btn sf-btn-info btn-sm text-white" title="Voir détails">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <a href="{% url 'utilisateurs:modifier_client_par_admin' client.id %}"
+                                    <a href="{% url 'modifier_client_admin' client.id %}"
                                         class="btn sf-btn-warning btn-sm" title="Modifier"
                                         aria-label="Modifier le client {{ client.username }}">
                                         <i class="bi bi-pencil"></i>
@@ -430,8 +429,7 @@
                     Commencez par ajouter un nouveau client.
                     {% endif %}
                 </p>
-                <a href="{% url 'utilisateurs:ajouter_client_par_admin' %}" class="btn sf-btn-primary"
-                    style="color: white;">
+                <a href="{% url 'ajouter_client_par_admin' %}" class="btn sf-btn-primary" style="color: white;">
                     <i class="bi bi-person-plus mr-2"></i> Ajouter un client
                 </a>
             </div>
@@ -515,7 +513,7 @@
                 <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
                     Annuler
                 </button>
-                <form action="{% url 'utilisateurs:supprimer_client' client.id  %}" method="post" class="d-inline">
+                <form action="{% url 'supprimer_client' client.id  %}" method="post" class="d-inline">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger px-4">
                         <i class="fas fa-trash-alt me-2"></i>Supprimer
