@@ -437,13 +437,13 @@
                 <div class="col-md-3">
                     <select name="classement" class="form-select sf-form-control">
                         <option value="">Tous les classements</option>
-                        <option value="EN_COURS" {% if selected_classement=='EN_COURS' %}selected{% endif %}>En Cours
+                        <option value="EN_COURS" {% if selected_classement == 'EN_COURS' %}selected{% endif %}>En Cours
                         </option>
-                        <option value="RESOLU" {% if selected_classement=='RESOLU' %}selected{% endif %}>Résolu</option>
-                        <option value="CLOS" {% if selected_classement=='CLOS' %}selected{% endif %}>Clos</option>
-                        <option value="REPORTE" {% if selected_classement=='REPORTE' %}selected{% endif %}>Reporté
+                        <option value="RESOLU" {% if selected_classement == 'RESOLU' %}selected{% endif %}>Résolu</option>
+                        <option value="CLOS" {% if selected_classement == 'CLOS' %}selected{% endif %}>Clos</option>
+                        <option value="REPORTE" {% if selected_classement == 'REPORTE' %}selected{% endif %}>Reporté
                         </option>
-                        <option value="ANNULE" {% if selected_classement=='ANNULE' %}selected{% endif %}>Annulé</option>
+                        <option value="ANNULE" {% if selected_classement == 'ANNULE' %}selected{% endif %}>Annulé</option>
                     </select>
                 </div>
 
@@ -544,8 +544,7 @@
                                         class="btn sf-btn-info btn-sm text-white" title="Voir détails">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    {% if reclamation.created_by == user and reclamation.created_by.role !=
-                                    'administrateur' %}
+                                    {% if reclamation.created_by == user and reclamation.created_by.role != 'administrateur' %}
                                     <a href="{% url 'reclamations:reclamation_update' reclamation.id %}"
                                         class="btn sf-btn-warning btn-sm" title="Modifier">
                                         <i class="bi bi-pencil"></i>
